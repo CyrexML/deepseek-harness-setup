@@ -14,6 +14,17 @@
  * The model cannot reason about a number it was never given. This plugin gives
  * it the number at the only moment it matters: the launch.
  *
+ * WHAT IT ASKS FOR INSTEAD
+ *
+ * "You cannot run this" is only half an answer. The half that matters is the
+ * work that does NOT need the card — the script itself, the data pipeline, the
+ * config, a CPU smoke run on a tiny subset — plus a written hand-off the user
+ * can execute alone later: exact commands to free the card, to install the
+ * right CUDA wheel, to start the run and to put the stand back. So the note
+ * prescribes that sequence and names the file to leave behind, and it carries
+ * the environment facts (python, torch, driver, VRAM) measured here, so the
+ * model does not spend turns rediscovering them.
+ *
  * WHY IT DENIES INSTEAD OF WARNING
  *
  * The sibling advisories (`file-size-notice`, `read-budget-notice`) never veto,
@@ -83,9 +94,37 @@ function readVram(cache, ttlMs) {
   return value
 }
 
+/**
+ * One-line facts about the machine that a training hand-off needs: interpreter,
+ * whether torch is already there, driver and its CUDA. Each probe is optional —
+ * anything that fails is simply left out, never guessed.
+ */
+function environment(cache) {
+  if (cache.env !== undefined) return cache.env
+  const run = (file, args, timeout = 6000) => {
+    try {
+      return execFileSync(file, args, { encoding: 'utf8', timeout, stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    } catch {
+      return undefined
+    }
+  }
+  const python = run('python3', ['-V'])
+  const torch = python === undefined
+    ? undefined
+    : run('python3', ['-c', 'import torch;print(torch.__version__, torch.version.cuda or "cpu-only")'], 20000)
+  const driver = run('nvidia-smi', ['--query-gpu=driver_version', '--format=csv,noheader'])
+  const cuda = (run('nvidia-smi', []) ?? '').match(/CUDA Version:\s*([0-9.]+)/)?.[1]
+  cache.env = { python, torch, driver, cuda }
+  return cache.env
+}
+
 export function apply(ctx, config = {}) {
   const minFreeMb = positiveInteger(config.minFreeMb, 'minFreeMb', 2048)
   const ttlMs = positiveInteger(config.cacheMs, 'cacheMs', 15000)
+  // Файл, который остаётся пользователю: по нему запуск повторяется без агента.
+  const handoffFile = typeof config.handoffFile === 'string' && config.handoffFile.length > 0
+    ? config.handoffFile
+    : 'RUN-TRAINING.md'
   const cache = {}
   const told = new Set()
 
@@ -107,23 +146,31 @@ export function apply(ctx, config = {}) {
     told.add(agent)
 
     const usedMb = vram.total - vram.free
+    const env = environment(cache)
+    const facts = [
+      env.python === undefined ? undefined : `interpreter: ${env.python}`,
+      env.torch === undefined ? 'torch: not installed in the default interpreter' : `torch: ${env.torch}`,
+      env.driver === undefined ? undefined : `driver: ${env.driver}${env.cuda === undefined ? '' : `, supports CUDA up to ${env.cuda}`}`,
+    ].filter(Boolean).join('; ')
+
     return [
       `Not started: this machine has ${vram.free} MiB of VRAM free out of ${vram.total} MiB.`,
       `The local model server holds the other ${usedMb} MiB for as long as the stand runs, so a CUDA run here ends in "CUDA out of memory" and nothing else.`,
+      'On top of that your shell has no GPU device: the sandbox gives it a bare /dev, which is why nvidia-smi answers "GPU access blocked by the operating system" there. The card is reachable only from the user\'s own terminal.',
+      facts.length === 0 ? undefined : `Measured on this machine — ${facts}.`,
       '',
-      'Do NOT retry the command and do NOT work around it silently. Tell the user what has to happen first, and give the exact steps:',
+      'Do NOT retry this command and do NOT quietly switch the code to the CPU. Do the part that does not need the card, then hand the run over to the user:',
       '',
-      `1. Keep VRAM free for their own work and shrink the model's context window to match:`,
-      '   powershell -ExecutionPolicy Bypass -File windows\\30-tune.ps1 -ReserveMb 6000',
-      '   (6000 = MiB left for training; a smaller model, e.g. Qwen3.5 9B, leaves more room.)',
-      '2. Or free the card completely for the duration of the run — stop the model server',
-      '   (run\\stop-server.ps1). The agent has no model while it is stopped, so this suits',
-      '   a run that is started and then watched, not an interactive session.',
-      '3. Or run on the CPU for a small experiment: CUDA_VISIBLE_DEVICES= python train.py',
-      '   (correct but slow — reasonable to check that the code runs at all).',
-      '',
-      'Meanwhile the work that does not need the GPU is worth doing now: write the training script, the data pipeline and the config, and say plainly that the run itself is waiting on video memory.',
-    ].join('\n')
+      '1. Finish the code. The script, the data pipeline and the config should be ready to start — this is the work the missing VRAM does not block.',
+      `2. Prove it runs, on the CPU, on a deliberately tiny subset (a few dozen samples, one short epoch): \`CUDA_VISIBLE_DEVICES= python3 <script> …\`. Commands that ask for the CPU are never blocked here. A CPU pass that completes means the remaining risk is memory, not code. Run the exact command you will put in the instruction, only smaller — a mode or flag you never executed is one you do not know works.`,
+      `3. Write ${handoffFile} in the workspace — the instruction the user follows alone, in copy-paste form, with THIS machine's numbers:`,
+      '   - freeing the card: either `powershell -ExecutionPolicy Bypass -File windows\\30-tune.ps1 -ReserveMb <MiB>` (the model keeps working with a smaller context window) or `run\\stop-server.ps1` (whole card free, the agent has no model until it is started again);',
+      '   - the environment: venv plus the torch wheel matching the driver above, or the exact `pip install` line if torch is already there;',
+      '   - the start command with the batch size and any flags the chosen VRAM budget allows, and what to expect in the output;',
+      '   - watching it: `nvidia-smi -l 5` in a second window, and what an out-of-memory failure looks like if the budget was set too high;',
+      '   - putting the stand back afterwards: the desktop shortcut Harness AI, or `windows\\30-tune.ps1` run again with NO -ReserveMb flag (never -ReserveMb set to the whole card — that would leave the model nothing).',
+      '4. Reply with what is ready, what is waiting on video memory, and the path to the file. Do not ask the user to choose between the options before the file exists — describe both in it.',
+    ].filter(part => part !== undefined).join('\n')
   }
 
   // Delegate first so an existing veto keeps its own wording; only an otherwise

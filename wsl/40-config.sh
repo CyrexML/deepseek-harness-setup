@@ -36,6 +36,21 @@ subst "$TPL/cordis.patch.yml.tmpl" > "$PROFILE/cordis.patch.yml"
 ok "модель $MODEL_ID, окно $CTX"
 
 step "пресет агента ($PRESET)"
+# Правило про работу на видеокарте в правилах агента. Файл ~/.dsh/AGENTS.md
+# читается в начале каждой сессии, и это единственный канал, который работает,
+# когда модель сама выясняет обстановку до первой команды: подсказка на запуске
+# срабатывает только если запуск случился. Дописывается ОДИН раз, по маркеру,
+# и чужого содержимого не трогает.
+if [ -f "$TPL/agents-gpu.md" ]; then
+  agents="$DSHDIR/AGENTS.md"
+  if ! grep -q 'dsh-local: gpu-work-rule' "$agents" 2>/dev/null; then
+    { [ -s "$agents" ] && printf '\n'; cat "$TPL/agents-gpu.md"; } >> "$agents"
+    ok "правило про видеокарту добавлено в AGENTS.md"
+  else
+    ok "правило про видеокарту уже в AGENTS.md"
+  fi
+fi
+
 mkdir -p "$DSHDIR/.agent-presets"
 if [ -d "$TPL/presets/local-64k" ]; then
   rm -rf "$DSHDIR/.agent-presets/$PRESET"

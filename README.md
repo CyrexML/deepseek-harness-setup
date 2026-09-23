@@ -240,11 +240,17 @@ the model share one card, so the split is decided up front:
 powershell -ExecutionPolicy Bypass -File windows\30-tune.ps1 -ReserveMb 6000
 ```
 
-The agent knows this by itself: the first CUDA training launch is not executed
-but answered with the measurement — how much VRAM is free, how much the model
-holds — and the same three ways out, so instead of an OOM traceback minutes later
-you get the explanation at once. After that the plugin stays out of the way: once
-you have freed the card, or if you want to try anyway, the next launch runs.
+**You start the training; the agent prepares it.** From its own shell the agent
+cannot reach the card at all: the sandbox gives it a bare `/dev` with no GPU
+device, so `nvidia-smi` answers "GPU access blocked" there. The agent's working
+rules (`~/.dsh/AGENTS.md`, installed for you) therefore tell it to do the part
+that is not blocked and hand the run over: finish the script, the data pipeline
+and the config; prove the code runs with a short CPU pass; and leave
+`RUN-TRAINING.md` in the project — the instruction you follow yourself: how to
+free the card, how to set up the environment, the start command, how to watch it
+and how to put the stand back. If it tries to launch training anyway, the first
+such command is not executed but answered with the measurement — how much VRAM
+is free and how much the model holds.
 
 On 16 GB a sensible split is Qwen3.5 9B (about 7 GB) plus 6–8 GB for training.
 If you need the large model instead, the other route is to stop the model server
