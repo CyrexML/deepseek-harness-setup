@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
-# Самопроверка восьми патч-слоёв стенда перед стартом DSH (вызывается из
-# start-web.sh; можно и руками: ensure-patches.sh [--check]).
+# Self-check of the stand's patch layers before DSH starts (called from
+# start-web.sh; can also be run by hand: ensure-patches.sh [--check]).
 #
-# Зачем: обновление плагина (Plugin Hub → Update = `pnpm add <pkg>@latest`,
-# routes.ts:878) или `pnpm build` харнеса молча стирают правки. Здесь каждый
-# слой узнаётся по маркеру, отсутствующий переприменяется своим тулчейном
-# (все идемпотентны), результат — одной строкой на слой. Ничего не делает,
-# если маркеры на месте. --check: только доложить, код возврата 1 при пропуске.
+# A plugin update (Plugin Hub -> Update = `pnpm add <pkg>@latest`) or a harness
+# `pnpm build` silently wipes the edits. Every layer is identified by a marker,
+# a missing one is re-applied by its own toolchain (all idempotent), and the
+# result is one line per layer. Does nothing when every marker is in place.
+# --check only reports and exits 1 when something is missing.
 #
-# Слои и маркеры:
+# Layers and their markers:
 #   bridge        client/index.js   "dsh-bridge-en:"            projects/PlugIN/dsh-bridge-en/translate.sh
 #   turn-rewind   lib/client.js     "/* dsh-turn-rewind-en */"  projects/PlugIN/dsh-turn-rewind-en/translate.mjs
 #   better-sidebar lib/index.js     "DSH_PREVIEW_TRUSTED_ROOTS"  scripts/patch-sidebar.sh (decision-14)
 #   llm-pi-ai     lib/index.js      "dsh-local: replay usage"   scripts/patch-llm-pi-ai-usage.mjs
 #   graph-memory  dist/dsh.js       "dsh-local: workspace-scoped recall"  scripts/patch-graph-memory-scope.mjs
-#   ui-conversation lib/client.js   "dsh-local: eager image read"   scripts/patch-ui-conversation-eager-read.mjs (харнес, не профиль)
-#   sidebar-slot-id  lib/client.js   "dsh-local: turnTail slot id"  scripts/patch-better-sidebar-slot-id.mjs (совместимость с DSH 0.1.6+)
-#   univer-slot-id   lib/client.js   "dsh-local: turnTail slot id"  scripts/patch-univer-slot-id.mjs (то же)
-#   sidebar-session-sync lib/client.js "dsh-local: session sync" scripts/patch-better-sidebar-session-sync.mjs (клик по файлу на 0.1.6)
-#   sidebar-binary-handoff lib/client.js "dsh-local: binary handoff" scripts/patch-better-sidebar-binary-handoff.mjs (pdf/офис — родным просмотрщикам)
+#   ui-conversation lib/client.js   "dsh-local: eager image read"   scripts/patch-ui-conversation-eager-read.mjs (harness, not the profile)
+#   sidebar-slot-id  lib/client.js   "dsh-local: turnTail slot id"  scripts/patch-better-sidebar-slot-id.mjs (DSH 0.1.6+ compatibility)
+#   univer-slot-id   lib/client.js   "dsh-local: turnTail slot id"  scripts/patch-univer-slot-id.mjs (same)
+#   sidebar-session-sync lib/client.js "dsh-local: session sync" scripts/patch-better-sidebar-session-sync.mjs (file click on 0.1.6)
+#   sidebar-binary-handoff lib/client.js "dsh-local: binary handoff" scripts/patch-better-sidebar-binary-handoff.mjs (pdf/office to the native viewers)
 #
-# translate.sh bridge при недостающих строках зовёт локальную модель
-# (auto-translate) — поэтому start-web.sh вызывает нас ПОСЛЕ проверки, что
-# llama-server отвечает. Если модель недоступна, translate.sh сам предупредит
-# и оставит непереведённое в tools/todo.json.
+# The bridge's translate.sh calls the local model for strings it does not know
+# yet, which is why start-web.sh runs this AFTER checking that llama-server
+# answers. With no model available translate.sh warns and leaves the untranslated
+# strings in tools/todo.json.
 set -uo pipefail
 export PATH="$HOME/.local/node/bin:$PATH"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -32,24 +32,25 @@ DSH_ROOT="${DSH_ROOT:-$HOME/tools/deepseek-harness}"
 CHECK=0; [ "${1:-}" = "--check" ] && CHECK=1
 missing=0
 
-# layer <имя> <файл> <маркер> <команда...>
+# layer <name> <file> <marker> <command...>
 layer() {
   local name="$1" file="$2" mark="$3"; shift 3
-  if [ ! -f "$file" ]; then echo "patches: $name — файла нет ($file), пропуск"; return; fi
-  if grep -qF -- "$mark" "$file"; then echo "patches: $name — ok"; return; fi
+  if [ ! -f "$file" ]; then echo "patches: $name - file missing ($file), skipped"; return; fi
+  if grep -qF -- "$mark" "$file"; then echo "patches: $name - ok"; return; fi
   if [ "$CHECK" = 1 ]; then echo "patches: $name — НЕТ ПАТЧА"; missing=1; return; fi
-  echo "patches: $name — патч не найден, применяю: $*"
+  echo "patches: $name - marker absent, applying: $*"
   if "$@" >"/tmp/ensure-$name.log" 2>&1 && grep -qF -- "$mark" "$file"; then
-    echo "patches: $name — применён"
+    echo "patches: $name - applied"
   else
-    echo "patches: $name — НЕ УДАЛОСЬ, см. /tmp/ensure-$name.log"; missing=1
+    echo "patches: $name - FAILED, see /tmp/ensure-$name.log"; missing=1
   fi
 }
 
 layer bridge "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en:" \
   bash "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/translate.sh"
-# client.js собирается последним шагом translate.sh: если патч лёг позже сборки,
-# бандл устарел, а маркер на месте (см. scripts/bridge-rebuild-client.sh).
+# client.js is built by the last step of translate.sh: if a patch landed after
+# that build, the bundle is stale while the marker is present (see
+# scripts/bridge-rebuild-client.sh).
 bash "$HERE/bridge-rebuild-client.sh" "$NM/@wenbin_wb/dsh-bridge" || missing=1
 
 layer turn-rewind "$NM/@anionex/dsh-turn-rewind/lib/client.js" "/* dsh-turn-rewind-en */" \

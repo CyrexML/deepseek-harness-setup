@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Точечно выставить agent-presets.default в $DSH_HOME/settings.yaml.
+"""Set agent-presets.default in $DSH_HOME/settings.yaml, touching nothing else.
 
-Это то же поле, которое пишет кнопка «Set as default» в интерфейсе
-(packages/client/ui-agent-preset/README.md: «the default write ... targets the
+This is the same field the "Set as default" button writes in the interface
+(packages/client/ui-agent-preset/README.md: "the default write ... targets the
 `agent-presets` settings namespace's `default` field, which is what the host
-resolves at creation»). YAML не переписывается целиком — правится одна строка,
-остальной документ сохраняется как есть.
+resolves at creation"). The YAML is not rewritten wholesale - one line is edited
+and the rest of the document is preserved as it is.
 """
 import sys, os, re
 
@@ -38,4 +38,4 @@ else:
         lines.insert(start + 1, f'  default: {value}\n')
 
 open(path, 'w', encoding='utf-8').write(''.join(lines))
-print(f"agent-presets.default: {old or '(не был задан)'} -> {value}")
+print(f"agent-presets.default: {old or '(was not set)'} -> {value}")

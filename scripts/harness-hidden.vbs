@@ -1,9 +1,9 @@
-' Запуск PowerShell-скрипта БЕЗ окна.
-' Задача планировщика с действием powershell.exe показывает окно консоли на
-' долю секунды даже с -WindowStyle Hidden: окно создаёт conhost ДО того, как
-' PowerShell успевает применить стиль. Раз в 15 минут это мигает на экране
-' (жалоба 2026-09-23). WScript.Shell.Run с режимом 0 не создаёт окна вовсе.
-'   wscript.exe harness-hidden.vbs "<путь к .ps1>" [аргументы]
+' Run a PowerShell script WITHOUT a window.
+' A scheduled task whose action is powershell.exe flashes a console for a split
+' second even with -WindowStyle Hidden: conhost creates the window BEFORE
+' PowerShell can apply the style, and once every 15 minutes that flash is
+' noticeable. WScript.Shell.Run with mode 0 creates no window at all.
+'   wscript.exe harness-hidden.vbs "<path to .ps1>" [arguments]
 Option Explicit
 Dim shell, args, cmd, i
 Set shell = CreateObject("WScript.Shell")

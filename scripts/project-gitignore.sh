@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
-# Положить в рабочую область .gitignore, чтобы служебное не уезжало в репозиторий.
+# Give a workspace a .gitignore so the agent's working litter stays out of git.
 #
-#   bash scripts/project-gitignore.sh <путь к проекту> [ещё проекты...]
-#   bash scripts/project-gitignore.sh --all          все рабочие области стенда
+#   bash scripts/project-gitignore.sh <project path> [more projects...]
+#   bash scripts/project-gitignore.sh --all          every workspace of the stand
 #
-# Что именно мешает при подключении проекта к GitHub (проверено на живых
-# проектах 2026-09-23):
-#   .shots/        снимки экрана, которые агент делает при проверке вёрстки
-#   backups/       копии файлов перед крупной правкой
-#   out/           выгрузки (PDF, картинки) из задач
-#   node_modules/  зависимости
-# Журнал изменений (тот, что виден в панели как «changes») в проекте НЕ лежит:
-# он в ~/.dsh/change-ledger и в репозиторий не попадает; его размер чистится
-# командой `scripts/dsh-cleanup.sh --apply --ledger-days 30`.
+# What actually gets in the way when a project goes to GitHub:
+#   .shots/        screenshots the agent takes while checking a layout
+#   backups/       copies of files made before a large edit
+#   out/           exports (PDFs, images) produced by tasks
+#   node_modules/  dependencies
+# The change ledger (what the panel shows as "changes") is NOT in the project: it
+# lives in ~/.dsh/change-ledger, never reaches a repository, and is trimmed with
+# `scripts/dsh-cleanup.sh --apply --ledger-days 30`.
 #
-# Существующий .gitignore не перезаписывается: недостающие строки дописываются
-# в конец под своим заголовком.
+# An existing .gitignore is not overwritten: missing lines are appended under
+# their own heading.
 set -euo pipefail
 
 MARK='# --- harness stand ---'
@@ -29,24 +28,24 @@ node_modules/
 
 add_to() {
   local dir="$1"
-  [ -d "$dir" ] || { echo "нет каталога: $dir" >&2; return 1; }
+  [ -d "$dir" ] || { echo "no such directory: $dir" >&2; return 1; }
   local file="$dir/.gitignore"
   if [ -f "$file" ] && grep -qF "$MARK" "$file"; then
-    echo "$dir — уже есть"
+    echo "$dir - already there"
     return 0
   fi
   if [ -f "$file" ]; then
     printf '\n%s' "$BLOCK" >> "$file"
-    echo "$dir — дописано в существующий .gitignore"
+    echo "$dir - appended to the existing .gitignore"
   else
     printf '%s' "$BLOCK" > "$file"
-    echo "$dir — создан .gitignore"
+    echo "$dir - .gitignore created"
   fi
 }
 
 if [ "${1:-}" = "--all" ]; then
   ws="$HOME/.dsh/storages/workspace.json"
-  [ -f "$ws" ] || { echo "нет $ws" >&2; exit 1; }
+  [ -f "$ws" ] || { echo "no $ws" >&2; exit 1; }
   export PATH="$HOME/.local/node/bin:$PATH"
   node -e '
     const fs = require("node:fs");

@@ -109,7 +109,7 @@ function Confirm-WslShutdown {
   Write-Host (T 'Stop WSL as well? Frees another ~2 GB but closes ALL Ubuntu processes,') -ForegroundColor Yellow
   Write-Host (T 'including editors, Docker and open terminals.') -ForegroundColor Yellow
   $ans = Read-Host (T 'Stop WSL? [y/N]')
-  if ($ans -match '^(y|Y|д|Д)') {
+  if ($ans -match '^(y|Y)') {
     Write-Host (T 'stopping WSL...')
     & wsl.exe --shutdown
     Write-Host (T 'WSL stopped')

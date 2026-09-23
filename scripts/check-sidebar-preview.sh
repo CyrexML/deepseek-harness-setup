@@ -12,17 +12,17 @@ PORT="${2:-3080}"
 FILE="${3:-js/main.js}"
 BASE="http://127.0.0.1:$PORT"
 
-curl -s -o /dev/null -m 2 "$BASE/" || { echo "хост не отвечает на $BASE - запущен?"; exit 1; }
+curl -s -o /dev/null -m 2 "$BASE/" || { echo "the host does not answer on $BASE - is it running?"; exit 1; }
 
 KEY="--$(echo "${PROJ#/}" | tr '/' '-')--"
 DIR="$HOME/.dsh/sessions/$KEY"
-[ -d "$DIR" ] || { echo "нет сессий для $PROJ"; exit 1; }
+[ -d "$DIR" ] || { echo "no sessions for $PROJ"; exit 1; }
 SID="$(ls -1t "$DIR" | head -1 | sed 's/^session-//')"
 URL="$BASE/sidebar/html/$SID$PROJ/$FILE"
 
-echo "проект : $PROJ"
-echo "сессия : $SID"
-echo "цель   : $FILE"
+echo "project : $PROJ"
+echo "session : $SID"
+echo "target  : $FILE"
 echo
 
 probe() {
@@ -32,21 +32,21 @@ probe() {
   ctype=$(curl -s -D- -o /dev/null "$@" "$URL" | tr -d '\r' | grep -i '^content-type' | cut -d' ' -f2-)
   printf '%-34s %s  %s\n' "$label" "$code" "$ctype"
   case "$code" in
-    403) echo "     GATE 1: фенс отвергает origin. Выключить песочницу превью." ;;
+    403) echo "     GATE 1: the fence rejects the origin. Turn the preview sandbox off." ;;
     500) body=$(curl -s "$@" "$URL")
          case "$body" in
-           *inspect*) echo "     GATE 2: патч persistence.stat не наложен или хост не перезапущен." ;;
+           *inspect*) echo "     GATE 2: the persistence.stat patch is missing, or the host was not restarted." ;;
            *) echo "     500: $body" ;;
          esac ;;
     200) case "$ctype" in
-           *javascript*) echo "     OK - скрипт исполнится." ;;
-           *) echo "     GATE 3: тип '$ctype' + nosniff = браузер откажется исполнять." ;;
+           *javascript*) echo "     OK - the script will execute." ;;
+           *) echo "     GATE 3: type '$ctype' + nosniff means the browser refuses to execute it." ;;
          esac ;;
   esac
 }
 
-probe "песочный iframe (Origin: null)" -H 'Origin: null' -H 'Sec-Fetch-Site: cross-site'
-probe "обычный iframe (same-origin)"   -H "Origin: $BASE" -H 'Sec-Fetch-Site: same-origin'
+probe "sandboxed iframe (Origin: null)" -H 'Origin: null' -H 'Sec-Fetch-Site: cross-site'
+probe "ordinary iframe (same-origin)"  -H "Origin: $BASE" -H 'Sec-Fetch-Site: same-origin'
 
 
 # GATE 5: the CSP sandbox directive forces an opaque origin on the previewed
@@ -56,14 +56,14 @@ probe "обычный iframe (same-origin)"   -H "Origin: $BASE" -H 'Sec-Fetch-S
 CSP=$(curl -s -D- -o /dev/null -H "Origin: $BASE" "$BASE/sidebar/html/$SID$PROJ/index.html" \
       | tr -d '\r' | grep -i '^content-security-policy' | cut -d' ' -f2-)
 echo
-echo "CSP на index.html:"
+echo "CSP on index.html:"
 echo "  $CSP"
 case "$CSP" in
-  *allow-same-origin*) echo "     OK - документ получает origin интерфейса." ;;
-  *sandbox*)           echo "     GATE 5: нет allow-same-origin - документ opaque, подресурсы уйдут с Origin: null." ;;
-  *)                   echo "     заголовка нет - песочница ответом не навязывается." ;;
+  *allow-same-origin*) echo "     OK - the document gets the interface origin." ;;
+  *sandbox*)           echo "     GATE 5: no allow-same-origin - the document is opaque and sub-resources go out with Origin: null." ;;
+  *)                   echo "     no header - the response does not impose a sandbox." ;;
 esac
 
 echo
-echo "Рабочая цель: вторая строка = 200 + text/javascript."
-echo "Первая строка останется 403 - это и есть песочница, её выключают в интерфейсе."
+echo "The goal: the second line is 200 + text/javascript."
+echo "The first line stays 403 - that is the sandbox, switched off in the interface."

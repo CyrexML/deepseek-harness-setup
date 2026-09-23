@@ -22,12 +22,12 @@
 #   new-project.sh <name> [one-line description]
 set -uo pipefail
 
-NAME="${1:?укажите имя проекта}"
+NAME="${1:?give the project name}"
 DESC="${2:-<one line: what it is>}"
 ROOT="$HOME/Harness_AI/projects/$NAME"
 
 if [ -e "$ROOT" ]; then
-  echo "уже существует: $ROOT"
+  echo "already exists: $ROOT"
   exit 1
 fi
 
@@ -55,8 +55,8 @@ you create files - it is what stops the next session reading the whole tree.>
 - Open: <what to do first>
 EOF
 
-echo "создан $ROOT"
-echo "  DECISIONS.md — скелет с картой, заполняется по мере появления файлов"
+echo "created $ROOT"
+echo "  DECISIONS.md - a skeleton map, filled in as files appear"
 echo
-echo "Дальше: запустить сессию агента с рабочим каталогом $ROOT"
-echo "(превью в сайдбаре работает для всего внутри ~/Harness_AI/projects)."
+echo "Next: start an agent session with $ROOT as the working directory"
+echo "(sidebar preview works for everything under ~/Harness_AI/projects)."

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Бюджет контекста одной сессии DSH: куда ушли токены, сколько сжатий, TTFT.
+"""Context budget of one DSH session: where the tokens went, how many compactions, TTFT.
 
-Использование:
-  dsh-session-report.py <session-id-prefix | путь к session.v2.jsonl(.zstd)> [-v]
+Usage:
+  dsh-session-report.py <session-id-prefix | path to session.v2.jsonl(.zstd)> [-v]
 
-По префиксу id ищет каталог в ~/.dsh/sessions/*/; .zstd распаковывает через
-dsh-unzstd.js (node, встроенный zlib.zstdDecompressSync, многофреймовый контейнер).
-Точные числа: usage llama-server на каждом шаге (input+cacheRead = контекст,
-outputTokens), потоковые чанки (reasoning/text по токенам). Оценка «~»:
-символы/3.6 для результатов инструментов и системных вставок.
+An id prefix is looked up in ~/.dsh/sessions/*/; .zstd is unpacked through
+dsh-unzstd.js (node, built-in zlib.zstdDecompressSync, multi-frame container).
+Exact numbers come from llama-server usage per step (input+cacheRead = context,
+outputTokens) and streaming chunks (reasoning/text by token). Values marked "~"
+are estimates: characters/3.6 for tool results and system insertions.
 """
 import json,sys,os,glob,subprocess,collections,statistics
 CPT=3.6

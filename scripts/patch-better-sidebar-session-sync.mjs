@@ -1,32 +1,31 @@
-// better-sidebar: определить активную сессию на DSH 0.1.6 и держать её в store.
+// better-sidebar: find the active session on DSH 0.1.6 and keep it in the store.
 //
-// ПРИЧИНА. Плагин 0.19.1 берёт активную сессию из
-// `ctx.sessions.list.getSnapshot().current` (lib/client.js:17152,
-// `function activeSessionId(ctx)`). На 0.1.6-alpha.2 в снимке списка такого поля
-// больше НЕТ — проверено вживую, ключи снимка:
-//   ids, byId, phase, subagentsByParent, jobsBySession
-// Хост теперь помечает показываемую сессию удержанием `mainView`, см.
-// packages/client/ui-workspace/src/client/tree.ts:43 и
-// packages/client/ui-session/src/client/index.ts:442:
+// WHY. Plugin 0.19.1 reads the active session from
+// `ctx.sessions.list.getSnapshot().current` (lib/client.js:17152). On
+// 0.1.6-alpha.2 that field is GONE from the snapshot - verified live, the keys
+// are: ids, byId, phase, subagentsByParent, jobsBySession. The host now marks the
+// displayed session with a `mainView` retention
+// (packages/client/ui-workspace/src/client/tree.ts:43,
+// packages/client/ui-session/src/client/index.ts:442):
 //   Object.values(byId).find(s => (s.retainedBy.mainView ?? 0) > 0)?.id
 //
-// СЛЕДСТВИЕ ДО ПАТЧА. `activeSessionId` всегда undefined, а свой store плагин
-// обновляет только из компонента `Sidebar` (lib/client.js:16031), который на
-// 0.1.6 не монтируется — панель рисует родной `ui-sidebar-right`. Поэтому в
-// `openTab` (lib/client.js:1365) `scope?.sessionId ?? store.getSnapshot().sessionId`
-// = undefined и происходит молчаливый выход `if (targetSessionId === void 0) return;`
-// — клик по файлу в проводнике плагина не делает НИЧЕГО. По той же причине
-// `place()` (native/surface.ts) всегда считал вкладку «не на экране».
+// CONSEQUENCE BEFORE THE PATCH. `activeSessionId` is always undefined, and the
+// plugin only updates its own store from the `Sidebar` component
+// (lib/client.js:16031), which never mounts on 0.1.6 because the panel is drawn
+// by the native `ui-sidebar-right`. So in `openTab` (lib/client.js:1365)
+// `scope?.sessionId ?? store.getSnapshot().sessionId` is undefined and the
+// function silently returns - clicking a file in the plugin's explorer does
+// NOTHING. For the same reason `place()` always considered the tab off-screen.
 //
-// ПАТЧ. Два шага:
-//   1) `activeSessionId` получает запасной путь через `retainedBy.mainView`;
-//   2) в точке создания store вешается подписка на список сессий, которая зовёт
-//      `sidebarStore.setSession(activeSessionId(ctx))` — независимо от того,
-//      смонтирована ли собственная панель плагина.
-// На 0.1.3 безвреден: `current` там есть и проверяется первым, а setSession
-// идемпотентен (ранний выход при том же id).
+// THE PATCH. Two steps:
+//   1) `activeSessionId` gets a fallback through `retainedBy.mainView`;
+//   2) where the store is created, a subscription to the session list calls
+//      `sidebarStore.setSession(activeSessionId(ctx))`, regardless of whether the
+//      plugin's own panel is mounted.
+// Harmless on 0.1.3: `current` exists there and is checked first, and setSession
+// is idempotent (early return on the same id).
 //
-// Запись через unlink: файлы плагина — хардлинки в pnpm-store.
+// Written through unlink: plugin files are hardlinks into the pnpm store.
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -41,7 +40,7 @@ const ACTIVE_ANCHOR = `\t\tfunction activeSessionId(ctx) {
 \t\t\t}
 \t\t}
 `;
-const ACTIVE_PATCH = `\t\tfunction activeSessionId(ctx) { ${MARK} // 0.1.6: поля current нет, показываемую сессию держит mainView
+const ACTIVE_PATCH = `\t\tfunction activeSessionId(ctx) { ${MARK} // 0.1.6: no current field; the displayed session is held by mainView
 \t\t\ttry {
 \t\t\t\tconst snapshot = ctx.sessions.list.getSnapshot();
 \t\t\t\tif (snapshot.current !== undefined) return snapshot.current;
@@ -57,7 +56,7 @@ const ACTIVE_PATCH = `\t\tfunction activeSessionId(ctx) { ${MARK} // 0.1.6: по
 `;
 
 const STORE_ANCHOR = '\t\t\tconst sidebarStore = createSidebarStore();\n';
-const STORE_PATCH = STORE_ANCHOR + `\t\t\tctx.effect(() => { ${MARK} // родной сайдбар не монтирует панель плагина — сессию берём у хоста
+const STORE_PATCH = STORE_ANCHOR + `\t\t\tctx.effect(() => { ${MARK} // the native sidebar never mounts the plugin panel - take the session from the host
 \t\t\t\tconst syncSession = () => {
 \t\t\t\t\ttry { sidebarStore.setSession(activeSessionId(ctx)); } catch {}
 \t\t\t\t};
@@ -69,7 +68,7 @@ const STORE_PATCH = STORE_ANCHOR + `\t\t\tctx.effect(() => { ${MARK} // родн
 `;
 
 const files = ['lib/client.js', 'lib/client-registry.js'].filter(f => existsSync(join(dir, f)));
-if (files.length === 0) { console.error(`нет файлов сборки в ${dir}`); process.exit(1); }
+if (files.length === 0) { console.error(`no build files in ${dir}`); process.exit(1); }
 
 let touched = 0, already = 0;
 for (const rel of files) {
@@ -81,11 +80,11 @@ for (const rel of files) {
     [STORE_ANCHOR, STORE_PATCH, 'createSidebarStore'],
   ]) {
     const n = s.split(anchor).length - 1;
-    if (n !== 1) { console.error(`${rel}: MATCH COUNT ${n} для якоря ${what}`); process.exit(1); }
+    if (n !== 1) { console.error(`${rel}: MATCH COUNT ${n} for the ${what} anchor`); process.exit(1); }
     s = s.replace(anchor, replacement);
   }
   rmSync(path, { force: true });
   writeFileSync(path, s);
   touched++;
 }
-console.log(`better-sidebar: session sync — обновлено ${touched}, уже было ${already} (файлов: ${files.length})`);
+console.log(`better-sidebar: session sync - updated ${touched}, already patched ${already} (files: ${files.length})`);

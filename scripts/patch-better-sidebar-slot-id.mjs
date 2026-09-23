@@ -1,26 +1,26 @@
-// better-sidebar: совместимость слота turnTail с DSH 0.1.6+ (id + свой matched).
+// better-sidebar: turnTail slot compatibility with DSH 0.1.6+ (id + own matched).
 //
-// В 0.1.6-alpha.2 слот `conversation.chat.turnTail` из chain стал list, а хост
-// требует у списочных регистраций `options.id`
-// (packages/client/ui-slots/src/index.ts:1230). Плагин 0.19.1 его не передаёт
-// (lib/client.js:3478) → `list slot "conversation.chat.turnTail" requires
-// options.id`, весь сайдбар падает с Minified React error #130.
+// In 0.1.6-alpha.2 the `conversation.chat.turnTail` slot changed from chain to
+// list, and the host requires `options.id` on list registrations
+// (packages/client/ui-slots/src/index.ts:1230). Plugin 0.19.1 does not pass it,
+// so the registration throws "list slot registration requires options.id" and the
+// whole sidebar dies with a minified React error #130.
 //
-// Второе отличие list от chain: у chain-записи компонент получает результат
-// `select` в пропе `matched`, у list-записи — только owner-пропсы (turn, seq,
-// openFile), см. ui-slots/src/index.ts:774 и :290. Плагин написан под chain и
-// падает на `matched.slice(...)` (lib/client.js:3421, «slot entry crashed in
-// conversation.chat.turnTail»). Поэтому вторым шагом компонент оборачивается:
-// если `matched` не пришёл — он вычисляется тут же теми же правилами, что в
-// `select`, а пустой результат отдаёт null (list-запись вправе ничего не рисовать).
+// The second difference: on a chain entry the component receives the result of
+// `select` in the `matched` prop, on a list entry only the owner props (turn,
+// seq, openFile) - ui-slots/src/index.ts:774 and :290. The plugin is written for
+// chain and crashes on `matched.slice(...)` (lib/client.js:3421). So the second
+// step wraps the component: when `matched` is missing it is computed here with
+// the same rules as in `select`, and an empty result renders null (a list entry
+// is allowed to draw nothing).
 //
-// Для старых хостов (0.1.3, где слот chain) оба изменения безвредны: лишний `id`
-// игнорируется (там проверяется только `select`, ui-slots/src/index.ts:852), а
-// обёртка при наличии `matched` сразу зовёт исходный компонент.
+// Harmless on older hosts (0.1.3, where the slot is chain): the extra `id` is
+// ignored, and the wrapper calls the original component as soon as `matched` is
+// present.
 //
-// Правятся ВСЕ файлы сборки плагина, где встречается регистрация (client.js —
-// то, что отдаётся браузеру, client-registry.js — его вариант для реестра).
-// Запись через unlink: файлы плагина — хардлинки в pnpm-store.
+// EVERY build file of the plugin carrying the registration is patched (client.js
+// is what the browser gets, client-registry.js is the registry variant).
+// Written through unlink: plugin files are hardlinks into the pnpm store.
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -29,10 +29,10 @@ const MARK = '/* dsh-local: turnTail slot id */';
 const ID = 'better-sidebar-turn-tail';
 const ANCHOR = '\t\t\t\tname: "conversation.chat.turnTail",\n';
 const files = ['lib/client.js', 'lib/client-registry.js'].filter(f => existsSync(join(dir, f)));
-if (files.length === 0) { console.error(`нет файлов сборки в ${dir}`); process.exit(1); }
+if (files.length === 0) { console.error(`no build files in ${dir}`); process.exit(1); }
 
 const COMPONENT_ANCHOR = '\t\t\t}, SidebarProducedFiles));\n';
-const COMPONENT_PATCH = `\t\t\t}, (props) => { ${MARK} // list-запись пропа matched не даёт — считаем сами
+const COMPONENT_PATCH = `\t\t\t}, (props) => { ${MARK} // a list entry gives no matched prop - compute it here
 \t\t\t\tlet m = props.matched;
 \t\t\t\tif (m === undefined) {
 \t\t\t\t\tif (store.getSuspended()) return null;
@@ -55,11 +55,11 @@ for (const rel of files) {
     [COMPONENT_ANCHOR, COMPONENT_PATCH, 'component'],
   ]) {
     const n = s.split(anchor).length - 1;
-    if (n !== 1) { console.error(`${rel}: MATCH COUNT ${n} для якоря ${what}`); process.exit(1); }
+    if (n !== 1) { console.error(`${rel}: MATCH COUNT ${n} for the ${what} anchor`); process.exit(1); }
     s = s.replace(anchor, replacement);
   }
   rmSync(path, { force: true });
   writeFileSync(path, s);
   touched++;
 }
-console.log(`better-sidebar: turnTail id — обновлено ${touched}, уже было ${already} (файлов: ${files.length})`);
+console.log(`better-sidebar: turnTail id - updated ${touched}, already patched ${already} (files: ${files.length})`);

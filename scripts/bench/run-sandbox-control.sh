@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# §3.7 decision-08: контрольные прогоны с песочницей.
-# По три прогона каждой задачи. Шаги и максимум контекста считаются
-# посегментно: по отметкам длины лога сервера до и после прогона.
+# Control runs with the sandbox: three runs of each task. Steps and peak context
+# are counted per segment, from the server log length before and after a run.
 set -euo pipefail
 
 OUT="${1:-$HOME/Harness_AI/bench/results/sandbox-control}"
@@ -9,7 +8,7 @@ RUNS="${RUNS:-3}"
 SRVLOG=/mnt/f/Harness_AI/run/server-A.log
 mkdir -p "$OUT"; : > "$OUT/summary.txt"
 
-seg_stats() {   # $1=от_строки  -> "шагов максконтекст"
+seg_stats() {   # $1=from_line  -> "steps max_context"
   local from="$1"
   tr -d '\000\r' < "$SRVLOG" | tail -n +"$from" > /tmp/_seg.$$
   local steps ctx
@@ -33,7 +32,7 @@ for task in 01 02; do
     en=$(cat "$OUT/$tag.log.end" 2>/dev/null || echo 0)
     rc=$(grep -a "EXIT=" "$OUT/$tag.log" 2>/dev/null | tail -1 | sed 's/EXIT=//')
     if (cd "$repo" && python3 -m pytest -q > "$OUT/$tag.pytest" 2>&1); then solved=ДА; else solved=НЕТ; fi
-    printf '%-8s wall=%4ss шагов=%-3s контекст=%-6s rc=%s решена=%-3s | %s\n' \
+    printf '%-8s wall=%4ss steps=%-3s context=%-6s rc=%s solved=%-3s | %s\n' \
       "$tag" "$((en-st))" "$steps" "$ctx" "$rc" "$solved" \
       "$(tail -1 "$OUT/$tag.pytest" | tr -d '\r')" | tee -a "$OUT/summary.txt"
   done

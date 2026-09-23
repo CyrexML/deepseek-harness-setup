@@ -79,8 +79,8 @@ python3 - "$LIB" "$SRC" "$CLIENT" <<'PYEOF'
 import io, os, sys
 
 lib_path, src_path, client_path = sys.argv[1], sys.argv[2], sys.argv[3]
-# pnpm держит файлы пакета хардлинками на store: запись по месту портит копию
-# в store. Удаляем (новый inode), затем пишем.
+# pnpm keeps package files as hardlinks into the store, so writing in place
+# would corrupt the store copy. Unlink first (new inode), then write.
 def _write(path, text):
     os.unlink(path)
     io.open(path, 'w', encoding='utf-8').write(text)
@@ -173,23 +173,23 @@ if tsx is not None and "key={htmlNoSandbox ? 'ns' : 'sb'}" not in tsx:
         _write(tsx_path, tsx)
         changed.append('src: TextEditor iframe key')
 
-print('\n'.join('  patched ' + c for c in changed) if changed else '  уже пропатчено, изменений нет')
+print('\n'.join('  patched ' + c for c in changed) if changed else '  already patched, nothing changed')
 PYEOF
 
 node --check "$LIB" >/dev/null 2>&1 \
-  && echo "  lib/index.js: синтаксис OK" \
-  || echo "  ВНИМАНИЕ: lib/index.js не парсится, откат: cp $LIB.bak-orig $LIB"
+  && echo "  lib/index.js: syntax OK" \
+  || echo "  WARNING: lib/index.js does not parse, roll back: cp $LIB.bak-orig $LIB"
 node --check "$CLIENT" >/dev/null 2>&1 \
-  && echo "  client-editor.js: синтаксис OK" \
-  || echo "  ВНИМАНИЕ: client-editor.js не парсится, откат: cp $CLIENT.bak-orig $CLIENT"
+  && echo "  client-editor.js: syntax OK" \
+  || echo "  WARNING: client-editor.js does not parse, roll back: cp $CLIENT.bak-orig $CLIENT"
 
 cat <<'EOF'
 
-Дальше:
-  1. htmlViewerNoSandbox: true под dsh-better-sidebar в ~/.dsh/settings.yaml
-     (gate 1 - это настройка, не баг; см. шапку про цену).
-  2. Перезапустить хост (серверные правки) - клиентский чанк читается с диска
-     на каждый запрос и отдаётся с no-cache + ETag, перезапуска не требует.
-  3. Ctrl+Shift+R на странице интерфейса, чтобы забрать новый бандл.
-  4. Проверить: scripts/check-sidebar-preview.sh
+Next:
+  1. htmlViewerNoSandbox: true under dsh-better-sidebar in ~/.dsh/settings.yaml
+     (that gate is a setting, not a bug; see the header for the cost).
+  2. Restart the host for the server-side edits - the client chunk is read from
+     disk per request and served with no-cache + ETag, so it needs no restart.
+  3. Ctrl+Shift+R on the interface page to pick up the new bundle.
+  4. Verify: scripts/check-sidebar-preview.sh
 EOF

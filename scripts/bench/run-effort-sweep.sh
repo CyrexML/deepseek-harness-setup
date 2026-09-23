@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# §7 decision-07: reasoning_effort на РЕАЛЬНОМ цикле (не на зонде).
+# reasoning_effort measured on a REAL loop, not on a probe.
 #
-# reasoning_effort задаётся сервером через --chat-template-kwargs, а не
-# конфигом dsh, поэтому на каждый режим — свой запуск сервера.
-# У pi-ai есть поле `reasoning` на маршруте, но доходит ли оно до
-# llama-server как reasoning_effort — не проверено, поэтому идём
-# серверным путём, который подтверждён через /apply-template.
+# reasoning_effort is set by the server through --chat-template-kwargs rather than
+# by the dsh config, so every mode needs its own server start. pi-ai has a
+# `reasoning` field on the route, but whether it reaches llama-server as
+# reasoning_effort is unverified, hence the server-side path confirmed through
+# /apply-template.
 set -euo pipefail
 
 OUTDIR="${1:-$HOME/Harness_AI/bench/results/effort-sweep}"
@@ -15,7 +15,7 @@ mkdir -p "$OUTDIR"
 : > "$OUTDIR/summary.txt"
 
 for effort in low medium xhigh; do
-  echo "### сервер: reasoning_effort=$effort"
+  echo "### server: reasoning_effort=$effort"
   ( cd /mnt/c && powershell.exe -NoProfile -ExecutionPolicy Bypass \
       -File 'F:\Harness_AI\run\stop-server.ps1' >/dev/null 2>&1 ) || true
   sleep 4
@@ -25,7 +25,7 @@ for effort in low medium xhigh; do
       -ReasoningEffort "$effort" -Log "F:\\Harness_AI\\run\\effort-$effort.log" \
       >/dev/null 2>&1 & ) 
   until grep -qa "listening on" <(tr -d '\000\r' < "/mnt/f/Harness_AI/run/effort-$effort.log" 2>/dev/null); do sleep 4; done
-  echo "    поднят"
+  echo "    up"
 
   for i in $(seq 1 "$RUNS"); do
     tag="$effort-$i"
@@ -37,7 +37,7 @@ for effort in low medium xhigh; do
     rc=$(grep -a "EXIT=" "$OUTDIR/$tag.log" 2>/dev/null | tail -1 | sed 's/EXIT=//')
     if (cd "$REPO" && python3 -m pytest -q > "$OUTDIR/$tag.pytest" 2>&1); then solved=ДА; else solved=НЕТ; fi
     steps=$(tr -d '\000\r' < "/mnt/f/Harness_AI/run/effort-$effort.log" | grep -ac "prompt eval time")
-    printf '%-10s wall=%3ss rc=%s решена=%-3s шагов_всего=%s | %s\n' \
+    printf '%-10s wall=%3ss rc=%s solved=%-3s steps_total=%s | %s\n' \
       "$tag" "$((en-st))" "$rc" "$solved" "$steps" "$(tail -1 "$OUTDIR/$tag.pytest" | tr -d '\r')" \
       | tee -a "$OUTDIR/summary.txt"
   done

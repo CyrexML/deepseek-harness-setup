@@ -5,10 +5,11 @@
 // 127.0.0.1:3080 (auto-unlocked admin): Remote access → Power tab shows the card. Screenshots go to
 // ~/Harness_AI/run/verify/.
 const DSH_ROOT = process.env.DSH_ROOT ?? `${process.env.HOME}/tools/deepseek-harness`;
-// Playwright лежит в сторе pnpm под именем с версией, поэтому путь ИЩЕТСЯ: после
-// обновления харнеса версия меняется. Берём не самую новую, а ту, чьи браузеры
-// реально скачаны (~/.cache/ms-playwright): в сторе может лежать альфа, для
-// которой браузеров нет, и запуск падает «Executable doesn't exist».
+// Playwright sits in the pnpm store under a versioned name, so the path is
+// SEARCHED for: a harness update changes the version. Not the newest one is
+// taken but the one whose browsers are actually downloaded
+// (~/.cache/ms-playwright) - the store may hold an alpha with no browsers, and
+// launching then fails with "Executable doesn't exist".
 const { readdirSync: __rd, readFileSync: __rf, existsSync: __ex } = await import('node:fs');
 const __pnpm = `${DSH_ROOT}/node_modules/.pnpm`;
 const __candidates = __rd(__pnpm).filter((name) => /^playwright@\d/.test(name)).sort().reverse();
@@ -23,16 +24,16 @@ const __pw = __candidates.find((name) => {
   const revision = __chromiumRevision(name);
   return revision !== undefined && __installed.some((dir) => dir.endsWith(`-${revision}`));
 }) ?? __candidates[0];
-if (__pw === undefined) throw new Error(`playwright не найден в ${__pnpm}`);
+if (__pw === undefined) throw new Error(`playwright not found in ${__pnpm}`);
 const __pwEntry = `${__pnpm}/${__pw}/node_modules/playwright/index.mjs`;
 const { chromium, devices } = await import(__pwEntry);
 import { readFileSync, mkdirSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 const OUT = `${process.env.HOME}/Harness_AI/run/verify`; mkdirSync(OUT, { recursive: true });
 const cookie = JSON.parse(readFileSync(`${process.env.HOME}/.dsh/dsh-bridge/sessions.json`, 'utf8')).at(-1)[0];
-const lan = 'http://' + execSync('hostname -I').toString().trim().split(/\s+/)[0] + ':3082'; // WSL IP меняется при перезапуске
+const lan = 'http://' + execSync('hostname -I').toString().trim().split(/\s+/)[0] + ':3082'; // the WSL IP changes on restart
 const local = readFileSync(`${process.env.HOME}/Harness_AI/run/web.log`, 'utf8').match(/dsh web: (http:\/\/\S+)/g).pop().replace('dsh web: ', '');
-const browser = await chromium.launch({ env: { ...process.env, LD_LIBRARY_PATH: `${process.env.HOME}/.local/lib/asound/usr/lib/x86_64-linux-gnu` } }); // libasound из ~/.local, как в shot.mjs
+const browser = await chromium.launch({ env: { ...process.env, LD_LIBRARY_PATH: `${process.env.HOME}/.local/lib/asound/usr/lib/x86_64-linux-gnu` } }); // libasound from ~/.local, as in shot.mjs
 const results = [];
 const ok = (name, cond, extra = '') => { results.push(`${cond ? 'PASS' : 'FAIL'} ${name} ${extra}`); };
 const dismiss = async (page) => { const c = page.locator('button', { hasText: 'Continue' }); if (await c.count()) { await c.first().click(); await page.waitForTimeout(600); } };
@@ -45,8 +46,8 @@ const dismiss = async (page) => { const c = page.locator('button', { hasText: 'C
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text().slice(0, 120)); });
   await page.goto(lan + '/', { waitUntil: 'load' }); await page.waitForTimeout(8000); await dismiss(page);
   ok('mobile: no console errors', errors.length === 0, errors.slice(0, 2).join(' | '));
-  // bridge 2.10.12: своя мобильная шапка (≡ · заголовок · +) слушает touch —
-  // обычный click ящик не открывает, нужен tap; click оставлен запасным путём.
+  // The bridge's own mobile header listens for touch: a plain click does not open
+  // the drawer, a tap does; click is kept as a fallback.
   const openDrawer = async () => {
     if (await page.evaluate(() => document.body.classList.contains('dsh-drawer-open'))) return;
     const burger = page.locator('.dsh-header-menu-btn').first();
@@ -64,10 +65,9 @@ const dismiss = async (page) => { const c = page.locator('button', { hasText: 'C
     await page.screenshot({ path: `${OUT}/m-power.png` });
     await page.locator('.dsh-power-pop button', { hasText: 'Cancel' }).click().catch(() => {});
   }
-  // bridge 2.10.12: своя мобильная шапка (≡ · заголовок · +). Ящик открывается
-  // ТОЛЬКО тапом (touch-события), click/dispatchEvent его не трогают; до тапа
-  // боковая панель за пределами вьюпорта.
-  await openDrawer(); // попап питания мог закрыть ящик
+  // The drawer opens ONLY on a tap (touch events); click/dispatchEvent leave it
+  // alone, and until the tap the side panel is outside the viewport.
+  await openDrawer(); // the power popup may have closed the drawer
   await page.locator('.BlCpQa_triggerLabel, [class*="_triggerLabel"]', { hasText: 'Settings' }).first().click({ force: true }); await page.waitForTimeout(1500);
   for (const tab of ['General', 'Plugin Hub', 'Remote access']) {
     await page.locator('nav button', { hasText: tab }).first().click({ force: true }); await page.waitForTimeout(2500);
@@ -86,10 +86,10 @@ const dismiss = async (page) => { const c = page.locator('button', { hasText: 'C
   ok('desktop: sidebar power button', await page.locator('.dsh-power-btn').count() > 0);
   await page.locator('button', { hasText: 'Settings' }).first().click({ force: true }); await page.waitForTimeout(1500);
   await page.locator('button', { hasText: 'Remote access' }).first().click({ force: true }); await page.waitForTimeout(3000);
-  // Считаем китайский ТОЛЬКО в нашей части панели. Каталог плагинов показывает
-  // рядом заметки к выпуску от авторов — у моста они по-китайски (2026-09-23:
-  // «【v2.10.13】可靠性加固…»), и наивный подсчёт по всей панели давал ложный
-  // провал. Блоки каталога и заметок исключаем по классу и по маркеру версии.
+  // Count Chinese ONLY in our part of the panel. The plugin catalog shows the
+  // authors' release notes next to it, and the bridge's are in Chinese, so a
+  // naive count over the whole panel produced a false failure. Catalog and
+  // release-note blocks are excluded by class and by the version marker.
   const chinese = await page.evaluate(() => {
     const panel = document.querySelector('div[class*="_panel"]');
     if (panel === null) return 0;

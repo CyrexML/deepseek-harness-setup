@@ -1,13 +1,12 @@
-﻿# Возврат таймаутов сна после перезагрузки, случившейся во время работы стенда.
+﻿# Restore the sleep timeouts after a reboot that happened while the stand ran.
 #
-# Лончер (harness-start.ps1) на время работы ставит standby/hibernate-timeout-ac
-# в 0 через `powercfg /change` — это ПОСТОЯННАЯ настройка схемы питания, и если
-# Windows перезагрузилась сама (обновление, ночь на 2026-09-15), ПК после входа
-# остаётся без сна до следующего Stop лончера. Этот скрипт запускается задачей
-# планировщика «Harness AI power restore» при входе пользователя (задержка 30 с,
-# см. install-shortcuts.ps1): если лежит power-timeouts.json и лончер не
-# работает — вернуть сохранённые значения и убрать файл. Пока лончер жив,
-# ничего не трогает (он сам восстановит при остановке).
+# The launcher sets standby/hibernate-timeout-ac to 0 through `powercfg /change`
+# for the duration - a PERSISTENT power scheme setting - so if Windows rebooted on
+# its own the PC would stay sleepless until the launcher's next stop. The
+# "Harness AI power restore" scheduled task runs this at logon and every 15
+# minutes: when power-timeouts.json exists and no launcher is running, the saved
+# values go back and the file is removed. While the launcher lives this touches
+# nothing; it restores them itself on shutdown.
 param([string]$Saved = 'F:\Harness_AI\run\power-timeouts.json')
 $RunDir = Split-Path -Parent $Saved
 $LauncherLog = "$RunDir\launcher.log"
@@ -18,11 +17,11 @@ $launcher = Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe'" |
   Where-Object { $_.CommandLine -like '*harness-start.ps1*' }
 if ($launcher) { Log 'saved timeouts present, launcher running — leaving them to it'; exit 0 }
 
-# Стенд могли поднять напрямую из WSL (scripts/start-web.sh) — тогда лончера
-# нет, но сон глушить всё равно надо, иначе эта задача через 15 минут вернёт
-# таймауты и Windows уснёт посреди работы агента (так и было 2026-09-23).
-# Признак живого стенда: отвечает порт интерфейса. WSL2 пробрасывает свои
-# слушающие порты на 127.0.0.1 Windows, поэтому проверка работает отсюда.
+# The stand may have been started straight from WSL, with no launcher at all, and
+# sleep still has to stay off - otherwise this task would restore the timeouts 15
+# minutes later and Windows would sleep mid-run. A live stand is detected by its
+# interface port: WSL2 forwards listening ports to 127.0.0.1 on the Windows side,
+# so the check works from here.
 $WebPort = if ($env:DSH_WEB_PORT) { [int]$env:DSH_WEB_PORT } else { 3080 }
 $webAlive = $false
 try {

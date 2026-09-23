@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# Подставляет актуальный адрес Windows-хоста в .dsh/config.json.
-# Нужен, пока сеть WSL работает в режиме NAT: адрес шлюза меняется при
-# каждом перезапуске WSL, поэтому константу в конфиг вписывать нельзя
-# (§7.3 decision-01). В зеркальном режиме (§7.2) скрипт не нужен —
-# там достаточно 127.0.0.1.
+# Write the current Windows host address into .dsh/config.json.
+# Needed while WSL networking runs in NAT mode: the gateway address changes on
+# every WSL restart, so a constant cannot be written into the config. In mirrored
+# mode the script is unnecessary - 127.0.0.1 is enough there.
 set -euo pipefail
 cfg="$(dirname "$0")/../../.dsh/config.json"
 gw="$(ip route show default | awk '{print $3}')"

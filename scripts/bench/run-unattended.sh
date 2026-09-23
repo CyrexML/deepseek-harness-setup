@@ -1,41 +1,44 @@
 #!/usr/bin/env bash
-# Ночной прогон: короткие сессии под внешним драйвером.
+# Unattended run: short sessions under an external driver.
 #
-# ЗАЧЕМ ИМЕННО ТАК. Агент не может сам перейти в новый чат, когда контекст
-# кончается. Поэтому долго живёт не сессия, а ЭТОТ цикл: каждая итерация —
-# отдельный процесс `dsh --profile headless` с чистым контекстом, а сквозной
-# памятью служит рабочий каталог (docs/bench-04 §5). Любой отказ внутри
-# (max-tokens, переполнение окна, падение llama-server) завершает процесс,
-# драйвер видит код возврата и запускает следующую итерацию заново.
+# WHY THIS SHAPE. The agent cannot move to a new chat by itself when the context
+# runs out, so what lives long is THIS loop rather than a session: each iteration
+# is a separate `dsh --profile headless` process with a clean context, and the
+# working directory serves as the memory between them. Any failure inside
+# (max-tokens, an overflowing window, llama-server dying) ends the process, the
+# driver sees the exit code and starts the next iteration from scratch.
 #
-# Почему не `ralph`: его раунды тоже свежие, но «an ordinary child failure
-# returns an error naming the failed round» — один упавший раунд убивает весь
-# цикл. При нашей истории с max-tokens это отказ на первой тяжёлой отладке.
+# Why not `ralph`: its rounds are fresh too, but "an ordinary child failure
+# returns an error naming the failed round" - one failed round kills the whole
+# loop, which with this stand's max-tokens history means stopping at the first
+# hard debugging step.
 #
-# ГЛАВНОЕ: условие остановки проверяет ДРАЙВЕР, а не модель. Заявление агента
-# «готово» — это его отчёт, а не сертификация. Здесь готовность = GATE вернул 0.
+# THE POINT: the stop condition is checked by the DRIVER, not by the model. The
+# agent saying "done" is its report, not a certification. Here done = GATE
+# returned 0.
 #
-#   run-unattended.sh <каталог> <файл-с-задачей> [итераций]
+#   run-unattended.sh <directory> <task-file> [iterations]
 #
-# Переменные: GATE (команда-критерий), STALL (сколько итераций без изменений
-# в дереве считать застреванием), DSH_BIN, DSH_PATCH.
+# Variables: GATE (the criterion command), STALL (how many iterations without a
+# change in the tree count as stuck), DSH_BIN, DSH_PATCH.
 set -uo pipefail
 
-REPO="${1:?укажите каталог проекта}"
-TASKFILE="${2:?укажите файл с текстом задачи}"
+REPO="${1:?give the project directory}"
+TASKFILE="${2:?give the file with the task text}"
 MAX_ITER="${3:-20}"
 
 GATE="${GATE:-node --test 'test/*.test.js'}"
-# Потолок на одну итерацию. Найден замером: сессия может уйти в дегенеративную
-# петлю (дословный повтор абзаца) и генерировать часами, НЕ упираясь ни в
-# max-tokens, ни в окно. Без потолка ночной прогон встаёт на первой такой.
+# Per-iteration ceiling, found by measurement: a session can fall into a
+# degenerate loop (repeating a paragraph verbatim) and generate for hours without
+# hitting max-tokens or the window. Without the ceiling an unattended run stalls
+# on the first one.
 ITER_TIMEOUT="${ITER_TIMEOUT:-600}"
 STALL="${STALL:-3}"
 DSH_BIN="${DSH_BIN:-$HOME/tools/deepseek-harness/apps/cli/lib/bin.js}"
 DSH_PATCH="${DSH_PATCH:-$HOME/Harness_AI/run/headless-local.yml}"
 
-[ -d "$REPO" ] || { echo "нет каталога: $REPO" >&2; exit 1; }
-[ -f "$TASKFILE" ] || { echo "нет файла задачи: $TASKFILE" >&2; exit 1; }
+[ -d "$REPO" ] || { echo "no such directory: $REPO" >&2; exit 1; }
+[ -f "$TASKFILE" ] || { echo "no task file: $TASKFILE" >&2; exit 1; }
 REPO="$(cd "$REPO" && pwd -P)"
 TASK="$(cat "$TASKFILE")"
 
@@ -47,8 +50,8 @@ STATUS="$RUNDIR/status.tsv"
 export PATH="$HOME/.local/node/bin:$PATH"
 export DSH_LLAMA_KEY="local-no-auth"
 
-# Слепок дерева — для обнаружения застревания. Служебный каталог исключён,
-# иначе собственные логи выглядели бы как прогресс.
+# A tree fingerprint for stall detection. The run's own directory is excluded,
+# otherwise its logs would look like progress.
 tree_hash() {
   find "$REPO" -type f -not -path "$RUNDIR/*" -not -path "*/.git/*" \
     -printf '%p %s %T@\n' 2>/dev/null | sort | md5sum | cut -d' ' -f1
@@ -61,61 +64,60 @@ stall_count=0
 started=$(date +%s)
 
 for i in $(seq 1 "$MAX_ITER"); do
-  # llama-server проверяем ПЕРВЫМ делом каждую итерацию: он умеет завершаться
-  # молча, лог обрывается чисто на `all slots are idle` (getting-started §5).
-  # Адрес резолвим заново — шлюз WSL меняется при перезапуске. Но если он
-  # задан снаружи, НЕ трогаем: bench-10 пускает трафик через перехватывающий
-  # прокси, и безусловная перезапись молча увела бы прогон мимо него —
-  # дампы вышли бы пустыми, а слепота детектора осталась бы незамеченной.
+  # llama-server is checked FIRST every iteration: it can exit silently with the
+  # log ending cleanly on `all slots are idle`. The address is resolved again
+  # because the WSL gateway changes on restart - but an externally supplied one is
+  # left alone, since a run may be routed through an intercepting proxy and
+  # overwriting it would silently bypass that.
   if [ -z "${DSH_LLAMA_BASE_URL:-}" ]; then
     export DSH_LLAMA_BASE_URL="http://$(ip route show default | awk '{print $3}'):8080/v1"
   fi
   if ! curl -sf --max-time 10 "$DSH_LLAMA_BASE_URL/models" > /dev/null; then
-    say "итерация $i: llama-server не отвечает, жду 60 с"
+    say "iteration $i: llama-server does not answer, waiting 60 s"
     printf '%s\t%s\tno-server\t-\t-\n' "$i" "$(date +%s)" >> "$STATUS"
     sleep 60
     continue
   fi
 
-  say "итерация $i из $MAX_ITER"
+  say "iteration $i of $MAX_ITER"
   LOG="$RUNDIR/iter-$(printf '%02d' "$i").log"
-  # Строку пишем СРАЗУ: пока итерация идёт, монитору иначе нечего показать —
-  # ровно в тот момент, когда смотреть нужнее всего.
-  printf '%s\t%s\tидёт\t-\t-\n' "$i" "$(date +%s)" >> "$STATUS"
+  # The row is written IMMEDIATELY: while an iteration runs the monitor would
+  # otherwise have nothing to show, exactly when watching matters most.
+  printf '%s\t%s\trunning\t-\t-\n' "$i" "$(date +%s)" >> "$STATUS"
   t0=$(date +%s)
   ( cd "$REPO" && timeout --signal=TERM --kill-after=30 "$ITER_TIMEOUT" \
       node "$DSH_BIN" --profile headless --patch "$DSH_PATCH" "$TASK" ) > "$LOG" 2>&1
   rc=$?
   t1=$(date +%s)
-  # 124 — сработал timeout. Отличаем от обычного отказа: это почти всегда петля.
+  # 124 means the timeout fired. Told apart from an ordinary failure: it is almost always a loop.
   if [ "$rc" -eq 124 ] || [ "$rc" -eq 137 ]; then
-    say "  ОБОРВАНА по таймауту ${ITER_TIMEOUT}с — вероятна петля повторов"
+    say "  ABORTED by the ${ITER_TIMEOUT}s timeout - a repetition loop is likely"
   fi
-  # Убираем строку «идёт», её заменит итоговая.
-  awk -F'\t' -v it="$i" '!($1==it && $3=="идёт")' "$STATUS" > "$STATUS.tmp" && mv "$STATUS.tmp" "$STATUS"
+  # Drop the "running" row; the final one replaces it.
+  awk -F'\t' -v it="$i" '!($1==it && $3=="running")' "$STATUS" > "$STATUS.tmp" && mv "$STATUS.tmp" "$STATUS"
 
-  # Критерий — наш, не модели.
+  # The criterion is the driver's, not the model's.
   gate_out="$RUNDIR/gate-$(printf '%02d' "$i").log"
   ( cd "$REPO" && eval "$GATE" ) > "$gate_out" 2>&1
   gate_rc=$?
 
   printf '%s\t%s\trc=%s\tgate=%s\t%ss\n' "$i" "$(date +%s)" "$rc" "$gate_rc" "$((t1-t0))" >> "$STATUS"
-  say "  сессия rc=$rc, критерий rc=$gate_rc, $((t1-t0)) с"
+  say "  session rc=$rc, criterion rc=$gate_rc, $((t1-t0)) s"
 
   if [ "$gate_rc" -eq 0 ]; then
-    say "ГОТОВО на итерации $i, всего $(( ($(date +%s)-started)/60 )) мин"
+    say "DONE at iteration $i, $(( ($(date +%s)-started)/60 )) minutes total"
     echo "done $i" > "$RUNDIR/result"
     exit 0
   fi
 
-  # Застревание: дерево не менялось несколько итераций подряд. Без этого цикл
-  # честно выжжет все итерации, повторяя один и тот же неудачный ход.
+  # Stuck: the tree has not changed for several iterations in a row. Without this
+  # the loop would burn through every iteration repeating the same failed move.
   h="$(tree_hash)"
   if [ "$h" = "$prev_hash" ]; then
     stall_count=$((stall_count+1))
-    say "  без изменений в дереве ($stall_count из $STALL)"
+    say "  no change in the tree ($stall_count of $STALL)"
     if [ "$stall_count" -ge "$STALL" ]; then
-      say "ОСТАНОВ: $STALL итераций подряд без единого изменения"
+      say "STOP: $STALL iterations in a row without a single change"
       echo "stalled $i" > "$RUNDIR/result"
       exit 2
     fi
@@ -125,6 +127,6 @@ for i in $(seq 1 "$MAX_ITER"); do
   prev_hash="$h"
 done
 
-say "ОСТАНОВ: исчерпаны $MAX_ITER итераций, критерий не выполнен"
+say "STOP: $MAX_ITER iterations exhausted, the criterion was not met"
 echo "budget $MAX_ITER" > "$RUNDIR/result"
 exit 3

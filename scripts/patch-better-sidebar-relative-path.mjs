@@ -1,47 +1,45 @@
-// better-sidebar: ссылка на файл ИЗ ЧАТА должна открываться так же, как из проводника.
+// better-sidebar: a file link FROM THE CHAT must open the same way as one from
+// the explorer.
 //
-// ПРИЧИНА. Маршрут превью `/sidebar/html/<sessionId>/<путь>` собирает путь из
-// сегментов URL и считает его АБСОЛЮТНЫМ (lib/index.js:669 decodeHtmlUrl:
-// `path = "/" + tail.join("/")`). Строит адрес `htmlUrl(scope, path)`
-// (lib/client.js:3832) — и передаёт путь как есть.
+// WHY. The preview route `/sidebar/html/<sessionId>/<path>` builds the path out
+// of URL segments and treats it as ABSOLUTE (lib/index.js:669 decodeHtmlUrl:
+// `path = "/" + tail.join("/")`), and `htmlUrl(scope, path)` (lib/client.js:3832)
+// passes the path through unchanged.
 //
-// Из проводника сайдбара путь приходит абсолютный ("/home/user/проект/cv.html"),
-// и всё работает. А из переписки хост даёт путь ОТНОСИТЕЛЬНО рабочей области
-// ("cv.html", "out/shot.png") — тогда получается URL
-// `/sidebar/html/session-…/cv.html`, сервер раскрывает его в "/cv.html", файл
-// оказывается вне рабочей области и запрос отвечает 400. Пользователь видит:
-// по ссылке в чате — ошибка/пустая панель, а тот же файл из проводника
-// открывается нормально (проверено 2026-09-23 на cv.html).
+// From the sidebar explorer the path arrives absolute and everything works. From
+// the conversation the host gives a path RELATIVE to the workspace ("cv.html",
+// "out/shot.png"), the URL becomes `/sidebar/html/session-.../cv.html`, the
+// server expands it to "/cv.html", the file ends up outside the workspace and the
+// request answers 400. What the user sees: a link in the chat fails while the
+// same file opens fine from the explorer.
 //
-// ПАТЧ. `htmlUrl` достраивает относительный путь рабочим каталогом сессии —
-// ровно тем же помощником `resolveSidebarPath(cwd, path)` (lib/client.js:3180),
-// которым плагин уже пользуется в перехвате строки «произведённые файлы».
-// Абсолютные пути проходят насквозь: первая же строка помощника возвращает их
-// без изменений. Ровно та же беда у соседнего маршрута `/sidebar/file`
-// (картинки из чата, скачивание): он передаёт cwd отдельным параметром, но
-// сервер всё равно требует абсолютный путь (lib/index.js:295 requireAbsolute),
-// поэтому достраивается и он.
+// THE PATCH. `htmlUrl` completes a relative path with the session's working
+// directory, using the very helper the plugin already uses elsewhere -
+// `resolveSidebarPath(cwd, path)` (lib/client.js:3180). Absolute paths pass
+// through untouched: the helper's first line returns them as they are. The
+// neighbouring `/sidebar/file` route (images from the chat, downloads) has the
+// same problem - it passes cwd as a separate parameter but the server still
+// requires an absolute path (lib/index.js:295 requireAbsolute) - so it is
+// completed as well.
 //
-// В lib/client-editor.js (отдельный чанк редактора) своей копии
-// resolveSidebarPath нет, поэтому туда вставляется маленький встроенный
-// эквивалент.
+// lib/client-editor.js is a separate editor chunk with no copy of
+// resolveSidebarPath, so a small inline equivalent is injected there.
 //
-// Запись через unlink: файлы плагина — хардлинки в pnpm-store.
+// Written through unlink: plugin files are hardlinks into the pnpm store.
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const dir = process.argv[2] || `${process.env.HOME}/.dsh/profiles/web/node_modules/dsh-better-sidebar`;
 const MARK = '/* dsh-local: relative path in chat links */';
 
-// Файлы, где живёт htmlUrl, и замена для каждого: в основном бандле есть
-// resolveSidebarPath, в чанке редактора — нет.
-// Маршрут /sidebar/file (картинки в чате, скачивание): сервер тоже требует
-// абсолютный путь (lib/index.js:295 requireAbsolute), а параметр cwd служит
-// только границей рабочей области, но не основой для достройки. Из чата путь
-// приходит относительным ("out/shot.png") — запрос отвечает 400, картинка не
-// открывается. Достраиваем так же, как в htmlUrl.
+// Where htmlUrl lives and what replaces it in each file: the main bundle has
+// resolveSidebarPath, the editor chunk does not.
+// The /sidebar/file route (chat images, downloads) also requires an absolute
+// path (lib/index.js:295 requireAbsolute); its cwd parameter only bounds the
+// workspace and is not used to complete the path, so a relative path from the
+// chat answers 400 and the image never opens. Complete it the same way.
 const FILE_URL_ANCHOR = '\t\t\tconst params = new URLSearchParams({\n\t\t\t\tsessionId: scope.sessionId,\n\t\t\t\tpath\n\t\t\t});\n';
-const FILE_URL_PATCH = `\t\t\tconst params = new URLSearchParams({ ${MARK} // из чата путь приходит относительным
+const FILE_URL_PATCH = `\t\t\tconst params = new URLSearchParams({ ${MARK} // a path from the chat arrives relative
 \t\t\t\tsessionId: scope.sessionId,
 \t\t\t\tpath: resolveSidebarPath(scope.cwd, path)
 \t\t\t});
@@ -51,7 +49,7 @@ const targets = [
   {
     file: 'lib/client.js',
     anchor: '\t\tfunction htmlUrl(scope, path) {\n\t\t\treturn encodeHtmlUrl(scope.sessionId, path);\n\t\t}\n',
-    patch: `\t\tfunction htmlUrl(scope, path) { ${MARK} // из чата путь приходит относительным
+    patch: `\t\tfunction htmlUrl(scope, path) { ${MARK} // a path from the chat arrives relative
 \t\t\treturn encodeHtmlUrl(scope.sessionId, resolveSidebarPath(scope.cwd, path));
 \t\t}
 `,
@@ -59,7 +57,7 @@ const targets = [
   {
     file: 'lib/client-registry.js',
     anchor: '\t\tfunction htmlUrl(scope, path) {\n\t\t\treturn encodeHtmlUrl(scope.sessionId, path);\n\t\t}\n',
-    patch: `\t\tfunction htmlUrl(scope, path) { ${MARK} // из чата путь приходит относительным
+    patch: `\t\tfunction htmlUrl(scope, path) { ${MARK} // a path from the chat arrives relative
 \t\t\treturn encodeHtmlUrl(scope.sessionId, resolveSidebarPath(scope.cwd, path));
 \t\t}
 `,
@@ -67,7 +65,7 @@ const targets = [
   {
     file: 'lib/client-editor.js',
     anchor: '\tfunction htmlUrl(scope, path) {\n\t\treturn encodeHtmlUrl(scope.sessionId, path);\n\t}\n',
-    patch: `\tfunction htmlUrl(scope, path) { ${MARK} // из чата путь приходит относительным
+    patch: `\tfunction htmlUrl(scope, path) { ${MARK} // a path from the chat arrives relative
 \t\tconst absolute = (() => {
 \t\t\tif (/^([A-Za-z]:[\\\\/]|[\\\\/])/.test(path)) return path;
 \t\t\tconst base = (scope.cwd ?? "").replace(/[\\\\/]+$/, "");
@@ -87,14 +85,14 @@ for (const { file, anchor, patch } of targets) {
   let s = readFileSync(path, 'utf8');
   if (s.includes(MARK)) { already++; continue; }
   const n = s.split(anchor).length - 1;
-  if (n !== 1) { console.error(`${file}: MATCH COUNT ${n} для якоря htmlUrl`); process.exit(1); }
+  if (n !== 1) { console.error(`${file}: MATCH COUNT ${n} for the htmlUrl anchor`); process.exit(1); }
   s = s.replace(anchor, patch);
-  // второй якорь: только там, где есть fileUrl (основной бандл и реестр)
+  // second anchor: only where fileUrl exists (the main bundle and the registry)
   const fileHits = s.split(FILE_URL_ANCHOR).length - 1;
   if (fileHits === 1) s = s.replace(FILE_URL_ANCHOR, FILE_URL_PATCH);
-  else if (fileHits > 1) { console.error(`${file}: MATCH COUNT ${fileHits} для якоря fileUrl`); process.exit(1); }
+  else if (fileHits > 1) { console.error(`${file}: MATCH COUNT ${fileHits} for the fileUrl anchor`); process.exit(1); }
   rmSync(path, { force: true });
   writeFileSync(path, s);
   touched++;
 }
-console.log(`better-sidebar: относительные пути из чата — обновлено ${touched}, уже было ${already}, нет файла ${missing}`);
+console.log(`better-sidebar: relative paths from the chat - updated ${touched}, already patched ${already}`);

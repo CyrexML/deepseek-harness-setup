@@ -23,10 +23,10 @@ const path = process.argv[2] || `${process.env.DSH_ROOT ?? `${process.env.HOME}/
 const MARK = '/* dsh-local: replay usage */';
 let s = readFileSync(path, 'utf8');
 let applied = 0, skipped = 0;
-// Якорь задаётся списком вариантов (сигнатуры уезжают между версиями харнеса:
-// 0.1.6-alpha.2 добавил requestedModel/systemPrompt/providerThinkingLevel).
-// Берём первый вариант, встречающийся ровно один раз; `{ANCHOR}` в тексте замены
-// подставляется найденным вариантом.
+// The anchor is a list of variants: signatures move between harness versions
+// (0.1.6-alpha.2 added requestedModel/systemPrompt/providerThinkingLevel). The
+// first variant occurring exactly once is used, and `{ANCHOR}` in the replacement
+// text is substituted with it.
 function edit(anchors, bRaw) {
   const list = Array.isArray(anchors) ? anchors : [anchors];
   const a = list.find(x => s.split(x).length - 1 === 1);
@@ -81,7 +81,7 @@ function dropStaleUsage(source, messages) {
 }
 {ANCHOR}`);
 
-// 1b. writer: положить usage в response (спред в объекте, который вернёт toPiReplayState)
+// 1b. writer: put usage into the response (spread into the object toPiReplayState returns)
 edit(
 ["\t\treturn {\n\t\t\tresponse: {\n\t\t\t\tkind: \"pi-ai\",", "\treturn {\n\t\tresponse: {\n\t\t\tkind: \"pi-ai\","],
 `{ANCHOR}

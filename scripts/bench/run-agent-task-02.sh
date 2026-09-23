@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-# Прогон эталонной задачи 01 против локального llama-server.
+# Reference task run against the local llama-server.
 #
-# Запускать ТОЛЬКО собранным бинарником apps/cli/lib/bin.js и ТОЛЬКО из
-# каталога задачи:
-#   - профиль headless берёт рабочий каталог агента из process.cwd()
-#     (packages/bundle/headless/src/index.ts:186), поле cwd в agent-loop
-#     под ним холостое;
-#   - `pnpm dsh` всегда стартует из корня workspace;
-#   - прямой вызов исходников из чужого cwd падает на разрешении модулей
-#     (@deepseek-ai/cordis не отдаёт FiberState).
+# Run ONLY the built binary apps/cli/lib/bin.js and ONLY from the task directory:
+#   - the headless profile takes the agent's working directory from process.cwd()
+#     (packages/bundle/headless/src/index.ts:186); the cwd field in agent-loop is
+#     inert under it;
+#   - `pnpm dsh` always starts from the workspace root;
+#   - calling the sources directly from another cwd fails on module resolution.
 set -euo pipefail
 
 DSH_BIN="${DSH_BIN:-$HOME/tools/deepseek-harness/apps/cli/lib/bin.js}"
@@ -23,12 +21,12 @@ export DSH_LLAMA_KEY="local-no-auth"
 echo "baseURL = $DSH_LLAMA_BASE_URL"
 echo "cwd     = $REPO"
 
-TASK='В репозитории падают тесты в tests/test_attribution.py. Почини так, чтобы весь набор python3 -m pytest проходил целиком. Остальные тесты ломать нельзя.'
+TASK='Tests in tests/test_attribution.py are failing in this repository. Fix it so that the whole python3 -m pytest suite passes. Do not break the other tests.'
 
-# decision-07 s3: расход VRAM рабочим столом не константа, состав машины
-# записываем для сопоставимости прогонов.
+# Desktop VRAM usage is not a constant, so the machine state is recorded to keep
+# runs comparable.
 {
-  echo "=== состояние машины на момент прогона ==="
+  echo "=== machine state at run time ==="
   nvidia-smi --query-gpu=memory.used,memory.total --format=csv,noheader
   /mnt/c/Windows/System32/nvidia-smi.exe --query-compute-apps=pid,process_name \
     --format=csv,noheader 2>/dev/null | sed 's/^/  /'
@@ -42,4 +40,4 @@ rc=$?
 set -e
 echo "EXIT=$rc" >> "$OUT"
 date +%s > "$OUT.end"
-echo "готово, rc=$rc"
+echo "done, rc=$rc"

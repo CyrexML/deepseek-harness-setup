@@ -1,23 +1,22 @@
-// Recall graph-memory только из сессий текущего workspace.
+// Recall graph-memory only from sessions of the current workspace.
 //
-// Плагин graph-memory (dist/dsh.js, agent/pre-step) перед каждым сообщением
-// пользователя вставляет «воспоминания» — turn memories, отобранные FTS5 по
-// тексту вопроса из ВСЕЙ базы. Границы проекта у него нет
-// (dist/src/format/dsh-recall.js filterDshRecallMemories отсекает только
-// текущую сессию), поэтому в Cooking_APP приезжали заметки про холст другого
-// проекта: 700–4 500 токенов на ход, до 12.6 % всего, что входило в контекст
-// (аудит 2026-09-15, сессии e86c8a24 / 5f83de34).
+// The graph-memory plugin (dist/dsh.js, agent/pre-step) injects "memories" before
+// every user message - turn memories selected by FTS5 over the WHOLE database. It
+// has no project boundary (dist/src/format/dsh-recall.js filterDshRecallMemories
+// only excludes the current session), so notes from a different project arrived
+// in this one: 700-4500 tokens per turn, up to 12.6% of everything entering the
+// context.
 //
-// cwd в базе плагина не хранится, но DSH раскладывает журналы сессий по
-// workspace: ~/.dsh/sessions/<ключ>/session-<id>, где ключ = '-' + cwd с '/'
-// заменёнными на '-' + '--'. Патч строит карту «id сессии → ключ» (кэш 60 с)
-// и оставляет только memories сессий с тем же ключом, что у cwd текущей
-// сессии. Навигационные тройки и episodic-контекст в assemble.js уже
-// фильтруются по отобранным memories, отдельно их трогать не надо.
+// The plugin's database does not store cwd, but DSH lays session journals out by
+// workspace: ~/.dsh/sessions/<key>/session-<id>, where the key is '-' + cwd with
+// '/' replaced by '-' + '--'. The patch builds a "session id -> key" map (cached
+// for 60 s) and keeps only memories from sessions with the same key as the
+// current session's cwd. Navigational triples and episodic context in assemble.js
+// are already filtered by the selected memories.
 //
-// Идемпотентен (маркер). Переприменяется scripts/ensure-patches.sh; после
-// обновления плагина якоря могут уехать — тогда MATCH COUNT ≠ 1 и выход 1.
-// Запись через unlink: файл — хардлинк на pnpm-store.
+// Idempotent (marker). Re-applied by scripts/ensure-patches.sh; after a plugin
+// update the anchors may move - then MATCH COUNT is not 1 and it exits 1.
+// Written through unlink: the file is a hardlink into the pnpm store.
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
 const path = process.argv[2] || `${process.env.HOME}/.dsh/profiles/web/node_modules/graph-memory/dist/dsh.js`;
 const MARK = '/* dsh-local: workspace-scoped recall */';
@@ -29,7 +28,8 @@ function edit(a, b) {
   s = s.replace(a, b);
 }
 
-// 1. Помощник — после блока импортов (первая строка, не начинающаяся с import/комментария).
+// 1. Helper, right after the import block (the first line that is neither an
+//    import nor a comment).
 edit(
 `function sessionKey(id) {`,
 `${MARK}
@@ -46,7 +46,7 @@ function __dshWorkspaceOfSession() {
             if (!ws.isDirectory()) continue;
             for (const e of __dshReaddir(__dshJoin(root, ws.name))) map.set(e.replace(/^session-/, ""), ws.name);
         }
-    } catch { /* нет каталога — карта пустая, фильтр пропустит всё */ }
+    } catch { /* no directory: the map stays empty and the filter passes everything */ }
     __dshWsMap = map; __dshWsAt = Date.now();
     return map;
 }
@@ -59,7 +59,7 @@ function __dshScopeMemories(memories, cwd) {
 }
 function sessionKey(id) {`);
 
-// 2. Точка фильтра.
+// 2. The filter point.
 edit(
 `            const recalledMemories = filterDshRecallMemories(recalled.turnMemories, currentSession, visibleMessageIds);`,
 `            const recalledMemories = __dshScopeMemories(filterDshRecallMemories(recalled.turnMemories, currentSession, visibleMessageIds), agent?.session?.header?.cwd); ${MARK}`);

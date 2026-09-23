@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Эксперимент B: три прогона задачи-02 на рабочем окне 32k.
+# Experiment B: three runs of task 02 on a 32k working window.
 set -euo pipefail
 OUT="${1:-$HOME/Harness_AI/bench/results/task02}"
 RUNS="${RUNS:-3}"
@@ -15,7 +15,7 @@ for i in $(seq 1 "$RUNS"); do
   en=$(cat "$OUT/run$i.log.end" 2>/dev/null || echo 0)
   rc=$(grep -a "EXIT=" "$OUT/run$i.log" 2>/dev/null | tail -1 | sed 's/EXIT=//')
   if (cd "$REPO" && python3 -m pytest -q > "$OUT/run$i.pytest" 2>&1); then solved=ДА; else solved=НЕТ; fi
-  printf 'run%-2s wall=%3ss rc=%s решена=%-3s шагов=%s | %s\n' \
+  printf 'run%-2s wall=%3ss rc=%s solved=%-3s steps=%s | %s\n' \
     "$i" "$((en-st))" "$rc" "$solved" "$((after-before))" "$(tail -1 "$OUT/run$i.pytest" | tr -d '\r')" \
     | tee -a "$OUT/summary.txt"
 done
