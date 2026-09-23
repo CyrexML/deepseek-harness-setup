@@ -13,58 +13,58 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 $cfg = Read-StandConfig
 
-Write-Step 'права администратора'
+Write-Step 'administrator rights'
 $admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
          ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if (-not $admin) { throw 'запустите PowerShell от имени администратора: установка WSL требует прав' }
-Write-Ok 'есть'
+if (-not $admin) { throw (T 'run PowerShell as administrator: installing WSL needs it') }
+Write-Ok 'present'
 
-Write-Step 'место на диске'
+Write-Step 'free disk space'
 $drive = (Split-Path -Qualifier $cfg.windowsRoot).TrimEnd(':')
 $free = [math]::Round((Get-PSDrive $drive).Free / 1GB)
-if ($free -lt 40) { Write-Warn "на диске $drive свободно $free ГБ, нужно хотя бы 40" }
-else { Write-Ok "на диске $drive свободно $free ГБ" }
+if ($free -lt 40) { Write-Warn 'drive {0} has {1} GB free, at least 40 are needed' $drive $free }
+else { Write-Ok 'drive {0} has {1} GB free' $drive $free }
 
-Write-Step 'видеокарта и драйвер'
+Write-Step 'GPU and driver'
 $smi = try { & nvidia-smi --query-gpu=name,driver_version --format=csv,noheader 2>$null } catch { $null }
 if ($smi) { Write-Ok $smi }
 else {
-  Write-Warn 'nvidia-smi не найден. Стенд рассчитан на видеокарту NVIDIA.'
-  Write-Info 'Поставьте свежий драйвер GeForce/Studio с nvidia.com и запустите этот шаг снова.'
-  Write-Info 'Без видеокарты стенд тоже поднимется, но модель будет считаться на процессоре — очень медленно.'
+  Write-Warn 'nvidia-smi not found. The stand is built for an NVIDIA GPU.'
+  Write-Info 'Install a current GeForce/Studio driver from nvidia.com and run this step again.'
+  Write-Info 'The stand still installs without a GPU, but the model then runs on the CPU - very slowly.'
 }
 
 Write-Step 'WSL2'
 $wslOk = $false
 try { & wsl.exe --status *>$null; $wslOk = ($LASTEXITCODE -eq 0) } catch { $wslOk = $false }
 if (-not $wslOk) {
-  Write-Info 'ставлю WSL2 (потребуется перезагрузка)'
+  Write-Info 'installing WSL2 (a reboot will be needed)'
   & wsl.exe --install --no-distribution
-  Write-Warn 'перезагрузите компьютер и запустите этот скрипт снова'
+  Write-Warn 'reboot the computer and run this script again'
   return
 }
-Write-Ok 'установлен'
+Write-Ok 'installed'
 
-Write-Step "дистрибутив $($cfg.wslDistro)"
+Write-Step 'distribution {0}' $cfg.wslDistro
 $installed = (& wsl.exe --list --quiet) -replace "`0", '' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
 if ($installed -contains $cfg.wslDistro) {
-  Write-Ok 'уже есть'
+  Write-Ok 'already there'
 } else {
-  Write-Info "устанавливаю $($cfg.wslDistro) — откроется окно с созданием пользователя"
+  Write-Info 'installing {0} - a window will open to create the user' $cfg.wslDistro
   & wsl.exe --install -d $cfg.wslDistro
-  Write-Info 'после создания пользователя закройте окно дистрибутива и запустите install.ps1 снова'
+  Write-Info 'after creating the user close the distribution window and run install.ps1 again'
   return
 }
 
-Write-Step 'версия WSL у дистрибутива'
+Write-Step 'WSL version of the distribution'
 $verbose = (& wsl.exe --list --verbose) -replace "`0", ''
 if ($verbose -match "$($cfg.wslDistro)\s+\w+\s+1\b") {
-  Write-Info 'дистрибутив на WSL1 — перевожу на WSL2 (это займёт несколько минут)'
+  Write-Info 'the distribution is on WSL1 - converting to WSL2 (a few minutes)'
   & wsl.exe --set-version $cfg.wslDistro 2
 }
 Write-Ok 'WSL2'
 
-Write-Step 'доступ WSL → Windows по сети'
+Write-Step 'network access from WSL to Windows'
 # llama-server listens on Windows, the interface runs in WSL; without this rule
 # requests from WSL to the model port are silently dropped.
 # Scoped to the WSL subnet and loopback on purpose: llama-server runs without an
@@ -76,15 +76,15 @@ $existing = Get-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue
 if (-not $existing) {
   New-NetFirewallRule -DisplayName $rule -Direction Inbound -Action Allow `
       -Protocol TCP -LocalPort $cfg.modelPort -RemoteAddress $allowFrom -Profile Any | Out-Null
-  Write-Ok "правило брандмауэра добавлено (только из WSL)"
+  Write-Ok 'firewall rule added (WSL only)'
 } else {
   # A rule left by an older installer version may have no address restriction;
   # narrow it in place rather than leaving it open.
   $from = ($existing | Get-NetFirewallAddressFilter).RemoteAddress
   if ($from -contains 'Any') {
     Set-NetFirewallRule -DisplayName $rule -RemoteAddress $allowFrom | Out-Null
-    Write-Ok 'правило брандмауэра сужено до подсети WSL'
-  } else { Write-Ok 'правило брандмауэра уже есть (ограничено)' }
+    Write-Ok 'firewall rule narrowed to the WSL subnet'
+  } else { Write-Ok 'firewall rule already there (restricted)' }
 }
 
-Write-Done 'предварительные условия выполнены'
+Write-Done 'prerequisites are met'

@@ -35,34 +35,35 @@ $root = $cfg.windowsRoot
 $distro = $cfg.wslDistro
 
 Write-Host ''
-Write-Host '  Удаление стенда Harness AI' -ForegroundColor Yellow
+Write-Host (T '  Removing the Harness AI stand') -ForegroundColor Yellow
 Write-Host ''
-Write-Host '  будет удалено:'
-Write-Host "    - ярлыки, задача планировщика, правило брандмауэра (порт $($cfg.modelPort))"
-Write-Host "    - движок и скрипты запуска: $root\llama.cpp, $root\run"
-if (-not $KeepModel) { Write-Host "    - модели: $root\models" } else { Write-Host '    - модели: ОСТАЮТСЯ (-KeepModel)' }
-if (-not $KeepData)  { Write-Host '    - данные DSH внутри WSL: ~/.dsh (переписки, память агента, настройки)' }
-else { Write-Host '    - данные DSH: ОСТАЮТСЯ (-KeepData)' }
-Write-Host '    - код стенда внутри WSL: ~/Harness_AI, ~/tools/deepseek-harness, ~/harness-stand'
-if ($RemoveWsl) { Write-Host "    - ДИСТРИБУТИВ WSL «$distro» ЦЕЛИКОМ" -ForegroundColor Red }
+Write-Host (T '  to be removed:')
+Write-Host (T '    - shortcuts, the scheduled task, the firewall rule (port {0})' @($cfg.modelPort))
+Write-Host (T '    - engine and launch scripts: {0}\llama.cpp, {0}\run' @($root))
+if (-not $KeepModel) { Write-Host (T '    - models: {0}\models' @($root)) } else { Write-Host (T '    - models: KEPT (-KeepModel)') }
+if (-not $KeepData)  { Write-Host (T '    - DSH data inside WSL: ~/.dsh (chats, agent memory, settings)') }
+else { Write-Host (T '    - DSH data: KEPT (-KeepData)') }
+Write-Host (T '    - stand code inside WSL: ~/Harness_AI, ~/tools/deepseek-harness, ~/harness-stand')
+if ($RemoveWsl) { Write-Host (T '    - THE ENTIRE WSL DISTRIBUTION "{0}"' @($distro)) -ForegroundColor Red }
 Write-Host ''
-Write-Host '  НЕ трогаем: саму Windows, WSL как компонент системы, драйвер видеокарты и ваши проекты вне стенда.'
+Write-Host (T '  Left alone: Windows itself, WSL as a system component, the GPU driver and your projects outside the stand.')
 Write-Host ''
-Write-Host '  Режимы:' -ForegroundColor Cyan
-Write-Host '    uninstall.cmd                 обычное удаление (спросит подтверждение)'
-Write-Host '    uninstall.cmd -KeepModel      оставить скачанные модели (их долго качать заново)'
-Write-Host '    uninstall.cmd -KeepData       оставить переписки, память агента и настройки'
-Write-Host '    uninstall.cmd -All            ПОД НОЛЬ: всё выше + дистрибутив WSL целиком'
+Write-Host (T '  Modes:') -ForegroundColor Cyan
+Write-Host (T '    uninstall.cmd                 normal removal (asks for confirmation)')
+Write-Host (T '    uninstall.cmd -KeepModel      keep the downloaded models (slow to fetch again)')
+Write-Host (T '    uninstall.cmd -KeepData       keep chats, agent memory and settings')
+Write-Host (T '    uninstall.cmd -All            EVERYTHING: the above plus the whole WSL distribution')
 Write-Host ''
 
 if (-not $Yes) {
-  $answer = Read-Host '  Удалить? Напишите "удалить" для подтверждения'
-  if ($answer -ne 'удалить') { Write-Host '  отменено'; return }
+  $word = T 'delete'
+  $answer = Read-Host (T '  Remove it? Type "{0}" to confirm' @($word))
+  if ($answer -ne $word) { Write-Host (T '  cancelled'); return }
 }
 
 function Try-Do([string]$what, [scriptblock]$action) {
   Write-Step $what
-  try { & $action; Write-Ok 'готово' } catch { Write-Warn "не удалось: $($_.Exception.Message)" }
+  try { & $action; Write-Ok 'done' } catch { Write-Warn 'failed: {0}' $_.Exception.Message }
 }
 
 Try-Do 'останавливаю стенд' {
@@ -123,16 +124,16 @@ Try-Do 'убираю пустой каталог стенда' {
 }
 
 if ($RemoveWsl -and -not $KeepWsl) {
-  Write-Warn "удаляю дистрибутив WSL «$distro» целиком — это снесёт ВСЁ, что в нём было"
+  Write-Warn 'removing the whole WSL distribution "{0}" - this wipes EVERYTHING that was in it' $distro
   if (-not $Yes) {
-    $answer = Read-Host "  Точно удалить дистрибутив $distro? Напишите его имя"
-    if ($answer -ne $distro) { Write-Host '  дистрибутив оставлен' }
+    $answer = Read-Host (T '  Really remove the distribution {0}? Type its name' @($distro))
+    if ($answer -ne $distro) { Write-Host (T '  the distribution was kept') }
     else { & wsl.exe --unregister $distro }
   } else { & wsl.exe --unregister $distro }
 }
 
 Write-Host ''
-Write-Done 'стенд удалён'
+Write-Done 'the stand is removed'
 Write-Host '  Остались нетронутыми: Windows, WSL, драйвер NVIDIA, Node.js внутри дистрибутива.'
 if ($KeepModel) { Write-Host "  Модели остались в $root\models — при новой установке мастер их подхватит." }
 if ($KeepData)  { Write-Host '  Данные DSH остались в ~/.dsh внутри WSL.' }

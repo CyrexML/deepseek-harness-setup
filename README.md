@@ -103,6 +103,17 @@ The installer explains every step as it goes:
 | `40-shortcuts` | shortcuts, autostart, power-maintenance task |
 | `50-verify` | verifies everything came up |
 
+**Message language.** The installer and the launcher speak English by default. To switch to
+Russian, set `"lang": "ru"` in `config.json`, or use the environment variable for one run:
+
+```powershell
+$env:HARNESS_LANG = 'ru'
+```
+
+Translations live in `i18n/ru.json` as a plain "English string -> translation" table. A
+string missing from the table is printed in English, so a partial translation breaks
+nothing — and a new language is one more file, not a second copy of every script.
+
 Every step is idempotent — an interrupted install can simply be started again. A single
 step can be run on its own:
 

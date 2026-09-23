@@ -34,9 +34,9 @@ function Test-Engine {
 }
 
 if (Test-Engine) {
-    Write-Step 'движок'
-    Write-Ok "уже установлен и запускается: $exe"
-    Write-Info 'чтобы переустановить — удалите папку llama.cpp и запустите шаг снова'
+    Write-Step 'engine'
+    Write-Ok 'already installed and starts: {0}' $exe
+    Write-Info 'to reinstall, delete the llama.cpp folder and run this step again'
     return
 }
 
@@ -54,41 +54,41 @@ function Get-GpuInfo {
     } catch { return $null }
 }
 
-Write-Step 'видеокарта и драйвер'
+Write-Step 'GPU and driver'
 $gpu = if ($Cpu) { $null } else { Get-GpuInfo }
 if ($null -eq $gpu) {
     if (-not $Cpu) {
-        Write-Warn 'NVIDIA не обнаружена (или нет драйвера) — ставлю сборку под процессор'
-        Write-Info 'Модель будет считаться на CPU: это в десятки раз медленнее.'
-        Write-Info 'Если карта есть — поставьте свежий драйвер с nvidia.com и запустите шаг заново.'
+        Write-Warn 'no NVIDIA GPU (or no driver) - installing the CPU build'
+        Write-Info 'The model will run on the CPU: tens of times slower.'
+        Write-Info 'If you do have a card, install a current driver from nvidia.com and run this step again.'
     }
 } else {
-    Write-Ok "$($gpu.name), драйвер $($gpu.driver), поддерживает CUDA до $($gpu.cuda)"
+    Write-Ok '{0}, driver {1}, supports CUDA up to {2}' $gpu.name $gpu.driver $gpu.cuda
 }
 
 if ($Build) {
-    Write-Step 'сборка из исходников'
+    Write-Step 'building from source'
     foreach ($tool in @('git', 'cmake')) {
-        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { throw "нет $tool — поставьте его (winget install Git.Git / Kitware.CMake)" }
+        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { throw (T 'no {0} - install it (winget install Git.Git / Kitware.CMake)' @($tool)) }
     }
-    if (-not $env:CUDA_PATH) { throw 'не найден CUDA Toolkit (переменная CUDA_PATH) — он нужен ТОЛЬКО для сборки из исходников' }
+    if (-not $env:CUDA_PATH) { throw (T 'CUDA Toolkit not found (CUDA_PATH) - it is needed ONLY for building from source') }
     if (-not (Test-Path (Join-Path $dst '.git'))) {
         New-Item -ItemType Directory -Force -Path $dst | Out-Null
-        Write-Info 'клонирую llama.cpp'
+        Write-Info 'cloning llama.cpp'
         & git clone --depth 1 https://github.com/ggml-org/llama.cpp $dst
     }
     if ($Tag) { & git -C $dst fetch --depth 1 origin tag $Tag; & git -C $dst checkout $Tag }
     Write-Info 'cmake configure (CUDA)'
     & cmake -S $dst -B (Join-Path $dst 'build') -DGGML_CUDA=ON -DLLAMA_CURL=OFF
-    Write-Info 'cmake build (десятки минут)'
+    Write-Info 'cmake build (tens of minutes)'
     & cmake --build (Join-Path $dst 'build') --config Release --target llama-server -j
-    if (-not (Test-Engine)) { throw 'сборка не дала работающий llama-server.exe' }
-    Write-Ok "собрано: $exe"
-    Write-Done 'llama.cpp собран'
+    if (-not (Test-Engine)) { throw (T 'the build produced no working llama-server.exe') }
+    Write-Ok 'built: {0}' $exe
+    Write-Done 'llama.cpp built'
     return
 }
 
-Write-Step 'поиск готовой сборки под Windows'
+Write-Step 'looking for a prebuilt Windows binary'
 $headers = @{ 'User-Agent' = 'harness-stand' }
 $releases = if ($Tag) {
     @(Invoke-RestMethod -Uri "https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/$Tag" -Headers $headers)
@@ -111,7 +111,7 @@ foreach ($rel in $releases) {
         $fit = $cudaAssets | Where-Object { $_.version -le $gpu.cuda } | Select-Object -First 1
         if (-not $fit -and $cudaAssets) {
             $fit = $cudaAssets | Select-Object -Last 1
-            Write-Warn "драйвер поддерживает CUDA до $($gpu.cuda), беру минимальную доступную сборку CUDA $($fit.version) — при ошибках обновите драйвер"
+            Write-Warn 'the driver supports CUDA up to {0}; taking the lowest available CUDA {1} build - update the driver if it fails' $gpu.cuda $fit.version
         }
         if ($fit) {
             $runtime = $rel.assets | Where-Object { $_.name -eq "cudart-llama-bin-win-cuda-$($fit.version)-x64.zip" } | Select-Object -First 1
@@ -122,29 +122,29 @@ foreach ($rel in $releases) {
     $cpu = $win | Where-Object { $_.name -match 'bin-win-cpu-x64\.zip$' } | Select-Object -First 1
     if ($cpu) { $pick = @{ release = $rel; engine = $cpu; runtime = $null; kind = 'CPU' }; break }
 }
-if ($null -eq $pick) { throw 'в последних 15 релизах llama.cpp нет сборки под Windows x64 — запустите шаг с ключом -Build' }
-Write-Ok "$($pick.release.tag_name), вариант $($pick.kind)"
+if ($null -eq $pick) { throw (T 'no Windows x64 build in the last 15 llama.cpp releases - run this step with -Build') }
+Write-Ok '{0}, variant {1}' $pick.release.tag_name $pick.kind
 
 New-Item -ItemType Directory -Force -Path $binDir | Out-Null
 
 function Get-Asset {
     param($Asset, [string]$What)
-    Write-Info "качаю ${What}: $($Asset.name) ($([math]::Round($Asset.size/1MB)) МБ)"
+    Write-Info 'downloading {0}: {1} ({2} MB)' $What $Asset.name ([math]::Round($Asset.size/1MB))
     $zip = Join-Path $env:TEMP $Asset.name
     & curl.exe -L --fail --retry 5 --retry-delay 3 -o $zip $Asset.browser_download_url
-    if ($LASTEXITCODE -ne 0) { throw "не удалось скачать $($Asset.name)" }
+    if ($LASTEXITCODE -ne 0) { throw (T 'could not download {0}' @($Asset.name)) }
     Expand-Archive -Path $zip -DestinationPath $binDir -Force
     Remove-Item $zip -Force
 }
 
-Write-Step 'установка'
+Write-Step 'installing'
 Get-Asset -Asset $pick.engine -What 'движок'
 if ($pick.runtime) {
     # The CUDA runtime comes as its own archive; without it the exe will not
     # start. The Toolkit is still not required.
     Get-Asset -Asset $pick.runtime -What 'библиотеки CUDA'
 } elseif ($pick.kind -ne 'CPU') {
-    Write-Warn "в релизе нет архива cudart для $($pick.kind) — если сервер не запустится, поставьте CUDA Toolkit или выберите другой релиз ключом -Tag"
+    Write-Warn 'the release has no cudart archive for {0} - if the server fails to start, install the CUDA Toolkit or pick another release with -Tag' $pick.kind
 }
 
 # Some archives nest everything in a subfolder - lift it up.
@@ -155,14 +155,14 @@ if (-not (Test-Path $exe)) {
         Remove-Item $nested.FullName -Recurse -Force
     }
 }
-if (-not (Test-Path $exe)) { throw "в архиве нет llama-server.exe — распакуйте вручную в $binDir" }
+if (-not (Test-Path $exe)) { throw (T 'the archive has no llama-server.exe - unpack it by hand into {0}' @($binDir)) }
 
-Write-Step 'проверка запуска'
+Write-Step 'startup check'
 if (-not (Test-Engine)) {
-    Write-Warn 'llama-server.exe установлен, но не запускается.'
-    Write-Info 'Обычно это значит, что не хватает библиотек CUDA или драйвер слишком старый.'
-    Write-Info 'Попробуйте: обновить драйвер NVIDIA; либо поставить сборку под процессор — этот же шаг с ключом -Cpu.'
+    Write-Warn 'llama-server.exe is installed but does not start.'
+    Write-Info 'Usually that means missing CUDA libraries or a driver that is too old.'
+    Write-Info 'Try: update the NVIDIA driver, or install the CPU build - this same step with -Cpu.'
     throw 'движок не проходит проверку запуска'
 }
-Write-Ok 'запускается'
-Write-Done "llama.cpp установлен: $exe"
+Write-Ok 'starts'
+Write-Done 'llama.cpp installed: {0}' $exe

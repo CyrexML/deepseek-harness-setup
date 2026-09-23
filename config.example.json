@@ -4,6 +4,8 @@
   "_windowsRoot": "Where models, llama.cpp, logs and launch scripts go on Windows. Needs ~40 GB free (model + build).",
   "wslDistro": "Ubuntu",
   "_wslDistro": "Name of the WSL2 distribution. The installer creates it if missing.",
+  "lang": "en",
+  "_lang": "Language of the installer and launcher messages: \"en\" or \"ru\". Translations live in i18n/<lang>.json; anything missing there stays English.",
   "harnessTag": "",
   "_harnessTag": "Empty = take the tag from stand.lock.json (the verified combination). Set it only to install a different version on purpose.",
   "webPort": 3080,

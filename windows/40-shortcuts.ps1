@@ -17,12 +17,12 @@ $root = $cfg.windowsRoot
 $runDir = Join-Path $root 'run'
 New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 
-Write-Step 'скрипты запуска в run\'
+Write-Step 'launch scripts into run\'
 # The scripts live inside WSL; the Windows side needs copies next to the model.
 $wslHome = (& wsl.exe -d $cfg.wslDistro -- bash -lc 'echo $HOME').Trim()
 $wslRunSource = "/mnt/$($root.Substring(0,1).ToLower())$($root.Substring(2) -replace '\\','/')/run"
 & wsl.exe -d $cfg.wslDistro -- bash -lc "cp `$HOME/Harness_AI/scripts/harness-start.ps1 `$HOME/Harness_AI/scripts/harness-stop.ps1 `$HOME/Harness_AI/scripts/harness-launch.vbs `$HOME/Harness_AI/scripts/harness-splash.ps1 `$HOME/Harness_AI/scripts/harness-idle-sleep.ps1 `$HOME/Harness_AI/scripts/harness-restore-power.ps1 `$HOME/Harness_AI/scripts/harness-hidden.vbs `$HOME/Harness_AI/scripts/harness.ico `$HOME/Harness_AI/scripts/splash-whale.png '$wslRunSource/' 2>/dev/null; true"
-Write-Ok 'скопированы'
+Write-Ok 'copied'
 
 function New-Shortcut {
   param([string]$Path, [string]$Target, [string]$Arguments, [string]$Icon, [string]$Description)
@@ -36,7 +36,7 @@ function New-Shortcut {
   $link.Save()
 }
 
-Write-Step 'ярлыки'
+Write-Step 'shortcuts'
 $desktop = [Environment]::GetFolderPath('Desktop')
 $startMenu = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
 $launch = Join-Path $runDir 'harness-launch.vbs'
@@ -50,12 +50,12 @@ if (Test-Path $launch) {
   }
   New-Shortcut -Path (Join-Path $desktop 'Harness AI — стоп.lnk') -Target "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe" `
     -Arguments "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$stop`"" -Icon $icon -Description 'Остановка стенда Harness AI'
-  Write-Ok 'созданы на рабочем столе и в меню «Пуск»'
+  Write-Ok 'created on the desktop and in the Start menu'
 } else {
-  Write-Warn "нет $launch — ярлыки пропущены (WSL-часть ещё не установлена?)"
+  Write-Warn 'no {0} - shortcuts skipped (WSL side not installed yet?)' $launch
 }
 
-Write-Step 'задача восстановления питания'
+Write-Step 'power-restore task'
 # The launcher sets the sleep timeouts to 0 while it runs. If Windows reboots on
 # its own they would stay at 0 forever, so this task restores them once neither
 # the launcher nor the interface is alive.
@@ -76,9 +76,9 @@ if (Test-Path $restore) {
   $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
   Register-ScheduledTask -TaskName 'Harness AI power restore' -Action $action `
     -Trigger @($logon, $repeat) -Settings $settings -Force | Out-Null
-  Write-Ok 'зарегистрирована (вход в систему + каждые 15 минут)'
+  Write-Ok 'registered (at logon and every 15 minutes)'
 } else {
-  Write-Warn "нет $restore — задача пропущена"
+  Write-Warn 'no {0} - task skipped' $restore
 }
 
-Write-Done 'ярлыки и обслуживание настроены'
+Write-Done 'shortcuts and maintenance are set up'

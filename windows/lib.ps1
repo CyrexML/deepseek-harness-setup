@@ -2,11 +2,43 @@
 
 $script:StandRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
-function Write-Step { param([string]$Text) Write-Host "==> $Text" -ForegroundColor Cyan }
-function Write-Ok   { param([string]$Text) Write-Host "    v $Text" -ForegroundColor Green }
-function Write-Info { param([string]$Text) Write-Host "    . $Text" }
-function Write-Warn { param([string]$Text) Write-Host "    ! $Text" -ForegroundColor Yellow }
-function Write-Done { param([string]$Text) Write-Host "v $Text`n" -ForegroundColor Green }
+# Output language. Messages are written in English in the source; i18n/<lang>.json
+# maps each English string to its translation, so another language is a data file
+# rather than a second copy of every script. Placeholders here are .NET style
+# ({0}, {1}); the bash side of the installer uses printf style (%s).
+#   config.json -> "lang": "ru"   or   $env:HARNESS_LANG = 'ru'
+# A string missing from the catalog is printed as it is, so a partial catalog
+# degrades to English instead of breaking.
+$script:Lang = if ($env:HARNESS_LANG) { $env:HARNESS_LANG } else {
+  $cfgPath = Join-Path $script:StandRoot 'config.json'
+  if (Test-Path $cfgPath) {
+    try { (Get-Content $cfgPath -Raw -Encoding UTF8 | ConvertFrom-Json).lang } catch { $null }
+  } else { $null }
+}
+if (-not $script:Lang) { $script:Lang = 'en' }
+
+$script:I18n = @{}
+if ($script:Lang -ne 'en') {
+  $table = Join-Path $script:StandRoot "i18n\$($script:Lang).json"
+  if (Test-Path $table) {
+    try {
+      (Get-Content $table -Raw -Encoding UTF8 | ConvertFrom-Json).PSObject.Properties |
+        ForEach-Object { $script:I18n[$_.Name] = [string]$_.Value }
+    } catch { }
+  }
+}
+
+function T {
+  param([string]$Text, [object[]]$Values)
+  $fmt = if ($script:I18n.ContainsKey($Text)) { $script:I18n[$Text] } else { $Text }
+  if ($Values -and $Values.Count -gt 0) { [string]::Format($fmt, $Values) } else { $fmt }
+}
+
+function Write-Step { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("==> " + (T $Text $Values)) -ForegroundColor Cyan }
+function Write-Ok   { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("    v " + (T $Text $Values)) -ForegroundColor Green }
+function Write-Info { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("    . " + (T $Text $Values)) }
+function Write-Warn { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("    ! " + (T $Text $Values)) -ForegroundColor Yellow }
+function Write-Done { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ((T $Text $Values) + "`n") -ForegroundColor Green }
 
 function Get-StandConfigPath {
   $custom = $env:HARNESS_CONFIG

@@ -12,27 +12,27 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 
 STAND="${STAND_DIR:-$HOME/Harness_AI}"
 
-step "перенос инструментов стенда в $STAND"
+step 'copying stand tooling into %s' "$STAND"
 mkdir -p "$STAND"
 for dir in scripts projects/PlugIN presets templates; do
   [ -d "$ROOT/$dir" ] || continue
   mkdir -p "$STAND/$(dirname "$dir")"
   cp -r "$ROOT/$dir" "$STAND/$(dirname "$dir")/"
-  ok "$dir"
+  ok '%s' "$dir"
 done
 chmod +x "$STAND"/scripts/*.sh 2>/dev/null || true
 
-step "применение патч-слоёв"
+step 'applying patch layers'
 # Translating new bridge strings needs a live model; without one translate.sh
 # says so and leaves them untranslated.
 bash "$STAND/scripts/ensure-patches.sh" 2>&1 | sed 's/^/    /'
 
-step "проверка"
+step 'verifying'
 if bash "$STAND/scripts/ensure-patches.sh" --check >/tmp/patch-check.log 2>&1; then
-  ok "все слои на месте"
+  ok 'every layer is in place'
 else
-  warn "часть слоёв не легла:"; sed 's/^/    /' /tmp/patch-check.log >&2
-  die "патчи не применились полностью — стенд поднимать нельзя"
+  warn 'some layers did not apply:'; sed 's/^/    /' /tmp/patch-check.log >&2
+  die 'the patches are incomplete - do not start the stand'
 fi
 
-done_step "патчи готовы"
+done_step 'patches ready'

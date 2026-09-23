@@ -14,47 +14,48 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 KEEP_DATA=0; YES=0
 while [ $# -gt 0 ]; do case "$1" in
   --keep-data) KEEP_DATA=1;; --yes) YES=1;;
-  *) echo "неизвестный ключ: $1"; exit 2;; esac; shift; done
+  *) t 'unknown flag: %s\n' "$1"; exit 2;; esac; shift; done
 
 targets=("$HOME/Harness_AI" "$HOME/tools/deepseek-harness" "$HOME/harness-stand")
 [ "$KEEP_DATA" = 0 ] && targets+=("$HOME/.dsh")
 
 echo
-echo "Будет удалено:"
+t 'To be removed:\n'
 for t in "${targets[@]}"; do
-  [ -e "$t" ] && printf '    %s (%s)\n' "$t" "$(du -sh "$t" 2>/dev/null | cut -f1)" || printf '    %s (уже нет)\n' "$t"
+  [ -e "$t" ] && printf '    %s (%s)\n' "$t" "$(du -sh "$t" 2>/dev/null | cut -f1)" || printf '    %s (%s)\n' "$t" "$(t 'already gone')"
 done
-[ "$KEEP_DATA" = 1 ] && echo "    ~/.dsh — ОСТАЁТСЯ (--keep-data)"
+[ "$KEEP_DATA" = 1 ] && t '    ~/.dsh STAYS (--keep-data)\n'
 echo
-echo "Останется: Node.js (~/.local/node), системные пакеты, ваши проекты вне стенда."
+t 'Left alone: Node.js (~/.local/node), system packages, your projects outside the stand.\n'
 echo
 
 if [ "$YES" = 0 ]; then
-  printf 'Удалить? Напишите "удалить": '
+  word="$(t 'delete')"
+  t 'Remove it? Type "%s": ' "$word"
   read -r answer
-  [ "$answer" = "удалить" ] || { echo "отменено"; exit 0; }
+  [ "$answer" = "$word" ] || { t 'cancelled\n'; exit 0; }
 fi
 
-step "останавливаю стенд"
-pkill -f 'bin.js web' 2>/dev/null && ok "интерфейс остановлен" || info "интерфейс не работал"
-pkill -f cloudflared 2>/dev/null && ok "туннель остановлен" || true
+step 'stopping the stand'
+pkill -f 'bin.js web' 2>/dev/null && ok 'interface stopped' || info 'the interface was not running'
+pkill -f cloudflared 2>/dev/null && ok 'tunnel stopped' || true
 
-step "возвращаю таймауты сна"
+step 'restoring sleep timeouts'
 ( cd /mnt/c 2>/dev/null && powershell.exe -NoProfile -ExecutionPolicy Bypass \
-    -File 'F:\Harness_AI\run\harness-idle-sleep.ps1' -On >/dev/null 2>&1 ) && ok "возвращены" || info "пропущено (нет Windows-части)"
+    -File 'F:\Harness_AI\run\harness-idle-sleep.ps1' -On >/dev/null 2>&1 ) && ok 'restored' || info 'skipped (no Windows side)'
 
 for t in "${targets[@]}"; do
-  step "удаляю $t"
+  step 'removing %s' "$t"
   rm -rf "$t" && ok "удалено"
 done
 
-step "строка PATH в ~/.bashrc"
+step 'PATH line in ~/.bashrc'
 if grep -q '# harness-stand' "$HOME/.bashrc" 2>/dev/null; then
   sed -i '/# harness-stand/,+1d' "$HOME/.bashrc"
-  ok "убрана"
+  ok 'removed'
 else
-  ok "её не было"
+  ok 'was not there'
 fi
 
-done_step "стенд удалён из WSL"
+done_step 'stand removed from WSL'
 echo "Windows-часть (модели, движок, ярлыки) удаляется отдельно: uninstall.ps1"

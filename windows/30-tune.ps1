@@ -18,7 +18,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $cfg = Read-StandConfig
 $root = $cfg.windowsRoot
 $modelPath = if ($cfg.model.PSObject.Properties['path']) { $cfg.model.path } else { Join-Path $root "models\$($cfg.model.file)" }
-if (-not (Test-Path $modelPath)) { throw "нет файла модели: $modelPath (сначала windows\20-model.ps1)" }
+if (-not (Test-Path $modelPath)) { throw (T 'no model file: {0} (run windows\20-model.ps1 first)' @($modelPath)) }
 
 function Get-FreeVramMb {
   try { [int]((& nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>$null | Select-Object -First 1)) }
@@ -26,7 +26,7 @@ function Get-FreeVramMb {
 }
 
 if (-not $CheckOnly) {
-  Write-Step 'подбор окна контекста'
+  Write-Step 'sizing the context window'
   $vramMb = Get-FreeVramMb
   $modelMb = [int]((Get-Item $modelPath).Length / 1MB)
   # Headroom for CUDA itself, compute buffers and the image projector: about
@@ -36,7 +36,7 @@ if (-not $CheckOnly) {
   # everything, leaving 150-500 MiB free - far too little for your own GPU work,
   # and llama-server holds what it allocated for as long as it runs.
   $budgetMb = $vramMb - $modelMb - $overheadMb - $ReserveMb
-  if ($ReserveMb -gt 0) { Write-Info "отложено под ваши задачи на GPU: $ReserveMb МиБ" }
+  if ($ReserveMb -gt 0) { Write-Info 'set aside for your own GPU work: {0} MiB' $ReserveMb }
   # KV cache at q4_0 compression, measured rather than derived: a 64k window
   # costs ~1500 MiB on a 27B model, hence this linear estimate.
   $mbPer1k = 23
@@ -46,14 +46,14 @@ if (-not $CheckOnly) {
   }
   if ($ctx -lt 8192) {
     $ctx = 8192
-    if ($ReserveMb -gt 0) { Write-Warn "с запасом $ReserveMb МиБ окно ужалось до 8k. Для своих задач на GPU лучше взять модель поменьше (docs/MODEL.md §2)" }
-    else { Write-Warn 'видеопамяти впритык: окно 8k. Возьмите квант поменьше (docs/MODEL.md §2)' }
+    if ($ReserveMb -gt 0) { Write-Warn 'with {0} MiB reserved the window shrank to 8k. For your own GPU work take a smaller model (docs/MODEL.md section 2)' $ReserveMb }
+    else { Write-Warn 'VRAM is tight: an 8k window. Take a smaller quant (docs/MODEL.md section 2)' }
   }
-  Write-Ok "видеопамять $vramMb МиБ, модель $modelMb МиБ → окно $ctx токенов"
+  Write-Ok 'VRAM {0} MiB, model {1} MiB -> window {2} tokens' $vramMb $modelMb $ctx
   Set-StandConfig @{ 'server.ctx' = $ctx }
   $cfg = Read-StandConfig
 
-  Write-Step 'команда запуска (run\start-server.ps1)'
+  Write-Step 'launch command (run\start-server.ps1)'
   $runDir = Join-Path $root 'run'
   New-Item -ItemType Directory -Force -Path $runDir | Out-Null
   $tpl = Get-Content (Join-Path $script:StandRoot 'templates\start-server.ps1.tmpl') -Raw -Encoding UTF8
@@ -75,10 +75,10 @@ if (-not $CheckOnly) {
   Copy-Item (Join-Path $script:StandRoot 'templates\stop-server.ps1.tmpl') (Join-Path $runDir 'stop-server.ps1') -Force
   ((Get-Content (Join-Path $runDir 'stop-server.ps1') -Raw) -replace '@ROOT@', $root) |
     Set-Content -Path (Join-Path $runDir 'stop-server.ps1') -Encoding UTF8
-  Write-Ok 'записана'
+  Write-Ok 'written'
 }
 
-Write-Step 'перезапуск сервера'
+Write-Step 'restarting the server'
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'run\stop-server.ps1') | Out-Null
 Start-Sleep -Seconds 3
 Start-Process powershell -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',(Join-Path $root 'run\start-server.ps1')) -WindowStyle Hidden
@@ -88,10 +88,10 @@ do {
   Start-Sleep -Seconds 5
   $health = try { (Invoke-RestMethod -Uri "$url/health" -TimeoutSec 5 -ErrorAction Stop).status } catch { '' }
 } until ($health -eq 'ok' -or (Get-Date) -gt $deadline)
-if ($health -ne 'ok') { throw "сервер не поднялся за 8 минут — смотрите $root\run\server.log" }
-Write-Ok 'поднят'
+if ($health -ne 'ok') { throw (T 'the server did not come up in 8 minutes - see {0}\run\server.log' @($root)) }
+Write-Ok 'up'
 
-Write-Step 'замер (первый запрос всегда медленнее — это прогрев)'
+Write-Step 'measuring (the first request is always slower - warm-up)'
 $body = @{ prompt = ('The quick brown fox jumps over the lazy dog near the river bank. ' * 500).Substring(0, 32000)
            n_predict = 1; temperature = 0; cache_prompt = $false; stream = $false } | ConvertTo-Json
 Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 600 | Out-Null
@@ -105,15 +105,15 @@ $decode  = [math]::Round($r2.timings.predicted_per_second)
 $freeMb  = try { [int]((& nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits 2>$null | Select-Object -First 1)) } catch { 0 }
 
 Write-Host ''
-Write-Host "  модель:        $(Split-Path -Leaf $modelPath)"
-Write-Host "  окно:          $($cfg.server.ctx) токенов"
-Write-Host "  префилл:       $prefill ток/с   (на RTX 5080, 16 ГБ — около 1970)"
-Write-Host "  генерация:     $decode ток/с   (на RTX 5080, 16 ГБ — около 95)"
-Write-Host "  свободно VRAM: $freeMb МиБ"
+Write-Host (T '  model:         {0}' @((Split-Path -Leaf $modelPath)))
+Write-Host (T '  window:        {0} tokens' @($cfg.server.ctx))
+Write-Host (T '  prefill:       {0} tok/s   (on an RTX 5080, 16 GB: about 1970)' @($prefill))
+Write-Host (T '  generation:    {0} tok/s   (on an RTX 5080, 16 GB: about 95)' @($decode))
+Write-Host (T '  VRAM free:     {0} MiB' @($freeMb))
 Write-Host ''
 if ($decode -lt 20) {
-  Write-Warn 'генерация ниже 20 ток/с — модель почти наверняка не влезла в видеопамять.'
-  Write-Info 'Возьмите квант поменьше (docs/MODEL.md §2) или запустите этот скрипт ещё раз: он пересчитает окно.'
+  Write-Warn 'generation below 20 tok/s - the model almost certainly did not fit into VRAM.'
+  Write-Info 'Take a smaller quant (docs/MODEL.md section 2), or run this script again to recompute the window.'
 } else {
-  Write-Done 'настройка модели закончена'
+  Write-Done 'model tuning finished'
 }

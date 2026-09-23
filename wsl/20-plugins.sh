@@ -14,12 +14,12 @@ mkdir -p "$PROFILE"
 
 want() { [ "$(cfg ".features.$1" true)" = "true" ]; }
 
-step "состав профиля"
+step 'profile contents'
 # Versions come from stand.lock.json. Ranges (^1.2.3) are wrong here: a month
 # later they resolve to a different build, and patch layers are anchored to
 # specific lines of code.
 LOCK="$ROOT/stand.lock.json"
-[ -f "$LOCK" ] || die "нет $LOCK — без него неизвестно, какие версии ставить"
+[ -f "$LOCK" ] || die 'no %s - without it the versions to install are unknown' "$LOCK"
 ver() { node -e '
   const lock = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"));
   const v = lock.plugins?.[process.argv[2]];
@@ -31,19 +31,19 @@ deps=()
 bundles=('"@deepseek-ai/dsh-base"' '"@deepseek-ai/dsh-web-app"')
 add() {
   local name="$1" v
-  v="$(ver "$name")" || { warn "$name нет в lock — пропускаю"; return 0; }
-  deps+=("\"$name\": \"$v\""); bundles+=("\"$name\""); info "$name@$v"
+  v="$(ver "$name")" || { warn '%s is not in the lock file - skipping' "$name"; return 0; }
+  deps+=("\"$name\": \"$v\""); bundles+=("\"$name\""); info '%s@%s' "$name" "$v"
 }
 
-add "dsh-plugin"                              # каталог плагинов (Plugin Hub)
+add "dsh-plugin"                              # plugin catalog (Plugin Hub)
 want turnRewind    && add "@anionex/dsh-turn-rewind"
 want betterSidebar && add "dsh-better-sidebar"
 want graphMemory   && add "graph-memory"
 want officePreview && add "dsh-univer-office"
 want mobileBridge  && add "@wenbin_wb/dsh-bridge"
-add "dsh-context"                             # счётчик контекста
+add "dsh-context"                             # context meter
 
-step "package.json профиля"
+step 'profile package.json'
 {
   printf '{\n  "name": "dsh-profile-web",\n  "private": true,\n  "dependencies": {\n    '
   (IFS=$',\n    '; printf '%s' "${deps[*]}")
@@ -52,11 +52,11 @@ step "package.json профиля"
   printf '\n      ],\n      "patchReload": "live"\n    }\n  }\n}\n'
 } > "$PROFILE/package.json"
 node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"))' "$PROFILE/package.json" ||
-  die "получился неправильный package.json"
-ok "записан $PROFILE/package.json"
+  die 'the generated package.json is invalid'
+ok 'written: %s/package.json' "$PROFILE"
 
-step "установка плагинов"
+step 'installing plugins'
 ( cd "$PROFILE" && pnpm install 2>&1 | tail -4 )
-ok "установлены"
+ok 'installed'
 
-done_step "плагины готовы"
+done_step 'plugins ready'

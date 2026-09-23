@@ -21,55 +21,55 @@ $root = Split-Path -Parent $here
 $wslRepo = "`$HOME/harness-stand"
 
 Write-Host ''
-Write-Host '  Обновление стенда Harness AI' -ForegroundColor Cyan
+Write-Host (T '  Updating the Harness AI stand') -ForegroundColor Cyan
 Write-Host ''
 
 if (-not $NoPull) {
-    Write-Step 'свежая версия установщика'
+    Write-Step 'fetching a fresh installer'
     if (Test-Path (Join-Path $root '.git')) {
         Push-Location $root
         try {
             $before = (& git rev-parse --short HEAD)
             & git pull --ff-only
             $after = (& git rev-parse --short HEAD)
-            if ($before -eq $after) { Write-Ok "уже последняя ($after)" } else { Write-Ok "$before → $after" }
+            if ($before -eq $after) { Write-Ok 'already the latest ({0})' $after } else { Write-Ok '{0} -> {1}' $before $after }
         } finally { Pop-Location }
     } else {
-        Write-Info 'папка не является клоном git — скачайте новый ZIP с GitHub и распакуйте поверх'
-        Write-Info 'после этого запустите обновление снова'
+        Write-Info 'this folder is not a git clone - download a new ZIP from GitHub and unpack it over this one'
+        Write-Info 'then run the update again'
     }
 }
 
 $lock = Join-Path $root 'stand.lock.json'
 if (Test-Path $lock) {
     $l = Get-Content $lock -Raw -Encoding UTF8 | ConvertFrom-Json
-    Write-Step 'что зафиксировано в новой версии'
-    Write-Info "харнес: $($l.harness.tag)"
-    foreach ($name in $l.plugins.PSObject.Properties.Name) { Write-Info "плагин: $name@$($l.plugins.$name)" }
-    Write-Info "патч-слоёв: $($l.patchLayers.Count)"
+    Write-Step 'what the new version pins'
+    Write-Info 'harness: {0}' $l.harness.tag
+    foreach ($name in $l.plugins.PSObject.Properties.Name) { Write-Info 'plugin: {0}@{1}' $name $l.plugins.$name }
+    Write-Info 'patch layers: {0}' $l.patchLayers.Count
 }
 
-Write-Step 'бэкап перед изменениями'
+Write-Step 'backup before changing anything'
 Invoke-Wsl $distro "bash -lc 'ts=`$(date +%Y%m%d-%H%M%S); dst=`$HOME/Harness_AI/run/backups/keep/before-update-`$ts; mkdir -p `$dst; cp `$HOME/.dsh/profiles/web/package.json `$HOME/.dsh/profiles/web/pnpm-lock.yaml `$HOME/.dsh/settings.yaml `$dst/ 2>/dev/null; echo `$dst'"
 
-Write-Step 'копирую установщик внутрь WSL'
+Write-Step 'copying the installer into WSL'
 $wslHere = ConvertTo-WslPath $root
 Invoke-Wsl $distro "rm -rf $wslRepo && mkdir -p $wslRepo && cp -r '$wslHere/.' $wslRepo/ && chmod +x $wslRepo/wsl/*.sh"
-Write-Ok 'скопирован'
+Write-Ok 'copied'
 
 foreach ($s in @('10-harness.sh', '20-plugins.sh', '30-patches.sh', '40-config.sh')) {
-    Write-Step "WSL: $s"
+    Write-Step 'WSL: {0}' $s
     Invoke-Wsl $distro "cd $wslRepo && bash wsl/$s"
 }
 
-Write-Step 'перезапуск стенда'
+Write-Step 'restarting the stand'
 Invoke-Wsl $distro "bash -lc '`$HOME/Harness_AI/scripts/stop-web.sh >/dev/null 2>&1; nohup `$HOME/Harness_AI/scripts/start-web.sh >/dev/null 2>&1 & sleep 25; true'"
-Write-Ok 'перезапущен'
+Write-Ok 'restarted'
 
-Write-Step 'проверка'
+Write-Step 'verifying'
 Invoke-Wsl $distro "cd $wslRepo && bash wsl/50-verify.sh"
 
-Write-Done 'обновление закончено'
-Write-Host '  Если что-то сломалось: бэкап профиля лежит в ~/Harness_AI/run/backups/keep/before-update-*'
+Write-Done 'update finished'
+Write-Host (T '  If something broke: the profile backup is in ~/Harness_AI/run/backups/keep/before-update-*')
 Write-Host '  Вернуть прежние версии: bash ~/Harness_AI/scripts/update-plugin.sh --rollback <папка бэкапа>'
 Write-Host ''
