@@ -8,6 +8,10 @@
 #   --ledger-days N  журнал изменений (~/.dsh/change-ledger) старше N дней — удалить
 #                   (умолч. 30). Это снимки файлов для отката хода: свежие нужны, старые
 #                   просто занимают место (118 МБ на 2141 файл к 2026-09-23)
+#   --bench-days N  рабочие каталоги замеров (~/Harness_AI/bench/*/repo, pristine, tools,
+#                   run*-*, bench/results) старше N дней — удалить. Сводки прогонов
+#                   (RESULTS.md, TASK.md, скрипты) остаются, отслеживаемое git не трогается
+#                   (98 МБ к 2026-09-23). По умолчанию выключено
 #   --caches        дополнительно почистить кэши пакетов (pnpm store, npm cache) — они не
 #                   про DSH, но занимают гигабайты
 #   --quiet         только итоговая строка
@@ -28,9 +32,9 @@ set -euo pipefail
 # (.bashrc для неинтерактивного login-shell не читается) — добавляем явно.
 export PATH="$HOME/.local/node/bin:/usr/local/bin:$PATH"
 DSH="$HOME/.dsh"; RUN="$HOME/Harness_AI/run"; ARCH="$RUN/archive"; WINRUN=/mnt/f/Harness_AI/run
-APPLY=0; DAYS=30; BDAYS=90; LDAYS=30; CACHES=0; QUIET=0
+APPLY=0; DAYS=30; BDAYS=90; LDAYS=30; BENCHDAYS=""; CACHES=0; QUIET=0
 while [ $# -gt 0 ]; do case "$1" in
-  --apply) APPLY=1;; --days) DAYS="$2"; shift;; --backup-days) BDAYS="$2"; shift;; --ledger-days) LDAYS="$2"; shift;; --caches) CACHES=1;; --quiet) QUIET=1;;
+  --apply) APPLY=1;; --days) DAYS="$2"; shift;; --backup-days) BDAYS="$2"; shift;; --ledger-days) LDAYS="$2"; shift;; --bench-days) BENCHDAYS="$2"; shift;; --caches) CACHES=1;; --quiet) QUIET=1;;
   *) echo "unknown arg $1"; exit 2;; esac; shift; done
 say() { [ "$QUIET" = 1 ] || echo "$@"; }
 mb() { du -sm "$1" 2>/dev/null | cut -f1; }
@@ -48,6 +52,24 @@ find "$DSH/sessions" -maxdepth 1 -mindepth 1 -type d | while read -r d; do
 done
 say "   attachments  $(mb "$DSH/attachments") MB, $(find "$DSH/attachments" -type f | wc -l) файлов"
 say "   projcache    $(mb "$DSH/storages") MB · graph-memory $(mb "$DSH/graph-memory") MB · change-ledger $(mb "$DSH/change-ledger") MB"
+BENCH="$HOME/Harness_AI/bench"
+[ -d "$BENCH" ] && say "   замеры      $(mb "$BENCH") MB (bench/; чистится только с --bench-days)"
+
+# Замеры: рабочие копии задач и выгрузки прогонов. Это результат измерений, и
+# место они занимают больше всего остального вместе взятого. Удаляем только то,
+# что git не отслеживает: иначе каталог исчез бы из рабочей копии и превратился
+# в кучу удалений в панели изменений.
+if [ -n "$BENCHDAYS" ] && [ -d "$BENCH" ]; then
+  freed=0
+  while IFS= read -r -d "" d; do
+    rel="${d#$HOME/Harness_AI/}"
+    [ -z "$(git -C "$HOME/Harness_AI" ls-files -- "$rel" 2>/dev/null | head -1)" ] || continue
+    sz=$(du -sm "$d" 2>/dev/null | cut -f1)
+    if [ "$APPLY" = 1 ]; then rm -rf "$d"; fi
+    freed=$((freed + ${sz:-0}))
+  done < <(find "$BENCH" -maxdepth 2 -type d \( -name repo -o -name pristine -o -name tools -o -name results -o -name "run[0-9]*-[0-9]*" \) -mtime "+$BENCHDAYS" -print0 2>/dev/null)
+  if [ "$APPLY" = 1 ]; then say "   замеры:      освобождено ${freed} MB"; else say "   замеры:      освободилось бы ${freed} MB (старше ${BENCHDAYS} дней)"; fi
+fi
 # Журнал изменений turn-rewind: снимки файлов на каждый ход. Своей ретенции у
 # него нет, поэтому чистим по возрасту — откат остаётся возможен для недавних
 # ходов, а старые снимки высвобождают место. Только при остановленном web:
