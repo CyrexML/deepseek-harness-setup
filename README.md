@@ -240,6 +240,12 @@ the model share one card, so the split is decided up front:
 powershell -ExecutionPolicy Bypass -File windows\30-tune.ps1 -ReserveMb 6000
 ```
 
+The agent knows this by itself: the first CUDA training launch is not executed
+but answered with the measurement — how much VRAM is free, how much the model
+holds — and the same three ways out, so instead of an OOM traceback minutes later
+you get the explanation at once. After that the plugin stays out of the way: once
+you have freed the card, or if you want to try anyway, the next launch runs.
+
 On 16 GB a sensible split is Qwen3.5 9B (about 7 GB) plus 6–8 GB for training.
 If you need the large model instead, the other route is to stop the model server
 while you compute (`run\stop-server.ps1`) — the agent is then headless until you
