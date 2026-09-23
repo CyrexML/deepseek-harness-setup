@@ -1,8 +1,8 @@
-﻿# Аварийное/независимое выключение системы Harness_AI.
+﻿# Independent shutdown of the Harness AI stand.
 #
-# Нужен на случай, когда окно launcher'а закрыли крестиком или система была
-# поднята вручную: launcher гасит всё сам, но полагаться на единственный путь
-# выключения нельзя.
+# For the case where the launcher window was closed or the system was started by
+# hand: the launcher stops everything itself, but a single path to shutdown is
+# not something to rely on.
 $ErrorActionPreference = 'Continue'
 chcp 65001 > $null
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
@@ -10,25 +10,25 @@ chcp 65001 > $null
 $Distro = 'Ubuntu'
 $RunDir = 'F:\Harness_AI\run'
 
-Write-Host '=== выключение Harness AI ===' -ForegroundColor Cyan
+Write-Host '=== stopping Harness AI ===' -ForegroundColor Cyan
 
-# Веб-интерфейс. Держатель `wsl.exe` мог пережить закрытие окна — снимаем и его.
+# Web interface. The `wsl.exe` holder may have survived the window closing.
 & wsl.exe -d $Distro -- bash -lc '~/Harness_AI/scripts/stop-web.sh' 2>&1 | Out-Null
 Get-CimInstance Win32_Process -Filter "Name = 'wsl.exe'" |
   Where-Object { $_.CommandLine -like '*harness-web-fg.sh*' } |
   ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
-Write-Host 'веб-интерфейс остановлен'
+Write-Host 'web interface stopped'
 
-# Модель.
+# Model.
 & "$RunDir\stop-server.ps1"
 
 Write-Host ''
-Write-Host 'Погасить также WSL? Закроет ВСЕ процессы Ubuntu — Claude Code, Docker,' -ForegroundColor Yellow
-Write-Host 'открытые терминалы.' -ForegroundColor Yellow
-$ans = Read-Host 'Гасить WSL? [y/N]'
-if ($ans -match '^(y|Y|д|Д)') { & wsl.exe --shutdown; Write-Host 'WSL остановлен' }
-else { Write-Host 'WSL оставлен работать' }
+Write-Host 'Stop WSL as well? This closes ALL Ubuntu processes - editors, Docker,' -ForegroundColor Yellow
+Write-Host 'open terminals.' -ForegroundColor Yellow
+$ans = Read-Host 'Stop WSL? [y/N]'
+if ($ans -match '^(y|Y)') { & wsl.exe --shutdown; Write-Host 'WSL stopped' }
+else { Write-Host 'WSL left running' }
 
 Write-Host ''
-Write-Host 'Готово.' -ForegroundColor Green
+Write-Host 'Done.' -ForegroundColor Green
 Start-Sleep -Seconds 2

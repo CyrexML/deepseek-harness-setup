@@ -14,7 +14,7 @@ STAND="${STAND_DIR:-$HOME/Harness_AI}"
 
 step 'copying stand tooling into %s' "$STAND"
 mkdir -p "$STAND"
-for dir in scripts projects/PlugIN presets templates; do
+for dir in scripts projects/PlugIN presets templates i18n; do
   [ -d "$ROOT/$dir" ] || continue
   mkdir -p "$STAND/$(dirname "$dir")"
   cp -r "$ROOT/$dir" "$STAND/$(dirname "$dir")/"

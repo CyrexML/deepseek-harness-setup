@@ -1,16 +1,15 @@
-﻿# Единая точка входа в систему Harness_AI: модель + веб-интерфейс dsh.
-# Ярлык в меню Пуск один, и он же ПЕРЕКЛЮЧАТЕЛЬ: система погашена — клик
-# поднимает её, система работает — клик гасит.
+﻿# Single entry point to the Harness AI stand: model + dsh web interface.
+# One shortcut, and it is a TOGGLE: a click starts the system when it is down
+# and stops it when it is running.
 #
-# Ставится через install-shortcuts.ps1.
+# Start order is not arbitrary: llama-server comes FIRST, because start-web.sh
+# refuses to start while the model does not answer. llama-server is deliberately
+# tied to this window, so closing the window also kills the model even if the
+# cleanup never ran.
 #
-# Порядок запуска не произволен. llama-server поднимается ПЕРВЫМ, потому что
-# start-web.sh отказывается стартовать, если модель не отвечает.
-#
-# llama-server намеренно запускается ПРИВЯЗАННЫМ к этому окну: тогда закрытие
-# окна крестиком гасит модель, даже если очистка не успела отработать.
-# -Hidden: режим ярлыка через harness-launch.vbs — консоли нет, вместо Enter
-# скрипт ждёт файл-сигнал power.request (кнопки Power в вебе) или второй клик.
+# -Hidden is the shortcut mode (through harness-launch.vbs): no console, and
+# instead of Enter the script waits for the power.request signal file written by
+# the Power button in the web UI, or for a second click on the shortcut.
 param([switch]$NoBrowser, [switch]$Hidden)
 
 $ErrorActionPreference = 'Stop'
@@ -19,25 +18,41 @@ chcp 65001 > $null
 
 $Distro = 'Ubuntu'
 $RunDir = 'F:\Harness_AI\run'
-# Порог предупреждения о видеопамяти после старта (МиБ). Норма стенда на 64k —
-# ~250 свободных; при нехватке драйвер молча вытесняет веса в ОЗУ (−10×,
-# known-limitations §13). Потребители помимо llama-server — DWM, ProtonVPN,
-# браузеры; их список пишется в launcher.log при каждом старте.
+
+# Message language: HARNESS_LANG, else run\lang.txt written at install time,
+# else English. Translations are a table of "English string -> translation" in
+# run\i18n\<lang>.json; a missing string is printed as it is.
+$Lang = if ($env:HARNESS_LANG) { $env:HARNESS_LANG }
+        elseif (Test-Path "$RunDir\lang.txt") { (Get-Content -Raw "$RunDir\lang.txt").Trim() }
+        else { 'en' }
+$I18n = @{}
+if ($Lang -and $Lang -ne 'en' -and (Test-Path "$RunDir\i18n\$Lang.json")) {
+  try {
+    (Get-Content "$RunDir\i18n\$Lang.json" -Raw -Encoding UTF8 | ConvertFrom-Json).PSObject.Properties |
+      ForEach-Object { $I18n[$_.Name] = [string]$_.Value }
+  } catch { }
+}
+function T { param([string]$Text, [object[]]$Values)
+  $fmt = if ($I18n.ContainsKey($Text)) { $I18n[$Text] } else { $Text }
+  if ($Values -and $Values.Count -gt 0) { [string]::Format($fmt, $Values) } else { $fmt }
+}
+# VRAM warning threshold after start (MiB). A 64k window normally leaves ~250
+# MiB free; below that the driver silently spills weights into RAM and
+# generation drops about tenfold. Who else holds VRAM is logged on every start.
 $VramWarnMiB = 100
 $Repo   = '~/Harness_AI'
 $WebLog = "$Repo/run/web.log"
 $Holder = $null
-# Файл-сигнал от bridge (Settings → Remote access → Power): {"mode":"dsh"|"wsl"}.
-# Путь совпадает с DSH_POWER_REQUEST_FILE в start-web.sh (/mnt/f/…).
+# Signal file from the bridge (Settings -> Remote access -> Power):
+# {"mode":"dsh"|"wsl"}. Same path as DSH_POWER_REQUEST_FILE in start-web.sh.
 $PowerRequest = "$RunDir\power.request"
-# Сохранённые таймауты сна на время работы (см. Disable-IdleSleep).
+# Sleep timeouts saved for the duration of the run (see Disable-IdleSleep).
 $PowerSaved = "$RunDir\power-timeouts.json"
-# Стадии запуска для экрана загрузки (harness-splash.ps1) в скрытом режиме.
+# Launch stages for the splash screen (harness-splash.ps1) in hidden mode.
 $LaunchStatus = "$RunDir\launch.status"
-# Журнал лончера: в скрытом режиме это единственный след того, что он делал.
+# Launcher log: in hidden mode this is the only trace of what happened.
 $LauncherLog = "$RunDir\launcher.log"
-# Ротация: свыше 1 МБ — в launcher.log.1 (история инцидентов не должна теряться,
-# но и расти бесконечно тоже).
+# Rotated past 1 MB into launcher.log.1.
 function Log([string]$m) {
   try {
     if ((Test-Path $LauncherLog) -and (Get-Item $LauncherLog).Length -gt 1MB) { Move-Item -Force $LauncherLog "$LauncherLog.1" }
@@ -47,8 +62,8 @@ function Log([string]$m) {
 
 function Wsl([string]$cmd) { & wsl.exe -d $Distro -- bash -lc $cmd }
 
-# Держателем считается `wsl.exe`, запустивший harness-web-fg.sh: именно под ним
-# первым планом работает node, и по нему систему видно из любого окна.
+# The holder is the `wsl.exe` that started harness-web-fg.sh: node runs in its
+# foreground, which makes the system visible from any other window.
 function Get-WebHolders {
   Get-CimInstance Win32_Process -Filter "Name = 'wsl.exe'" |
     Where-Object { $_.CommandLine -like '*harness-web-fg.sh*' }
@@ -62,51 +77,50 @@ function Test-SystemRunning {
 function Stop-Everything {
   Log 'Stop-Everything'
   Write-Host ''
-  Write-Host '--- выключение ---' -ForegroundColor Yellow
-  # Держатель гасится первым: node работает у него на переднем плане и уходит
-  # вместе с ним. stop-web.sh следом — на случай, если веб подняли иначе.
+  Write-Host (T '--- shutting down ---') -ForegroundColor Yellow
+  # Kill the holder first: node runs in its foreground and dies with it.
+  # stop-web.sh follows, in case the web was started some other way.
   if ($script:Holder -and -not $script:Holder.HasExited) {
     Stop-Process -Id $script:Holder.Id -Force -ErrorAction SilentlyContinue
   }
-  # Отдельно — держатель, поднятый ДРУГИМ окном launcher'а. Ярлык один, и гасить
-  # он обязан систему целиком, а не только то, что поднял сам.
+  # Also holders started by ANOTHER launcher window: there is one shortcut, and
+  # it must stop the whole system, not only what it started itself.
   Get-WebHolders | ForEach-Object {
     Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
   }
   Wsl "$Repo/scripts/stop-web.sh" 2>&1 | Out-Null
-  Write-Host 'веб-интерфейс остановлен'
+  Write-Host (T 'web interface stopped')
   & "$RunDir\stop-server.ps1"
   Restore-IdleSleep
-  # Уборка при выключении (web уже остановлен, поэтому можно трогать сессии):
-  # сессии старше 30 дней — в архив run/archive (90 дней), вложения без ссылок,
-  # лишние копии в run/backups, старые логи. Отключить: создать файл
-  # F:\Harness_AI\run\cleanup-off. Правила и отчёт: scripts/dsh-cleanup.sh.
+  # Cleanup on shutdown (safe now that the web is stopped): old sessions are
+  # archived, unreferenced attachments and stale backups removed. Disable by
+  # creating F:\Harness_AI\run\cleanup-off; rules live in scripts/dsh-cleanup.sh.
   if (-not (Test-Path "$RunDir\cleanup-off")) {
-    Write-Host 'уборка...'
+    Write-Host (T 'cleaning up...')
     Wsl "$Repo/scripts/dsh-cleanup.sh --apply --quiet" 2>&1 | Out-Null
   }
 }
 
-# Про WSL спрашиваем только в интерактивном пути и только ПОСЛЕ остановки
-# харнесса. При закрытии окна крестиком спросить не у кого — тогда WSL остаётся
-# жить, и это безопасный исход, а не потеря чужих процессов.
+# WSL is only offered on the interactive path and only AFTER the harness has
+# stopped. When the window is closed there is nobody to ask, and leaving WSL
+# running is the safe outcome rather than killing someone else's processes.
 function Confirm-WslShutdown {
   Write-Host ''
-  Write-Host 'Погасить также WSL? Освободит ещё ~2 ГБ, но закроет ВСЕ процессы Ubuntu' -ForegroundColor Yellow
-  Write-Host 'включая Claude Code, Docker и открытые терминалы.' -ForegroundColor Yellow
-  $ans = Read-Host 'Гасить WSL? [y/N]'
+  Write-Host (T 'Stop WSL as well? Frees another ~2 GB but closes ALL Ubuntu processes,') -ForegroundColor Yellow
+  Write-Host (T 'including editors, Docker and open terminals.') -ForegroundColor Yellow
+  $ans = Read-Host (T 'Stop WSL? [y/N]')
   if ($ans -match '^(y|Y|д|Д)') {
-    Write-Host 'гашу WSL...'
+    Write-Host (T 'stopping WSL...')
     & wsl.exe --shutdown
-    Write-Host 'WSL остановлен'
+    Write-Host (T 'WSL stopped')
   } else {
-    Write-Host 'WSL оставлен работать'
+    Write-Host (T 'WSL left running')
   }
 }
 
-# Таймауты сна по сети: STANDBYIDLE / HIBERNATEIDLE, 4-е hex-число в выводе
-# powercfg /q — индекс «от сети» (мин, макс, шаг, AC, DC; порядок не зависит
-# от языка системы). Секунды -> минуты для powercfg /change.
+# AC sleep timeouts: STANDBYIDLE / HIBERNATEIDLE. The 4th hex number in
+# powercfg /q output is the AC value (min, max, step, AC, DC - the order does
+# not depend on the system language). Seconds -> minutes for powercfg /change.
 function Get-AcTimeoutMinutes([string]$setting) {
   $out = & powercfg.exe /q SCHEME_CURRENT SUB_SLEEP $setting 2>$null | Out-String
   $m = [regex]::Matches($out, '0x[0-9a-fA-F]{8}')
@@ -114,18 +128,17 @@ function Get-AcTimeoutMinutes([string]$setting) {
   return [int]([Convert]::ToInt32($m[3].Value, 16) / 60)
 }
 
-# 2026-09-14: одного SetThreadExecutionState оказалось мало — в 15:54 ПК ушёл
-# в сон с причиной «System Idle» при живом запросе (powercfg /requests его
-# показывал). Поэтому на время работы таймауты сна/гибернации по сети
-# выставляются в 0 («никогда»), прежние значения — в power-timeouts.json,
-# Restore-IdleSleep возвращает их при выключении. Если лончер умер, ПК просто
-# не спит до следующего цикла старт/стоп — безопасный исход для удалённого
-# доступа. Права администратора не нужны (проверено).
+# SetThreadExecutionState alone turned out not to be enough: the PC still slept
+# with reason "System Idle" while a request was live. So while the stand runs the
+# AC sleep and hibernate timeouts are set to 0 ("never"), the previous values go
+# into power-timeouts.json, and Restore-IdleSleep puts them back on shutdown.
+# If the launcher dies the PC simply does not sleep until the next start/stop
+# cycle - the safe outcome for remote access. No administrator rights needed.
 function Disable-IdleSleep {
-  # Файл от прошлого запуска, который не дошёл до Restore (перезагрузка ПК
-  # 2026-09-14 20:49 при работающем стенде), хранит НАСТОЯЩИЕ значения — его
-  # не затираем, но нули выставляем всё равно: раньше здесь был return, и
-  # стенд после такой перезагрузки жил с тем, что осталось в системе.
+  # A file left by a previous run that never reached Restore (a reboot while the
+  # stand was up) holds the REAL values: keep it, but write the zeros anyway. An
+  # early return here used to leave the stand running with whatever the system
+  # had after such a reboot.
   $names = @('standby-timeout-ac', 'hibernate-timeout-ac')
   if (-not (Test-Path $PowerSaved)) {
     $saved = @{}
@@ -136,7 +149,7 @@ function Disable-IdleSleep {
     if ($saved.Count -gt 0) { $saved | ConvertTo-Json | Set-Content -Encoding UTF8 $PowerSaved }
   }
   foreach ($name in $names) { & powercfg.exe /change $name 0 | Out-Null }
-  Write-Host 'сон по простою отключён на время работы' -ForegroundColor DarkGray
+  Write-Host (T 'idle sleep disabled while the stand runs') -ForegroundColor DarkGray
 }
 
 function Restore-IdleSleep {
@@ -144,15 +157,15 @@ function Restore-IdleSleep {
   try {
     $saved = Get-Content -Raw $PowerSaved | ConvertFrom-Json
     foreach ($p in $saved.PSObject.Properties) { & powercfg.exe /change $p.Name ([int]$p.Value) | Out-Null }
-    Write-Host 'таймауты сна восстановлены'
-  } catch { Write-Host "не удалось восстановить таймауты сна: $_" -ForegroundColor Yellow }
+    Write-Host (T 'sleep timeouts restored')
+  } catch { Write-Host (T 'could not restore the sleep timeouts: {0}' @($_)) -ForegroundColor Yellow }
   Remove-Item -Force $PowerSaved -ErrorAction SilentlyContinue
 }
 
-# Экран загрузки: отдельный скрытый процесс с WinForms-окном (кит, стадия,
-# бегунок), читает launch.status. Без него в скрытом режиме непонятно, идёт
-# ли запуск. Стадии: model → web → done (окно гаснет само) | error: текст
-# (окно показывает ошибку и кнопку «Закрыть»).
+# Splash: a separate hidden process with a WinForms window that reads
+# launch.status. Without it a hidden launch gives no sign of progress. Stages:
+# model -> web -> done (the window fades out), stopping -> stopped, or
+# "error: text" (the window shows the error and a close button).
 function Set-Stage([string]$stage) {
   if (-not $Hidden) { return }
   try { [IO.File]::WriteAllText($LaunchStatus, $stage) } catch { }
@@ -171,17 +184,17 @@ function Start-Splash {
   } catch { }
 }
 
-# В скрытом режиме ошибку показывает экран загрузки (стадия error:); если его
-# нет — поднимаем его заново, он покажет ошибку первым же тиком. MessageBox
-# из скрытого процесса Windows прячет вместе с консолью (SW_HIDE в STARTUPINFO
-# достаётся первому окну), поэтому им не пользуемся.
+# In hidden mode errors are shown by the splash (stage "error:"); if it is gone
+# it is started again and shows the error on its first tick. A MessageBox is no
+# use here: Windows hides it together with the console (SW_HIDE from STARTUPINFO
+# lands on the first window).
 function Show-Error([string]$text) {
   Set-Stage ('error: ' + ($text -replace '\s+', ' '))
   Start-Splash
 }
 
-# Видеопамять после старта: свободно + кто держит (perf-counter Dedicated Usage,
-# > 30 МиБ, кроме llama-server). Возвращает строку для лога или $null.
+# VRAM after start: free memory plus who else holds it (Dedicated Usage counter,
+# above 30 MiB, excluding llama-server). Returns a log line or $null.
 function Get-VramReport {
   try {
     $smi = "$env:SystemRoot\System32\nvidia-smi.exe"
@@ -204,8 +217,8 @@ function Get-VramReport {
   } catch { return $null }
 }
 
-# Скрытый режим: ждём сигнал. Возвращает 'dsh' | 'wsl' (кнопка в вебе) или
-# 'gone' (систему погасил второй клик по ярлыку — гасить уже нечего).
+# Hidden mode: wait for a signal. Returns 'dsh' | 'wsl' (the web button) or
+# 'gone' (a second click on the shortcut already stopped the system).
 function Wait-StopSignal {
   while ($true) {
     Start-Sleep -Seconds 2
@@ -233,16 +246,16 @@ try {
   # complete silence and looked exactly like "the launcher does not work".
   if (Test-SystemRunning) {
     Log 'toggle: system running -> stopping'
-    Write-Host 'система уже работает — этот клик её выключает' -ForegroundColor Yellow
+    Write-Host (T 'the system is already running - this click stops it') -ForegroundColor Yellow
     Set-Stage 'stopping'
     Start-Splash
     Stop-Everything
     Set-Stage 'stopped'
-    # Скрытому окну спросить не у кого: второй клик гасит только харнесс,
-    # WSL остаётся; выбор «с WSL» — кнопка Power в вебе.
+    # A hidden window has nobody to ask: a second click stops the harness only
+    # and leaves WSL running; "with WSL" is the Power button in the web UI.
     if (-not $Hidden) { Confirm-WslShutdown }
     Write-Host ''
-    Write-Host 'Готово.' -ForegroundColor Green
+    Write-Host (T 'Done.') -ForegroundColor Green
     Start-Sleep -Seconds 2
     exit 0
   }
@@ -254,38 +267,30 @@ try {
   # harness-start.ps1 is included: PowerShell has already read it into memory, so
   # replacing the file mid-run is safe and the NEXT click gets the fresh code.
   Wsl "cp $Repo/scripts/start-server.ps1 $Repo/scripts/stop-server.ps1 $Repo/scripts/harness-splash.ps1 $Repo/scripts/splash-whale.png $Repo/scripts/harness-start.ps1 $Repo/scripts/harness-stop.ps1 /mnt/f/Harness_AI/run/"
+  # Message catalogs travel with the scripts, otherwise a Russian launcher would
+  # fall back to English after every update.
+  Wsl "mkdir -p /mnt/f/Harness_AI/run/i18n && cp $Repo/i18n/*.json /mnt/f/Harness_AI/run/i18n/ 2>/dev/null || true"
   Remove-Item -Force $PowerRequest -ErrorAction SilentlyContinue
   Remove-Item -Force $LaunchStatus -ErrorAction SilentlyContinue
   Set-Stage 'model'
   Start-Splash
 
-  # 1. Модель. Рука C — рабочая конфигурация решения 13, n-max=3.
+  # 1. The model.
   #
-  # ИСТОРИЯ 2026-09-09, чтобы не искать заново. За день сервер перезапускался
-  # больше десяти раз подряд, и генерация просела 83 -> 3,8 т/с при неизменной
-  # командной строке. Подпись: карта «загружена» на 99 %, но потребляет 93 Вт
-  # из 360, утилизация памяти 5 %, вытеснения по счётчику Non-local нет.
-  # Ошибки при этом НЕ БЫЛО НИКАКОЙ — отказ молчаливый.
-  #
-  # Причина — накопленное состояние видеопамяти драйвера, а не конфигурация:
-  # llama-server переставал получать полное выделение. Снимается ТОЛЬКО
-  # перезагрузкой Windows; перезапуск сервера не помогает. После перезагрузки
-  # та же тройка даёт 78,9 / 84,9 / 93,6 т/с, а llama-server держит на 164 МБ
-  # больше видеопамяти при том же аппетите рабочего стола.
-  #
-  # Признак для диагностики: если генерация упала в разы, смотреть не логи,
-  # а `nvidia-smi --query-gpu=power.draw,utilization.memory`. Низкое
-  # потребление при высокой «загрузке» = это оно, помогает перезагрузка.
-  Write-Host 'запускаю модель (Qwen3.8-27B, окно 64k, зрение)...'
-  # Шаг 1 аудита контекста 2026-09-12: свой jinja, reasoning прошлых шагов не
-  # реплеится в промпт (48-60% окна по замеру). Откат: убрать -ChatTemplateFile.
-  # Обоснование и проверка — шапка параметра в start-server.ps1.
-  # 2026-09-15: параметры стенда — умолчания start-server.ps1 (temp 1.0 /
-  # top-p 0.95 / top-k 20 / min-p 0, шаблон qwen3.8-agent.jinja, проектор на
-  # CPU, verbosity 3, n-max 3). Ручной запуск без параметров даёт тот же сервер.
+  # Diagnostic note worth keeping: after a dozen server restarts in a row,
+  # generation once fell from 83 to 3.8 tok/s with an unchanged command line and
+  # no error at all. The signature is a card reported as 99% "busy" while drawing
+  # 93 W of 360 with 5% memory utilisation. The cause is accumulated driver VRAM
+  # state, not configuration, and only a Windows reboot clears it - restarting
+  # the server does not. So if generation collapses, look at
+  # `nvidia-smi --query-gpu=power.draw,utilization.memory` rather than the logs.
+  Write-Host (T 'starting the model...')
+  # Sampling and the chat template are the defaults of start-server.ps1; the
+  # custom jinja keeps past reasoning out of the replayed prompt (measured at
+  # 48-60% of the window). Roll back by dropping -ChatTemplateFile.
   & "$RunDir\start-server.ps1" | Out-Null
 
-  Write-Host -NoNewline 'жду готовности модели'
+  Write-Host -NoNewline (T 'waiting for the model')
   $ready = $false
   foreach ($i in 1..120) {
     try {
@@ -296,18 +301,16 @@ try {
     Start-Sleep -Seconds 1
   }
   Write-Host ''
-  if (-not $ready) { throw 'модель не поднялась за 120 с, смотрите F:\Harness_AI\run\server.log' }
-  Write-Host 'модель готова' -ForegroundColor Green
+  if (-not $ready) { throw (T 'the model did not come up in 120 s, see F:\Harness_AI\run\server.log') }
+  Write-Host (T 'model ready') -ForegroundColor Green
 
-  # 2. Веб-интерфейс. Прежний экземпляр гасим, чтобы лог и токен были свежими.
+  # 2. The web interface. Stop any previous instance so the log and the token
+  # are fresh.
   Wsl "$Repo/scripts/stop-web.sh" 2>&1 | Out-Null
 
-  # Держатель: `wsl.exe` обязан оставаться живым, иначе WSL снимет веб-сервер
-  # вместе с сессией. Подробнее — комментарий в start-web.sh.
-  #
-  # Аргументов у harness-web-fg.sh нет намеренно: Start-Process склеивает
-  # ArgumentList пробелами без кавычек, и составная команда доезжает рваной.
-  Write-Host 'запускаю веб-интерфейс...'
+  # The holder `wsl.exe` must stay alive, otherwise WSL tears the web server down
+  # with the session (see the comment in start-web.sh).
+  Write-Host (T 'starting the web interface...')
   Set-Stage 'web'
 
   # The old URL must not be mistaken for the new one: the wait below greps
@@ -320,7 +323,7 @@ try {
   # shell expansion - `bash -lc '...'` arrives torn apart, and a bare `~` never
   # expands without a shell.
   $wslHome = (& wsl.exe -d $Distro -- bash -lc 'printf %s "$HOME"')
-  if (-not $wslHome -or $wslHome -match '\s') { throw "не удалось определить домашний каталог в WSL: '$wslHome'" }
+  if (-not $wslHome -or $wslHome -match '\s') { throw (T 'could not resolve the WSL home directory: {0}' @($wslHome)) }
   $Holder = Start-Process wsl.exe -PassThru -WindowStyle Hidden -ArgumentList @(
     '-d', $Distro, '--', 'bash', "$wslHome/Harness_AI/scripts/harness-web-fg.sh"
   )
@@ -328,54 +331,50 @@ try {
   $url = $null
   foreach ($i in 1..40) {
     Start-Sleep -Seconds 1
-    if ($Holder.HasExited) { throw 'веб-интерфейс упал при старте, смотрите ~/Harness_AI/run/web.log' }
+    if ($Holder.HasExited) { throw (T 'the web interface died on start, see ~/Harness_AI/run/web.log') }
     $line = Wsl "grep -h 'dsh web:' $WebLog 2>/dev/null | tail -1"
     if ($line -match '(http://\S+)') { $url = $Matches[1]; break }
   }
-  if (-not $url) { throw 'не дождался ссылки за 40 с, смотрите ~/Harness_AI/run/web.log' }
+  if (-not $url) { throw (T 'no link after 40 s, see ~/Harness_AI/run/web.log') }
 
-  Write-Host 'веб-интерфейс готов' -ForegroundColor Green
+  Write-Host (T 'web interface ready') -ForegroundColor Green
   Write-Host ''
   Write-Host "  $url" -ForegroundColor Cyan
-  Write-Host '  (токен одноразовый, меняется при каждом запуске)'
+  Write-Host (T '  (the token is single-use and changes on every start)')
   Write-Host ''
   $vram = Get-VramReport
   if ($vram) { Log $vram.text }
   if ($vram -and $vram.free -lt $VramWarnMiB) {
-    Set-Stage ("warn: свободно $($vram.free) МиБ видеопамяти (порог $VramWarnMiB): генерация может уйти в ОЗУ и замедлиться в разы. Держат: " + (($vram.text -split 'others: ')[1]))
+    Set-Stage ('warn: ' + (T 'only {0} MiB of VRAM free (threshold {1}): generation may spill into RAM and slow down several times over. Held by: {2}' @($vram.free, $VramWarnMiB, (($vram.text -split 'others: ')[1]))))
   } else {
     Set-Stage 'done'
   }
   Log 'ready'
   if (-not $NoBrowser) { Start-Process $url }
 
-  # Пока это окно живо, ПК не уходит в сон: ES_CONTINUOUS|ES_SYSTEM_REQUIRED
-  # (2147483649 = 0x80000001; hex-литерал PS 5.1 в UInt32 не приводит).
-  # ES_DISPLAY_REQUIRED не ставится — монитор гаснет по расписанию Windows
-  # (5 мин), а машина остаётся доступной телефону через туннель. Флаг живёт
-  # на этом потоке до выхода из скрипта — снимать не нужно ни по Enter, ни по
-  # ошибке. Без него через 30 мин простоя (standby-timeout-ac 0x708) ПК
-  # засыпает, и запрос с телефона приходит в никуда; разбудить через туннель
-  # нельзя. Проверка: powercfg /requests (от администратора) показывает
-  # SYSTEM: powershell.exe.
+  # While this window lives the PC does not sleep: ES_CONTINUOUS|ES_SYSTEM_REQUIRED
+  # (2147483649 = 0x80000001; PS 5.1 will not cast the hex literal to UInt32).
+  # ES_DISPLAY_REQUIRED is deliberately NOT set: the monitor still turns off on
+  # the Windows schedule while the machine stays reachable from a phone. The flag
+  # lives on this thread until the script exits. Verify with powercfg /requests.
   try {
     Add-Type -Namespace DshPower -Name Native -MemberDefinition '[DllImport("kernel32.dll", SetLastError=true)] public static extern uint SetThreadExecutionState(uint esFlags);'
     [void][DshPower.Native]::SetThreadExecutionState([uint32]2147483649)
-    Write-Host 'сон ПК заблокирован на время работы; монитор гаснет как обычно' -ForegroundColor DarkGray
+    Write-Host (T 'PC sleep is blocked while the stand runs; the monitor still turns off as usual') -ForegroundColor DarkGray
   } catch {
-    Write-Host "не удалось заблокировать сон ПК: $_" -ForegroundColor Yellow
+    Write-Host (T 'could not block PC sleep: {0}' @($_)) -ForegroundColor Yellow
   }
-  try { Disable-IdleSleep } catch { Write-Host "не удалось отключить таймауты сна: $_" -ForegroundColor Yellow }
+  try { Disable-IdleSleep } catch { Write-Host (T 'could not disable the sleep timeouts: {0}' @($_)) -ForegroundColor Yellow }
 
   if ($Hidden) {
     $mode = Wait-StopSignal
     if ($mode -eq 'gone') {
-      Write-Host 'система выключена другим окном'
+      Write-Host (T 'the system was stopped by another window')
     } else {
       Stop-Everything
-      # wsl: только погасить Ubuntu. sleep: сон ПК (WSL оставляем — после
-      # пробуждения всё на месте). shutdown: полное выключение, Ubuntu гасим
-      # заранее, чтобы Windows не ждала VM; 5 с задержки — на выход скрипта.
+      # wsl: stop Ubuntu only. sleep: suspend the PC and leave WSL alone, so
+      # everything is in place after waking. shutdown: stop Ubuntu first so
+      # Windows does not wait for the VM, with 5 s for this script to exit.
       switch ($mode) {
         'wsl'      { & wsl.exe --shutdown }
         'sleep'    {
@@ -389,33 +388,33 @@ try {
       }
     }
   } else {
-    Write-Host 'Система работает. Это окно ею управляет — не закрывайте его во время работы.'
-    Write-Host 'Выключить можно и отсюда, и вторым кликом по тому же ярлыку.'
+    Write-Host (T 'The system is running. This window controls it - keep it open.')
+    Write-Host (T 'You can stop it from here, or with a second click on the same shortcut.')
     Write-Host ''
-    Read-Host 'Нажмите Enter, чтобы выключить систему'
+    Read-Host (T 'Press Enter to stop the system')
 
-    # Систему мог погасить второй клик по ярлыку, пока это окно ждало Enter.
-    # Тогда гасить нечего и спрашивать про WSL не за чем.
+    # A second click on the shortcut may have stopped the system while this
+    # window waited for Enter; then there is nothing to stop or to ask about.
     if (Test-SystemRunning) {
       Stop-Everything
       Confirm-WslShutdown
     } else {
-      Write-Host 'система уже выключена другим окном'
+      Write-Host (T 'the system was already stopped by another window')
     }
   }
 
   Write-Host ''
-  Write-Host 'Готово.' -ForegroundColor Green
+  Write-Host (T 'Done.') -ForegroundColor Green
   Log 'exit'
   Start-Sleep -Seconds 2
 }
 catch {
   Write-Host ''
-  Write-Host "ОШИБКА: $_" -ForegroundColor Red
+  Write-Host (T 'ERROR: {0}' @($_)) -ForegroundColor Red
   Log "ERROR: $_"
   try { Stop-Everything } catch { }
-  if ($Hidden) { Show-Error "$_ (лог: ~/Harness_AI/run/web.log)"; exit 1 }
+  if ($Hidden) { Show-Error (T '{0} (log: ~/Harness_AI/run/web.log)' @($_)); exit 1 }
   Write-Host ''
-  Read-Host 'Нажмите Enter, чтобы закрыть окно'
+  Read-Host (T 'Press Enter to close this window')
   exit 1
 }

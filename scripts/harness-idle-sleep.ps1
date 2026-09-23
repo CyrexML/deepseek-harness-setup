@@ -1,27 +1,25 @@
-﻿# Глушитель сна по простою для стенда, запущенного НЕ через лончер.
+﻿# Idle-sleep suppressor for a stand started WITHOUT the launcher.
 #
-# Зачем. harness-start.ps1 на время работы ставит standby/hibernate-timeout-ac
-# в 0 и возвращает прежние значения при остановке. Но стенд можно поднять и
-# напрямую из WSL (scripts/start-web.sh) — тогда таймауты остаются штатными
-# (на этом ПК 15 минут от сети), и Windows усыпляет машину прямо посреди
-# работы агента: нагрузка на CPU/GPU простоем НЕ считается, нужен ввод с
-# клавиатуры или мыши. 2026-09-23: семь засыпаний за два часа (журнал System,
-# Kernel-Power 42), из-за чего работа рвалась и выглядела как выключение ПК.
+# harness-start.ps1 sets standby/hibernate-timeout-ac to 0 for the duration and
+# restores the previous values on stop. But the stand can also be started
+# straight from WSL, and then the normal timeouts remain and Windows puts the
+# machine to sleep in the middle of the agent's work: CPU and GPU load does NOT
+# count as activity, keyboard or mouse input does.
 #
-# Протокол тот же, что у лончера: прежние значения лежат в power-timeouts.json,
-# и если процесс умрёт, их вернёт задача планировщика «Harness AI power restore».
+# Same protocol as the launcher: the previous values live in
+# power-timeouts.json, and if this process dies the "Harness AI power restore"
+# scheduled task puts them back.
 #
-#   harness-idle-sleep.ps1 -Off   выключить сон по простою (сохранив прежнее)
-#   harness-idle-sleep.ps1 -On    вернуть прежние значения
-#   harness-idle-sleep.ps1        показать текущее состояние
+#   harness-idle-sleep.ps1 -Off   disable idle sleep (saving the previous values)
+#   harness-idle-sleep.ps1 -On    restore the previous values
+#   harness-idle-sleep.ps1        show the current state
 #
-# Прав администратора не требует. Гашение экрана (VIDEOIDLE) НЕ трогается:
-# погасший монитор работе не мешает.
+# Needs no administrator rights.
 param(
   [switch]$Off,
   [switch]$On,
-  # На сколько гасить экран, если у пользователя стоит «никогда». Сам стенд от
-  # погасшего монитора не страдает.
+  # How long before the screen turns off when the user's setting is "never".
+  # The stand itself does not care about a dark monitor.
   [int]$MonitorMinutes = 10,
   [string]$Saved = 'F:\Harness_AI\run\power-timeouts.json'
 )
@@ -32,8 +30,8 @@ function Log([string]$m) {
   try { Add-Content -Path $LauncherLog -Value ((Get-Date).ToString('yyyy-MM-dd HH:mm:ss') + " [idle-sleep] " + $m) } catch { }
 }
 
-# 4-е hex-число в выводе powercfg /q — индекс «от сети» (мин, макс, шаг, AC, DC).
-# Порядок не зависит от языка системы, поэтому парсим позиционно, а не по словам.
+# The 4th hex number in powercfg /q output is the AC value (min, max, step, AC,
+# DC). The order does not depend on the system language, so parse by position.
 function Get-AcTimeoutMinutes([string]$setting, [string]$subgroup = 'SUB_SLEEP') {
   $out = & powercfg.exe /q SCHEME_CURRENT $subgroup $setting 2>$null | Out-String
   $m = [regex]::Matches($out, '0x[0-9a-fA-F]{8}')
@@ -64,9 +62,9 @@ if ($Off) {
   }
   foreach ($name in @('standby-timeout-ac', 'hibernate-timeout-ac')) { & powercfg.exe /change $name 0 | Out-Null }
 
-  # Экран гасить НУЖНО: он не мешает работе (ни локальной, ни с телефона — стенд
-  # живёт в фоне), а вот гореть всю ночь ему незачем. Трогаем только случай
-  # «никогда»: осмысленную настройку пользователя не переписываем.
+  # Turning the screen off is fine: it blocks neither local nor phone work, and
+  # there is no reason for it to burn all night. Only the "never" case is
+  # touched - a deliberate user setting is left alone.
   $video = Get-AcTimeoutMinutes 'VIDEOIDLE' 'SUB_VIDEO'
   if ($video -eq 0) {
     & powercfg.exe /change monitor-timeout-ac $MonitorMinutes | Out-Null
@@ -79,7 +77,7 @@ if ($Off) {
 }
 
 if ($On) {
-  # Лончер жив — состояние принадлежит ему, не вмешиваемся.
+  # The launcher is alive: the state belongs to it, stay out of the way.
   $launcher = Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue |
     Where-Object { $_.CommandLine -like '*harness-start.ps1*' }
   if ($launcher) { Log 'restore skipped: launcher is running and owns the timeouts'; Show-State; exit 0 }

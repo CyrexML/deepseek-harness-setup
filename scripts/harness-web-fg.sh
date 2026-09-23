@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# Веб-интерфейс на переднем плане — точка входа для launcher'а с Windows.
+# Web interface in the foreground - the entry point for the Windows launcher.
 #
-# Существует ради одной вещи: у неё НЕТ аргументов и в её пути НЕТ пробелов.
-# `Start-Process` из PowerShell склеивает массив аргументов через пробел, не
-# расставляя кавычек, поэтому `bash -lc "DSH_WEB_FOREGROUND=1 ... start-web.sh ~"`
-# доезжал до bash разорванным: команда обрывалась на первом пробеле, остальное
-# уходило в $0/$1. Строка без пробелов эту ловушку снимает.
+# It exists for one reason: it takes NO arguments and its path has NO spaces.
+# PowerShell's Start-Process joins the argument array with spaces and quotes
+# nothing, so a composed command arrived at bash torn apart at the first space,
+# with the rest landing in $0/$1. A single space-free path removes that trap.
 export DSH_WEB_FOREGROUND=1
-# Через `bash`, а не напрямую: бит исполнения у start-web.sh может
-# не пережить свежий клон репозитория, и запуск падал бы с Permission denied.
+# Through `bash` rather than directly: the executable bit on start-web.sh may
+# not survive a fresh clone, and the launch would fail with Permission denied.
 exec bash "$HOME/Harness_AI/scripts/start-web.sh" "$HOME/Harness_AI"

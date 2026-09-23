@@ -36,6 +36,18 @@ function New-Shortcut {
   $link.Save()
 }
 
+# Message language and catalogs for the launcher and the splash: they run from
+# run\ and never see config.json, so the choice is written next to them.
+$lang = if ($cfg.PSObject.Properties['lang'] -and $cfg.lang) { $cfg.lang } else { 'en' }
+Set-Content -Path (Join-Path $runDir 'lang.txt') -Value $lang -Encoding UTF8 -NoNewline
+$i18nSrc = Join-Path $script:StandRoot 'i18n'
+if (Test-Path $i18nSrc) {
+  $i18nDst = Join-Path $runDir 'i18n'
+  New-Item -ItemType Directory -Force -Path $i18nDst | Out-Null
+  Copy-Item "$i18nSrc\*.json" $i18nDst -Force
+}
+Write-Ok 'message language: {0}' $lang
+
 Write-Step 'shortcuts'
 $desktop = [Environment]::GetFolderPath('Desktop')
 $startMenu = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'

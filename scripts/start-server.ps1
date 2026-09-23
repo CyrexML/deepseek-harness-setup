@@ -3,9 +3,8 @@
 # 'forcing full prompt re-processing' (SLT_TRC) -- decision-01 s8.1.
 # Per s8.2 timings must be taken WITHOUT trace: pass -Verbosity 3.
 param(
-  # 64k: замер 2026-09-08. q4_0 на кэше держит тензорное ядро MMA_F16
-  # (q4_1 в этой сборке FlashAttention НЕ поддержан — GGML_CUDA_FA_ALL_QUANTS=OFF),
-  # префилл на 54k промпта 1536 т/с, удержание 20/20. Прежнее: 32768/q8_0/2.
+  # 64k window with a q4_0 KV cache: q4_0 keeps the MMA_F16 tensor kernel, while
+  # q4_1 is not supported by FlashAttention in this build.
   [int]$Ctx        = 65536,
   [string]$CacheK  = "q4_0",
   [string]$CacheV  = "q4_0",
@@ -13,93 +12,72 @@ param(
   # literal string "$false", which cannot convert to Boolean. MTP is on by
   # default; pass -NoMtp to turn it off (needed for test 5.0 and the 5.4 baseline).
   [switch]$NoMtp,
-  # 3 — пик до обрыва: 4 на окне 64k роняет префилл 1871->763 (вытеснение).
+  # 3 draft tokens is the peak before the cliff: 4 on a 64k window drops prefill
+  # from 1871 to 763 tok/s because VRAM spills.
   [int]$SpecNMax   = 3,
   [int]$CtxCheckpoints = 32,
-  # Шаблон модели: "medium" = НИКАКОЙ инструкции (пустая строка, template §59-70),
-  # "low" = «Keep your thinking brief and focused». Жёсткий потолок — ReasoningBudget.
-  # Замер 2026-09-11/12 (3 сессии, 1 450 шагов): медиана 150-300 ток./шаг, но
-  # 8-16% шагов упираются в 5000 и дают ~40% всего reasoning; reasoning = 73%
-  # времени декодирования провальной сессии (199k из 272k ток.).
+  # "medium" sends NO thinking instruction, "low" sends "Keep your thinking brief
+  # and focused". The hard ceiling is ReasoningBudget: measured across three
+  # sessions, the median step spends 150-300 reasoning tokens, but 8-16% of steps
+  # hit the cap and produce about 40% of all reasoning.
   [string]$ReasoningEffort = "medium",
   [int]$ReasoningBudget = 5000,
-  # Собственный jinja вместо встроенного в GGUF. Пустая строка = флаг не
-  # передаётся, командная строка дословно прежняя (правило рук A/B).
-  #
-  # Зачем: --no-reasoning-preserve в агентном цикле НЕ работает. Шаблон (строка
-  # 119) держит reasoning для всех assistant после последнего user; ответы
-  # инструментов — role=tool, поэтому «последний user» — это промпт хода, и
-  # reasoning всех 50-80 шагов хода уходит в каждый запрос. Замер по usage
-  # llama-server: прирост контекста между шагами 285 644 ток. = вывод модели
-  # 235 780 + результаты; reasoning — 48-60% всего, что входит в окно.
-  # F:\Harness_AI\models\qwen3.8-agent.jinja: та же строка с условием
-  # `preserve_thinking is true or (keep_last_thinking is true and last)`.
-  # Проверка после запуска: POST /apply-template с двумя assistant-сообщениями
-  # с reasoning_content — в ответе не должно быть их текста.
-  # 2026-09-15: умолчание = шаблон стенда; "" — стоковый шаблон из GGUF.
+  # Custom jinja instead of the one baked into the GGUF. --no-reasoning-preserve
+  # does NOT work in an agent loop: the stock template keeps reasoning for every
+  # assistant message after the last user message, and tool results have
+  # role=tool, so the "last user" is the turn prompt and the reasoning of all
+  # 50-80 steps is replayed in every request - measured at 48-60% of everything
+  # entering the window. The stand's template adds `and not loop.last`, so only
+  # the latest answer keeps its reasoning. Verify with POST /apply-template using
+  # two assistant messages carrying reasoning_content: neither text may come back.
+  # An empty string falls back to the stock GGUF template.
   [string]$ChatTemplateFile = "F:\Harness_AI\models\qwen3.8-agent.jinja",
   [int]$Port       = 8080,
   [string]$Log     = "F:\Harness_AI\run\server.log",
   [int]$Verbosity  = 3,
   [string]$Bind    = "0.0.0.0",
-  # DRY-семплер (bench-05). ВЫКЛЮЧЕН по умолчанию: без -Dry командная строка
-  # обязана совпадать с прежней дословно, иначе рука A замера несопоставима
-  # с прошлыми прогонами.
+  # DRY sampler, off by default.
   #
-  # DryPenaltyLastN: дефолт сборки -- 64 токена. Повторяющийся абзац занимает
-  # 80-120 токенов, то есть окно в 64 петлю физически не видит. 2048 выбрано
-  # как окно, покрывающее несколько повторов абзаца.
+  # DryPenaltyLastN: the build default of 64 tokens cannot see a loop at all -
+  # a repeated paragraph is 80-120 tokens. 2048 covers several repetitions.
   [switch]$Dry,
   [double]$DryMultiplier   = 0.8,
   [double]$DryBase         = 1.75,
   [int]$DryAllowedLength   = 4,
   [int]$DryPenaltyLastN    = 2048,
-  # Мультимодальный проектор. ВЫКЛЮЧЕН по умолчанию: без -Mmproj командная
-  # строка обязана совпадать с прежней дословно, иначе замеры генерации
-  # несопоставимы с bench-07 -- то же правило, что у -Dry.
+  # Multimodal projector.
   #
-  # MmprojDevice "none" = проектор не выгружается на GPU и считает на CPU.
-  # Запас видеопамяти на окне 64k -- 539 МиБ по memory.free, веса проектора
-  # 885 МиБ: на GPU они не помещаются (решение 11 §4). "auto" оставлен, чтобы
-  # это можно было проверить замером, а не рассуждением.
-  # 2026-09-15: умолчание = проектор стенда (на CPU, см. MmprojDevice); "" — без зрения.
+  # MmprojDevice "none" keeps the projector on the CPU: on a 64k window about
+  # 539 MiB of VRAM are free and the projector weighs 885 MiB, so it does not
+  # fit. An empty Mmproj means no vision at all.
   [string]$Mmproj = "F:\Harness_AI\models\mmproj-F16.gguf",
   [string]$MmprojDevice = "none",
-  # Сэмплинг (bench-09). Умолчания дословно повторяют прежние зашитые
-  # константы, поэтому базовая рука остаётся сопоставимой с bench-03..08.
-  #
-  # Типы [string], а не [double], намеренно: PS 5.1 форматирует [double] по
-  # текущей культуре, и в локали с запятой "0,9" ушло бы в exe и было бы
-  # прочитано как 0. Тот же капкан уже сработал на -Dry (см. ниже). Строка
-  # заодно сохраняет "0.90" в точности, а не "0.9".
-  # 2026-09-15: умолчания = рабочая рука лончера (решение 13, bench-09:
-  # temp 1.0 / top-p 0.95 / top-k 20 / min-p 0). Прежние 0.4/0.90/15/0.02
-  # (bench-03..08) — руками, если нужна сопоставимость со старыми замерами.
-  # Ручной запуск без параметров = тот же стенд, что поднимает лончер.
+  # Sampling. The types are [string] rather than [double] on purpose: PS 5.1
+  # formats [double] using the current culture, so in a comma locale "0,9" would
+  # reach the exe and be read as 0. A string also preserves "0.90" exactly.
+  # Running this script without parameters gives the same server the launcher
+  # starts.
   [string]$Temp   = "1.0",
   [string]$TopP   = "0.95",
   [string]$TopK   = "20",
   [string]$MinP   = "0.0",
-  # Штрафы. Пустая строка = флаг не передаётся, то есть умолчание сборки
-  # (presence 0.0, repeat 1.0 — оба выключены). Рекомендация Qwen для
-  # non-thinking просит presence 1.5.
+  # Penalties. An empty string means the flag is not passed at all, i.e. the
+  # build defaults (presence 0.0, repeat 1.0). Qwen recommends presence 1.5 for
+  # the non-thinking mode.
   [string]$PresencePenalty = "",
   [string]$RepeatPenalty   = "",
-  # Обычный режим вместо thinking. Шаблон модели проверяет
-  # `enable_thinking is undefined or enable_thinking is true`, поэтому
-  # выключается явным false в chat-template-kwargs. Рекомендация Qwen для
-  # этого режима: temp 0.7, top-p 0.80, top-k 20, min-p 0.0, presence 1.5.
+  # Plain mode instead of thinking. The template checks
+  # `enable_thinking is undefined or enable_thinking is true`, so it is turned
+  # off with an explicit false in chat-template-kwargs. Qwen recommends
+  # temp 0.7, top-p 0.80, top-k 20, min-p 0.0, presence 1.5 for this mode.
   [switch]$NoThinking,
-  # Произвольные дополнительные флаги llama-server — для проб, а не для
-  # рабочего запуска. Добавлено при проверке набора флагов Ollama (проба 12):
-  # -b/-ub и --spec-draft-backend-sampling у нас не задавались никогда, и
-  # проверить их можно только замером. В рабочей команде оставаться не должны:
-  # что доказано замером — переносится в явный параметр выше.
-  # Строка, а не [string[]]: в режиме -File PowerShell склеивает
-  # "-Extra -b,1024,-ub,1024" в ОДИН элемент, и llama-server отвергает его
-  # целиком ("invalid argument: -b,1024,-ub,1024"). Разбираем сами по пробелу.
-  [string]$Extra = "",
-  # Только напечатать командную строку и выйти (сверка конфигурации без запуска).
+  # Extra llama-server flags, for experiments rather than for the working setup:
+  # whatever a measurement proves is worth keeping moves up into an explicit
+  # parameter. A string, not [string[]]: in -File mode PowerShell joins
+  # "-Extra -b,1024,-ub,1024" into ONE element which llama-server rejects
+  # wholesale, so the split by spaces happens here.
+
+  # Only print the command line and exit (configuration check).
   [switch]$PrintOnly
 )
 
@@ -116,10 +94,8 @@ $model = "F:\Harness_AI\models\Qwen3.8-27B-UD-Q3_K_XL.gguf"
 if (-not (Test-Path $exe))   { Write-Error "missing $exe";   exit 1 }
 if (-not (Test-Path $model)) { Write-Error "missing $model"; exit 1 }
 
-# Без -NoThinking строка обязана совпасть с прежней ДОСЛОВНО, иначе базовая
-# рука несопоставима с прошлыми замерами. Пробелов внутри JSON нет: PS 5.1
-# и режет внутренние кавычки, и разбивает аргумент по пробелам при передаче
-# в нативный exe.
+# No spaces inside the JSON: PowerShell both strips inner quotes and splits the
+# argument on spaces when passing it to a native exe.
 if ($NoThinking) {
   $ctk = "{\`"reasoning_effort\`":\`"$ReasoningEffort\`",\`"enable_thinking\`":false}"
 } else {
@@ -168,15 +144,14 @@ if ($RepeatPenalty)   { $a += @("--repeat-penalty",   $RepeatPenalty) }
 if ($Mmproj) {
   if (-not (Test-Path $Mmproj)) { Write-Error "missing $Mmproj"; exit 1 }
   $a += @("--mmproj", $Mmproj)
-  # "auto" из справки -- описание умолчания, а не допустимое значение: сервер
-  # отвергает его с "invalid device: auto". Пустая строка = флаг не передаётся,
-  # то есть штатная выгрузка проектора на GPU.
+  # "auto" in the help text describes the default rather than being a valid
+  # value: the server rejects it with "invalid device: auto". An empty string
+  # means the flag is not passed, i.e. the projector goes to the GPU.
   if ($MmprojDevice) { $a += @("--mmproj-device", $MmprojDevice) }
 }
 
-# Единственная переменная замера bench-05. Числа передаются как строки: PS 5.1
-# форматирует [double] по текущей культуре, и в локали с запятой в качестве
-# десятичного разделителя "0,8" ушло бы в exe и было бы прочитано как 0.
+# Numbers are passed as strings: PS 5.1 formats [double] using the current
+# culture, so in a comma locale "0,8" would reach the exe and be read as 0.
 if ($Extra) { $a += ($Extra -split ' +' | Where-Object { $_ }) }
 
 if ($Dry) {

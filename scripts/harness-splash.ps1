@@ -1,14 +1,14 @@
-﻿# Экран загрузки лончера (WinForms). Живёт отдельным скрытым процессом:
-# harness-start.ps1 -Hidden пишет стадии в launch.status (model | web | done |
-# error: текст), этот скрипт их показывает и закрывается на done.
-# Нужен -STA (WinForms). Если статус не обновляется 120 с — лончер умер,
-# окно закрывается само, чтобы не висеть вечно.
+﻿# Launcher splash screen (WinForms) in its own hidden process: harness-start.ps1
+# -Hidden writes stages into launch.status (model | web | done | stopping |
+# stopped | "error: text"), this script shows them and closes on done. Needs -STA.
+# If the status stops changing for 120 s the launcher is dead and the window
+# closes itself rather than hanging forever.
 param(
   [string]$StatusFile = 'F:\Harness_AI\run\launch.status',
   [string]$Image      = 'F:\Harness_AI\run\splash-whale.png'
 )
-# Короткий журнал стадий — единственный способ понять, что видел экран, когда
-# лончер работает без консоли.
+# A short stage log: the only way to tell what the screen showed when the
+# launcher runs without a console.
 $LogFile = [IO.Path]::ChangeExtension($StatusFile, '.splash.log')
 function Log([string]$m) { try { Add-Content -Path $LogFile -Value ((Get-Date).ToString('HH:mm:ss.fff') + ' ' + $m) } catch { } }
 Log ('start pid=' + $PID)
@@ -18,9 +18,9 @@ Add-Type -Namespace DshSplash -Name Native -MemberDefinition @'
 [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
 '@
-# powershell.exe DPI-unaware: окно размывается и центрируется в виртуальных
-# координатах. Объявляем DPI-aware и масштабируем пиксели сами (шрифты в pt
-# WinForms масштабирует сам).
+# powershell.exe is DPI-unaware: the window would blur and centre itself in
+# virtual coordinates. Declare DPI awareness and scale pixels by hand (WinForms
+# scales point-sized fonts itself).
 [void][DshSplash.Native]::SetProcessDPIAware()
 [System.Windows.Forms.Application]::EnableVisualStyles()
 $gg = [System.Drawing.Graphics]::FromHwnd([IntPtr]::Zero); $k = $gg.DpiX / 96.0; $gg.Dispose()
@@ -68,7 +68,7 @@ $title.Location  = New-Object System.Drawing.Point(0, (S 140))
 $f.Controls.Add($title)
 
 $sub = New-Object System.Windows.Forms.Label
-$sub.Text      = 'Запуск'
+$sub.Text      = (T 'Starting')
 $sub.Font      = New-Object System.Drawing.Font('Segoe UI', 10)
 $sub.ForeColor = $muted
 $sub.TextAlign = 'MiddleCenter'
@@ -88,7 +88,7 @@ $track.Controls.Add($runner)
 $f.Controls.Add($track)
 
 $hint = New-Object System.Windows.Forms.Label
-$hint.Text      = 'браузер откроется сам, когда всё будет готово'
+$hint.Text      = (T 'the browser will open by itself when everything is ready')
 $hint.Font      = New-Object System.Drawing.Font('Segoe UI', 8.5)
 $hint.ForeColor = [System.Drawing.Color]::FromArgb(96, 104, 124)
 $hint.TextAlign = 'MiddleCenter'
@@ -97,7 +97,7 @@ $hint.Location  = New-Object System.Drawing.Point(0, (S 248))
 $f.Controls.Add($hint)
 
 $closeBtn = New-Object System.Windows.Forms.Button
-$closeBtn.Text      = 'Закрыть'
+$closeBtn.Text      = (T 'Close')
 $closeBtn.FlatStyle = 'Flat'
 $closeBtn.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(70, 76, 96)
 $closeBtn.ForeColor = $fg
@@ -108,15 +108,30 @@ $closeBtn.Visible   = $false
 $closeBtn.Add_Click({ $f.Close() })
 $f.Controls.Add($closeBtn)
 
-$stages = @{
-  model    = 'Загружаю модель Qwen3.8-27B в видеопамять'
-  web      = 'Поднимаю веб-интерфейс DSH'
-  done     = 'Готово, открываю браузер'
-  stopping = 'Останавливаю стенд'
-  stopped  = 'Стенд остановлен'
+# Message language, same mechanism as the launcher: run\lang.txt or HARNESS_LANG,
+# translations in run\i18n\<lang>.json, untranslated strings stay English.
+$RunDir = Split-Path -Parent $StatusFile
+$Lang = if ($env:HARNESS_LANG) { $env:HARNESS_LANG }
+        elseif (Test-Path "$RunDir\lang.txt") { (Get-Content -Raw "$RunDir\lang.txt").Trim() }
+        else { 'en' }
+$I18n = @{}
+if ($Lang -and $Lang -ne 'en' -and (Test-Path "$RunDir\i18n\$Lang.json")) {
+  try {
+    (Get-Content "$RunDir\i18n\$Lang.json" -Raw -Encoding UTF8 | ConvertFrom-Json).PSObject.Properties |
+      ForEach-Object { $I18n[$_.Name] = [string]$_.Value }
+  } catch { }
 }
-# Анимация по времени (Stopwatch), а не по тикам: ~60 к/с, плавные кривые.
-# Окно и панели — с двойной буферизацией, иначе бегунок мерцает.
+function T([string]$Text) { if ($I18n.ContainsKey($Text)) { $I18n[$Text] } else { $Text } }
+
+$stages = @{
+  model    = (T 'Loading the model into video memory')
+  web      = (T 'Starting the DSH web interface')
+  done     = (T 'Ready, opening the browser')
+  stopping = (T 'Stopping the stand')
+  stopped  = (T 'The stand is stopped')
+}
+# Animation is driven by a Stopwatch rather than by tick counts: ~60 fps and
+# smooth curves. Window and panels are double-buffered or the runner flickers.
 foreach ($c in @($f, $track)) {
   $c.GetType().GetProperty('DoubleBuffered', [Reflection.BindingFlags]'Instance,NonPublic').SetValue($c, $true, $null)
 }
@@ -131,21 +146,21 @@ $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 16
 $timer.Add_Tick({
   $t = $clock.Elapsed.TotalSeconds
-  # Появление: 0.7 с, ease-out.
+  # Fade-in: 0.7 s, ease-out.
   if (-not $script:fading) {
     $f.Opacity = EaseOutCubic ([Math]::Min(1.0, $t / 0.7))
   }
-  # Бегунок: туда-обратно по синусу, период 2.2 с; кит чуть «дышит».
+  # The runner sweeps back and forth on a sine, period 2.2 s.
   $u = ($t % 2.2) / 2.2
   $ping = if ($u -lt 0.5) { $u * 2 } else { 2 - $u * 2 }
   $runner.Left = [int][Math]::Round($travel * (EaseInOutSine $ping))
   $pic.Top = $picTop + [int][Math]::Round(3 * [Math]::Sin($t * 1.6))
-  # Статус — не чаще 6 раз в секунду.
+  # Poll the status file at most 6 times a second.
   if ($t - $script:lastPoll -ge 0.15) {
     $script:lastPoll = $t
     $status = $null
-    # ReadAllText: UTF-8, как пишет лончер (WriteAllText). Get-Content в PS 5.1
-    # читал бы ANSI и ломал кириллицу в стадиях error:/warn:.
+    # ReadAllText reads UTF-8, matching the launcher's WriteAllText. Get-Content
+    # in PS 5.1 would read ANSI and mangle non-ASCII text in error:/warn: stages.
     if (Test-Path $StatusFile) { try { $status = ([IO.File]::ReadAllText($StatusFile)).Trim() } catch { } }
     if ($status -and $status -ne $script:phase) {
       $script:phase = $status; $script:lastChange = Get-Date
@@ -155,16 +170,16 @@ $timer.Add_Tick({
         $sub.Font = New-Object System.Drawing.Font('Segoe UI', 9)
         $sub.Size = New-Object System.Drawing.Size(($W - (S 40)), (S 60))
         $sub.Location = New-Object System.Drawing.Point((S 20), (S 172))
-        $sub.Text = 'Не удалось запустить: ' + $status.Substring(6).Trim()
+        $sub.Text = (T 'Could not start: ') + $status.Substring(6).Trim()
         $track.Visible = $false; $hint.Visible = $false; $closeBtn.Visible = $true
       } elseif ($status -like 'warn:*') {
-        # Стенд работает, но есть что показать (видеопамять): жёлтый текст,
-        # кнопка закрытия, уход сам через 25 с.
+        # The stand is up but something is worth showing (VRAM): yellow text,
+        # a close button, and it fades out by itself after 25 s.
         $sub.ForeColor = [System.Drawing.Color]::FromArgb(230, 180, 60)
         $sub.Font = New-Object System.Drawing.Font('Segoe UI', 9)
         $sub.Size = New-Object System.Drawing.Size(($W - (S 40)), (S 60))
         $sub.Location = New-Object System.Drawing.Point((S 20), (S 172))
-        $sub.Text = 'Запущено, но: ' + $status.Substring(5).Trim()
+        $sub.Text = (T 'Started, but: ') + $status.Substring(5).Trim()
         $track.Visible = $false; $hint.Visible = $false; $closeBtn.Visible = $true
         $script:fading = $true
         $script:doneT = $t + 24.2
@@ -175,12 +190,12 @@ $timer.Add_Tick({
       }
     }
     if (-not $script:fading -and $script:phase -notlike 'error:*' -and $script:phase -notlike 'warn:*') {
-      $base = if ($stages.ContainsKey($script:phase)) { $stages[$script:phase] } else { 'Запуск' }
+      $base = if ($stages.ContainsKey($script:phase)) { $stages[$script:phase] } else { (T 'Starting') }
       $sub.Text = $base + ('.' * ([int][Math]::Floor($t / 0.45) % 4))
       if (((Get-Date) - $script:lastChange).TotalSeconds -gt 120) { Log 'close (watchdog)'; $timer.Stop(); $f.Close() }
     }
   }
-  # Уход: пауза 0.8 с, затем 0.45 с ease-in.
+  # Fade-out: 0.8 s pause, then 0.45 s ease-in.
   if ($script:fading) {
     $k2 = ($t - $script:doneT - 0.8) / 0.45
     if ($k2 -ge 0) {
@@ -190,9 +205,9 @@ $timer.Add_Tick({
   }
 })
 $f.Add_KeyDown({ if ($_.KeyCode -eq 'Escape') { $f.Close() } })
-# Процесс запускается скрытым (Start-Process -WindowStyle Hidden): Windows
-# применяет SW_HIDE из STARTUPINFO к ПЕРВОМУ окну процесса, и форма осталась
-# бы невидимой. Показываем окно явно вторым вызовом ShowWindow.
+# The process starts hidden (Start-Process -WindowStyle Hidden) and Windows
+# applies SW_HIDE from STARTUPINFO to the process's FIRST window, which would
+# leave the form invisible. Show it explicitly with a second ShowWindow call.
 $f.Show()
 [void][DshSplash.Native]::ShowWindow($f.Handle, 5)
 $f.Activate()

@@ -1,20 +1,20 @@
-﻿# Перерегистрация задачи «Harness AI power restore» без мигающего окна консоли.
+﻿# Re-register the "Harness AI power restore" task without a flashing console.
 #
-#   ПРАВЫЙ КЛИК по PowerShell → «Запуск от имени администратора», затем:
+#   RIGHT-CLICK PowerShell -> Run as administrator, then:
 #   powershell -ExecutionPolicy Bypass -File F:\Harness_AI\run\fix-power-task.ps1
 #
-# Зачем: задача запускалась действием powershell.exe, и раз в 15 минут на экране
-# мигало окно консоли — его создаёт conhost ДО того, как PowerShell применит
-# -WindowStyle Hidden. Через wscript.exe + harness-hidden.vbs окна нет вовсе.
+# The task used to run powershell.exe directly, which flashed a console window
+# every 15 minutes: conhost creates it BEFORE PowerShell applies -WindowStyle
+# Hidden. Through wscript.exe + harness-hidden.vbs there is no window at all.
 $ErrorActionPreference = 'Stop'
 $runDir = 'F:\Harness_AI\run'
 $hidden = Join-Path $runDir 'harness-hidden.vbs'
 $restore = Join-Path $runDir 'harness-restore-power.ps1'
-foreach ($f in @($hidden, $restore)) { if (-not (Test-Path $f)) { throw "нет файла $f" } }
+foreach ($f in @($hidden, $restore)) { if (-not (Test-Path $f)) { throw "missing file: $f" } }
 
 $admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
          ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if (-not $admin) { throw 'нужен запуск от имени администратора' }
+if (-not $admin) { throw 'run this as administrator' }
 
 $action = New-ScheduledTaskAction -Execute "$env:WINDIR\System32\wscript.exe" -Argument "`"$hidden`" `"$restore`""
 $logon = New-ScheduledTaskTrigger -AtLogOn
@@ -26,5 +26,5 @@ Register-ScheduledTask -TaskName 'Harness AI power restore' -Action $action `
   -Trigger @($logon, $repeat) -Settings $settings -Force | Out-Null
 
 $t = Get-ScheduledTask -TaskName 'Harness AI power restore'
-foreach ($a in $t.Actions) { Write-Host ("действие: " + $a.Execute + " " + $a.Arguments) }
-Write-Host 'готово: окно консоли больше появляться не должно'
+foreach ($a in $t.Actions) { Write-Host ("action: " + $a.Execute + " " + $a.Arguments) }
+Write-Host 'done: the console window should not appear any more'
