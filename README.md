@@ -265,6 +265,49 @@ JavaScript, the settings ship `htmlViewerNoSandbox: true`
 with the interface's origin and can read and write session files. That is what
 you want for your own projects; do not open someone else's HTML that way.
 
+## Git: keeping a project clean
+
+The agent leaves three different things around your work, and they are worth
+telling apart.
+
+**Turn snapshots** — what the panel shows as changes. They live in
+`~/.dsh/change-ledger`, outside your projects, and never reach git. They do grow.
+Clean them with `dsh-cleanup.sh --apply --ledger-days 30`.
+
+**Restore points** — the `turn-rewind` plugin writes them **into the repository
+that contains the project**, as `refs/dsh-turn-rewind/…` refs. They are not
+branches: `git branch` does not list them and a normal `git push` does not send
+them, but many interfaces show them next to branches, which is why it looks like
+you have hundreds of branches. To see and prune them:
+
+```bash
+bash ~/Harness_AI/scripts/git-rewind-refs.sh ~/path/to/project            # how many
+bash ~/Harness_AI/scripts/git-rewind-refs.sh ~/path/to/project --days 14  # drop old ones
+```
+
+A deleted restore point means that turn can no longer be rewound, so by default
+the script changes nothing.
+
+**Working litter** — `.shots/` (screenshots), `backups/` (copies made before an
+edit), `out/`, logs. This is the only part that would actually land in a commit.
+
+### Putting a project on GitHub
+
+```bash
+bash ~/Harness_AI/scripts/project-git-init.sh ~/Harness_AI/projects/MyProject
+```
+
+It writes the `.gitignore`, creates the repository on `main`, **shows exactly
+what the commit will contain and how big it is**, makes the first commit and
+configures pushing so that only branches leave. Then:
+
+```bash
+gh repo create <name> --private --source=. --remote=origin --push
+```
+
+One warning: `git push --mirror` would send every ref, restore points included.
+A normal `git push` does not.
+
 ## Troubleshooting
 
 **The phone shows 530 over the tunnel.** Cloudflare Tunnel needs outbound TCP 7844. Some

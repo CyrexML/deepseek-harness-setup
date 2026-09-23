@@ -1,0 +1,106 @@
+# Проверки, которые ловят то, что ломает установку у другого человека:
+# синтаксис скриптов обеих платформ, кодировку .ps1 и следы личных данных.
+name: checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linux:
+    name: скрипты WSL и модули
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: синтаксис bash
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            bash -n "$f" || { echo "СИНТАКСИС: $f"; fail=1; }
+          done < <(find . -name '*.sh' -not -path './.git/*')
+          exit $fail
+
+      - name: в скриптах WSL нет CRLF
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            if grep -qU $'\r' "$f"; then echo "CRLF в $f — bash такой файл не выполнит"; fail=1; fi
+          done < <(find . -name '*.sh' -not -path './.git/*')
+          exit $fail
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: модули пресета и патчей разбираются
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            node --check "$f" 2>/dev/null || node -e "import('file://$PWD/${f#./}').catch(e => { console.error('$f: ' + e.message); process.exit(1) })" || fail=1
+          done < <(find . -name '*.mjs' -not -path './.git/*')
+          exit $fail
+
+      - name: JSON и YAML разбираются
+        run: |
+          python3 - <<'PY'
+          import json, sys, pathlib, yaml
+          bad = []
+          for p in pathlib.Path('.').rglob('*.json'):
+              if '.git' in p.parts: continue
+              try: json.loads(p.read_text(encoding='utf-8'))
+              except Exception as e: bad.append(f'{p}: {e}')
+          class L(yaml.SafeLoader): pass
+          L.add_multi_constructor('!', lambda *a: None)
+          L.add_multi_constructor('tag:yaml.org,2002:js', lambda *a: None)
+          for p in list(pathlib.Path('.').rglob('*.yml')) + list(pathlib.Path('.').rglob('*.yaml')):
+              if '.git' in p.parts: continue
+              try: list(yaml.load_all(p.read_text(encoding='utf-8'), Loader=L))
+              except Exception as e: bad.append(f'{p}: {e}')
+          print('\n'.join(bad) or 'все файлы разбираются')
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: нет следов личных данных
+        run: |
+          # Домашний путь ловим по имени пользователя, но обобщённые примеры
+          # (/home/user, /home/me) — это документация, а не утечка.
+          hits=$(grep -rInE 'BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|/home/[a-z][a-z0-9_-]+/' \
+                   --exclude-dir=.git --exclude=checks.yml . \
+                 | grep -vE '/home/(user|me|username|youruser|ubuntu|runner)/' || true)
+          if [ -n "$hits" ]; then
+            printf '%s\n' "$hits"
+            echo 'найдены ключи или домашние пути'; exit 1
+          fi
+          echo 'чисто'
+
+  windows:
+    name: скрипты Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: синтаксис PowerShell
+        shell: pwsh
+        run: |
+          $bad = 0
+          Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errors) | Out-Null
+            if ($errors.Count) { Write-Host "СИНТАКСИС: $($_.FullName): $($errors[0].Message)"; $bad = 1 }
+          }
+          exit $bad
+
+      - name: .ps1 сохранены с BOM
+        shell: pwsh
+        run: |
+          # Windows PowerShell 5.1 читает файл без BOM как ANSI: русские
+          # комментарии превращаются в мусор и ломают разбор.
+          $bad = 0
+          Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
+            $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
+            if ($bytes.Length -lt 3 -or $bytes[0] -ne 0xEF -or $bytes[1] -ne 0xBB -or $bytes[2] -ne 0xBF) {
+              Write-Host "нет BOM: $($_.FullName)"; $bad = 1
+            }
+          }
+          exit $bad

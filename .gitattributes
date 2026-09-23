@@ -1,0 +1,26 @@
+# Окончания строк задаются здесь, а не настройкой клиента.
+#
+# Почему это важно: у многих на Windows включено core.autocrlf=true. Без этого
+# файла при клонировании .sh получили бы CRLF, и bash внутри WSL спотыкался бы
+# на каждом '\r' — установка падала бы с невнятной ошибкой в первой же строке.
+# Обратная сторона: .cmd и .vbs Windows должен видеть с CRLF.
+* text=auto eol=lf
+
+*.sh   text eol=lf
+*.mjs  text eol=lf
+*.js   text eol=lf
+*.py   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+
+*.ps1  text eol=crlf
+*.psm1 text eol=crlf
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+*.vbs  text eol=crlf
+
+*.png  binary
+*.ico  binary
+*.jinja text eol=lf
