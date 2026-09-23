@@ -1,0 +1,3 @@
+[["🔒 此操作需要管理员权限","🔒 This action requires admin privileges"],
+["远程访问时浏览/添加工作区需输入后台管理密码解锁（与访问密码不同）。","When accessing remotely, browsing/adding workspaces requires the admin password to unlock (different from the access password)."],
+["placeholder=\"请输入后台管理密码\"","placeholder=\"Enter the admin password\""]]

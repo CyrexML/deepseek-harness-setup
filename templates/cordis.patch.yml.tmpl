@@ -1,0 +1,150 @@
+# Патч профиля web — маршрут на локальный llama-server.
+# Повторяет решения, проверенные на профиле headless
+# (bench/agent-task-02/dsh-patch.yml), без частей, относящихся к задаче:
+# профиль web держит инструменты не в дереве загрузчика, а за пресетами
+# агента, поэтому здесь только выбор провайдера и модели.
+
+# Родной провайдер DeepSeek гасим: он требует DEEPSEEK_API_KEY и иначе
+# падает MISSING_CREDENTIAL в момент запроса.
+- id: llm-deepseek
+  disabled: true
+
+# Маршрут на llama-server, работающий нативно на Windows.
+# api: openai-completions — проволочный протокол pi-ai (docs/dsh-schema-check.md §2.3).
+# Адрес НЕ константа: шлюз WSL→Windows меняется при перезапуске WSL,
+# поэтому берётся из окружения (docs/known-limitations.md §4, decision-01 §7.3).
+- id: llm-pi-ai
+  config:
+    providers:
+      qwen-local:
+        api: openai-completions
+        baseURL: !!js process.env.DSH_LLAMA_BASE_URL
+        apiKeyEnv: DSH_LLAMA_KEY
+        # Зрение (2026-09-16). Проектор работает на CPU (decision-12): цена
+        # картинки ~ пикселям — 824×1800 кодировались ~2 мин каждая, а после
+        # сжатия контекста все картинки хода кодируются заново → тишина > 5 мин
+        # → `pi-ai stream idle timeout after 300000ms` → повтор → снова
+        # кодирование (сессия 561951d2). requestImagePixelBudget: DSH сам
+        # уменьшает ЛЮБУЮ картинку (скриншот, фото пользователя) до бюджета —
+        # 412×900 ≈ 360 токенов и ~25 с. streamIdleTimeoutMs — страховка на
+        # случай перекодирования нескольких картинок подряд.
+        requestImagePixelBudget: 370800
+        streamIdleTimeoutMs: 900000
+        models:
+          - id: @MODEL_ID@
+            # = -c сервера (@CTX@). Обходы через «окно 131072» отменены
+            # 2026-09-13: корень (pi-ai клэмпил max_tokens по оценке символов)
+            # закрыт патчем скомпилированного llm-pi-ai — реплей несёт usage
+            # сервера, оценка якорится на нём. Патч переприменяет
+            # scripts/ensure-patches.sh при каждом старте web (после `pnpm build`
+            # харнеса тоже). История: docs/audit-report-2026-09-15.md, память
+            # Claude dsh-context-audit-2026-09-12.
+            contextWindow: @CTX@
+            # 12288 — НЕ снижать до 8192 (пробовали 2026-09-13, эталон 14, прогон 1):
+            # потолок должен вмещать --reasoning-budget 5000 ПЛЮС самый большой
+            # легитимный tool-call (write скрипта 12 КБ ≈ 3,5k). При 8192 пятая
+            # перезапись tools/extract.js оборвалась, и agent-loop закрыл ход по
+            # max-tokens (agent.ts:468) — авто-продолжения нет, задача встала.
+            # p99 вывода за шаг 6-7k, но хвост легитимен, а не только дампы.
+            maxTokens: 12288
+            # Зрение. Без этой строки dsh отказывает раньше сервера:
+            # умолчание маршрута -- DEFAULT_INPUT = ['text'], и адаптер
+            # llm-pi-ai роняет запрос с UNSUPPORTED_CONTENT
+            # ("model does not support image input", adapter.ts §generate).
+            # Это заявление о возможностях эндпойнта, а не проверка его:
+            # сервер обязан быть поднят с --mmproj, иначе отказ просто
+            # переедет на уровень ниже. Замер 2026-09-08: проектор
+            # mmproj-F16 на CPU (-MmprojDevice none), генерация не страдает,
+            # одна картинка 900x600 -- около 20 с на кодирование.
+            input: [text, image]
+            # Уровни рассуждения. Без этого поля модель, объявленная руками,
+            # считается НЕ-reasoning: llm/src/index.ts:870 отклоняет тогда любой
+            # явный effort, включая "off" — а graph-memory передаёт его всегда
+            # (dist/dsh.js:93, умолчание "off"). Отсюда 50 сообщений в карантине
+            # и пустой граф на 2026-09-09.
+            # `off:` НАМЕРЕННО без значения: catalog.ts:653 читает это как
+            # «уровень поддержан, не отправлять ничего» — запрос байт в байт
+            # такой же, как раньше. Один уровень сверх off объявить обязан
+            # (catalog.ts:701), поэтому low.
+            reasoningEfforts:
+              off:
+              low: low
+
+          # Отдельная запись ТОЙ ЖЕ модели для компактора: мышление выключено
+          # безусловно. llama-server имя модели не проверяет (оно и сейчас не
+          # совпадает с загруженным файлом), поэтому вторая запись — это только
+          # другой набор параметров запроса, а не другая модель.
+          #
+          # Почему так, а не эффортом: компактор (dsh-compaction-basic) ручки
+          # рассуждения не имеет вовсе — в его схеме только thresholdRatio,
+          # retainRatio, retainTokens, summarizationProvider, summarizationModel,
+          # maxTokens, compactionRetries, maxOverflowRetries (config.ts §27).
+          # Единственный способ дотянуться до запроса — увести его на маршрут.
+          #
+          # thinkingFormat обязателен: chat_template_kwargs читаются pi-ai ТОЛЬКО
+          # под двумя chat-template форматами (catalog.ts §369), под остальными
+          # они не отправляются никуда. Взят `chat-template`, а не
+          # `qwen-chat-template`: последний шлёт enable_thinking жёстко как
+          # `!!reasoningEffort` и наш литерал игнорирует
+          # (openai-completions.js:584). Под `chat-template` литеральное
+          # значение уходит на провод как есть (buildChatTemplateValues:720).
+          #
+          # reasoningEfforts объявлены, потому что ВСЕ ветки диспетча закрыты
+          # условием `model.reasoning` (openai-completions.js:575-595): у
+          # не-reasoning модели kwargs не отправятся, и шаблон Qwen3 будет
+          # думать по своему умолчанию.
+          - id: qwen38-27b-nothink
+            # = -c сервера; реплей пересказа с 2026-09-13 идёт без reasoning
+            # (compaction-notools.mjs) и с usage-якорем (патч llm-pi-ai).
+            contextWindow: @CTX@
+            maxTokens: 8192
+            input: [text]
+            reasoningEfforts:
+              off:
+              low: low
+            compat:
+              thinkingFormat: chat-template
+              chatTemplateKwargs:
+                enable_thinking: false
+
+# Потолок вывода bash. Умолчание пакета 64 000 байт хвоста (bash-local
+# src/index.ts:109; bash-sandbox берёт ту же Config) ≈ 18k токенов — один
+# вызов больше цикла между сжатиями. Замер 317a9aa7: два вывода `node -e`
+# по 43 283 и 24 485 симв. (модель печатала таблицы литералов в stdout).
+# 16 000 ≈ 4,5k токенов; полный вывод инструмент и так сбрасывает в spill-
+# файл и печатает его путь. Патч заменяет config строки целиком
+# (docs/architecture.md: «replaces its whole config»), поэтому timeoutMs
+# из dsh-base повторён.
+- id: bash-sandbox
+  config:
+    timeoutMs: 60000
+    maxOutputBytes: 16000
+- id: agent-default-model
+  config:
+    provider: qwen-local
+    model: @MODEL_ID@
+
+# Пресет агента по умолчанию.
+#
+# thresholdRatio компактора задать отсюда нельзя: в профиле web строка
+# compaction-basic погашена в host-плане, а живой экземпляр приходит из
+# композиции пресета агента, куда патч профиля не дотягивается. Своей
+# patch-семантики у слоя пресетов нет — README dsh-agent-presets, раздел
+# Known Limitations: "there is no patch semantics at this layer to express
+# 'standard plus one change'". Поэтому пресет скопирован целиком в
+# ~/.dsh/.agent-presets/local-64k; здесь только выбор копии.
+#
+# 2026-09-09: неякорные копии standard-th065 и cordis-th065 удалены, осталась
+# одна. Копия отличается от штатного standard: thresholdRatio 0.75,
+# retainRatio 0.25, maxTokens 3072 у компактора, maxBytes 6144 у инструкций,
+# лимиты web-инструмента и три якорных модуля (tool-bootstrap,
+# dev-tool-search, compaction-epoch).
+#
+# Копия не обновляется при обновлении dsh: после апгрейда её надо
+# переснять с нового standard и заново наложить перечисленное.
+#
+# Живое значение всё равно берётся из ~/.dsh/settings.yaml (agent-presets.default),
+# которое пишет кнопка «Set as default»; эта строка — только запасное умолчание.
+- id: agent-presets
+  config:
+    default: local-64k

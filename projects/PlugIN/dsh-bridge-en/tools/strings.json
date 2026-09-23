@@ -1,0 +1,8465 @@
+[
+ {
+  "key": "运行中",
+  "n": 2,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression",
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "未启动",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "已连接",
+  "n": 2,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression",
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "下载中…",
+  "n": 3,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "连接中…",
+  "n": 4,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "自动重连中…",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "暂停中",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "异常",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "点击前往「安全认证」配置",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🛡️ 访问安全认证已生效 · 扫码设备免密",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "设置 ➔",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "点击前往「安全认证」开启访问保护",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "⚠️ 当前未开启访问认证，建议在「安全认证」开启密码或扫码保护。",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "去开启 ➔",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "✓ 已复制",
+  "n": 3,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "复制链接",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "隐藏二维码",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "显示二维码",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请在私密环境下使用",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "📱 提示：手机浏览器扫码打开后，在菜单点击「添加到主屏幕」即可作为独立全屏 App 运行。",
+  "n": 1,
+  "len": 46,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "关闭隧道并重新开启，可获得新的 URL",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🔄 重置链接",
+  "n": 3,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🛜 局域网网卡 / IP 选择",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "切换中…",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "检测到主机存在多张网卡（如物理 Wi-Fi、以太网、WSL 或虚拟机）。若默认 IP 无法被移动端访问，可手动切换：",
+  "n": 1,
+  "len": 58,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "⚡ 自动推荐 ({0} · {1})",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": " [虚拟/WSL]",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "查看自建隧道服务器搭建教程",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "公网访问入口",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "尚未配置任何公网隧道，可在下方开启 Cloudflare 隧道或配置自建隧道",
+  "n": 1,
+  "len": 38,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "复制",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "停止重连",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "关闭",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "关闭并重新开启，更换临时地址",
+  "n": 2,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "请先在「隧道配置」中保存服务器配置",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "开启公网隧道",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请在私密环境下扫码使用",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "DSH 启动时自动恢复该隧道的运行状态",
+  "n": 2,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "随 DSH 启动自动开启",
+  "n": 2,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "隧道配置",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "Token · 固定域名 · 自建服务器 · 外部登记",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "收起 ▴",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "展开 ▾",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "保存配置失败",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "隧道服务器配置",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "WebSocket 地址，例如 wss://tunnel.example.com/connect",
+  "n": 1,
+  "len": 48,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "隧道服务端连接令牌（Tunnel Access Token）",
+  "n": 1,
+  "len": 30,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "💡 用于与您的 VPS 隧道服务端建立反向通道（与 Web 网页访客访问密码互相独立）。",
+  "n": 1,
+  "len": 45,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "保存中…",
+  "n": 6,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 已保存",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "保存配置",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请先保存服务器配置",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "开启",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 固定域名配置已保存",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "保存失败",
+  "n": 6,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "⚙️ 高级配置：固定域名 (Cloudflare Token) ",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "● 已配置固定域名",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "▴ 折叠",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "▾ 展开",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "在 Cloudflare Zero Trust 控制台创建 Tunnel 即可获取专属 Token 并绑定自己的域名（如 dsh.yourname.com），每次重启 URL 永不变更。不填则使用默认免登录临时随机域名。",
+  "n": 1,
+  "len": 110,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "📖 查看「Cloudflare 固定域名」申请与配置教程",
+  "n": 1,
+  "len": 29,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "自定义固定域名 (例如: dsh.yourdomain.com)",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "Tunnel Token (例如: eyJhIjoi...)",
+  "n": 1,
+  "len": 30,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "保存固定域名配置",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "清除",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "✓ 外部隧道地址已登记",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 已清除登记",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "外部已部署隧道",
+  "n": 2,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement",
+   "Property"
+  ]
+ },
+ {
+  "key": "已在 Docker / 服务器上自行部署隧道（如 cloudflared）时，登记公网地址即可在面板展示入口与二维码；插件不会重复下载或管理该隧道。",
+  "n": 1,
+  "len": 74,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "https://tunnel.yourdomain.com 或 trycloudflare 地址",
+  "n": 1,
+  "len": 48,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "保存",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "「仅密码 / PIN 码登录」模式必须先设置访问密码才能开启安全防护。\n\n请先在下方「设置外部访客访问密码 / PIN 码」输入密码并点击「保存访问密码」，然后再开启。",
+  "n": 1,
+  "len": 84,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:alert"
+  ]
+ },
+ {
+  "key": "请先设置访客访问密码，再开启安全防护",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "⚠️ 您尚未设置任何访问密码或管理密码。\n\n开启安全防护后，任何知道局域网 IP / 隧道地址的访客仍可直接进入（当前相当于\"免密开放\"状态）。\n\n是否仍要开启？建议先关闭，在下方「设置外部访客访问密码」处设置密码后再开启。",
+  "n": 1,
+  "len": 112,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:confirm"
+  ]
+ },
+ {
+  "key": "更新失败",
+  "n": 10,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "✓ 安全防护已开启（注意：尚未设置密码，访客仍可免密进入，请立即在下方设置访问密码）",
+  "n": 1,
+  "len": 42,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 访问安全认证已开启（现有登录态已刷新）",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 访问安全认证已关闭（访问免密，管理保护不受影响）",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 管理保护已开启（修改配置需管理密码）",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 管理保护已关闭（修改配置免密，请谨慎）",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "「仅密码 / PIN 码登录」需要先设置访问密码。\n\n请在下方「设置外部访客访问密码 / PIN 码」处输入密码并点击「保存访问密码」，然后再切换到此模式或开启安全防护。",
+  "n": 1,
+  "len": 85,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:alert"
+  ]
+ },
+ {
+  "key": "请先在下方设置访客访问密码，再切换为「仅密码登录」模式",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "✓ 外部验证模式已切换，已刷新全域登录态",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "✓ 防护生效范围已更新",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "✓ 远程管理防篡改策略已更新",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "✓ 访客访问密码已成功保存！原有的历史访客会话已全部安全刷新。",
+  "n": 1,
+  "len": 31,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "✓ 后台管理密码已成功保存！远程管理解锁状态已重置生效。",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "重置后，之前包含旧 Token 的二维码和分享链接将立即失效。是否确认重置？",
+  "n": 1,
+  "len": 38,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:confirm"
+  ]
+ },
+ {
+  "key": "重置失败",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "✓ 安全 Token 已重置，二维码与专属链接已刷新",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "全部通道 (局域网+公网)",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "仅公网隧道",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "仅局域网",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "扫码免密 + 密码",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "仅密码登录",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "仅安全 Token",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "需密码解锁",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "仅限电脑本机管理",
+  "n": 2,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression",
+   "call:includes"
+  ]
+ },
+ {
+  "key": "宽松模式",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🔐 全局访问安全防护体系",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "集成外部访问门禁拦截与管理后台防篡改控制，双重守护远程会话与网络配置安全",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "✓ 已启用安全防护",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "未开启安全防护",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🌐 保护范围: ",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔑 外部验证: ",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔒 后台防篡改: ",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "尚未设置任何访问密码或管理密码",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": " —— 此时“访问认证已开启”但任何知道局域网 IP / 隧道地址的人都能直接进入（隧道入口自身不设防，详见下方安全须知）。",
+  "n": 1,
+  "len": 62,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "建议立即在下方设置",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "访客访问密码",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "或",
+  "n": 1,
+  "len": 1,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "管理密码",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement",
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "后再对外开放。",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🛡️ 第一道防线：外部访问门禁（控制谁能使用 AI）",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "控制外部设备通过局域网 IP 或公网隧道（Cloudflare/自建隧道）进入 DSH 聊天界面时的身份验证方式",
+  "n": 1,
+  "len": 56,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "验证模式选择",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🟢 扫码免密 + 密码认证 (推荐)",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "二维码自带专属 Token 扫码秒进；直接输 IP/公网域名需输密码",
+  "n": 1,
+  "len": 34,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🔑 仅密码 / PIN 码登录",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "所有外部访问必须手动输入访问密码方可进入",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🎫 仅安全 Token 免密",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "仅持有带安全 Token 的二维码或专属分享链接方可进入",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "防护生效通道",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "全部通道防护 (推荐)",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "局域网 IP 直连与公网隧道全部受安全保护",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "仅公网隧道开启防护",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "局域网内设备直接免密直连，公网隧道强制验证",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "仅局域网开启防护",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "仅局域网直连需验证，公网隧道不开启",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "设置外部访客访问密码 {0}",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "输入新密码以修改（留空保存可清除访客密码）",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "设置外部访客访问密码 / PIN 码",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "隐藏",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "显示",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 已成功保存！",
+  "n": 2,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "保存访问密码",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "💡 当外部朋友或同事未通过二维码扫码，而是直接输入 IP 或公网域名访问时，需输入此密码登录。",
+  "n": 1,
+  "len": 48,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "免密扫码 Token (专属访问凭据)",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "未生成",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "重新生成 Token，使之前分享的旧二维码和链接立即失效",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🔄 重置安全 Token",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "💡 控制台生成的局域网与公网二维码已自动嵌入此 Token，手机扫码即可免密进入聊天界面（但不赋予后台管理设置权限）。",
+  "n": 1,
+  "len": 60,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔒 第二道防线：管理后台防篡改（控制谁能修改本插件所有设置）",
+  "n": 1,
+  "len": 31,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "锁定整个插件设置后台（包含局域网、公网隧道、IM 机器人密钥与安全设置），防止他人随意篡改配置",
+  "n": 1,
+  "len": 47,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🛡️ 管理保护已开启（修改配置需管理密码）",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "⚠️ 管理保护已关闭（修改配置免密）",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "关闭管理保护",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "开启管理保护",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "设置独立管理员密码 {0}",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "输入新密码以修改（留空保存可清除独立管理密码）",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "设置后台管理解锁密码（建议与访客密码不同）",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "保存管理密码",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🔑 核心作用：用于远程设备进入设置后台时的解锁验证。设置后，即便把访问密码告知他人，他人也无法进入设置后台改配置。",
+  "n": 1,
+  "len": 58,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "远程设备管理权限策略",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔒 需密码解锁 (推荐)",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "远程手机/外网打开本插件设置时默认全局锁定，输入管理密码解锁后方可使用",
+  "n": 1,
+  "len": 35,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🚫 仅限电脑本机管理 (最严格)",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "远程设备彻底锁定整个设置后台，仅允许在 127.0.0.1 电脑本机上操作",
+  "n": 1,
+  "len": 37,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🔓 宽松模式",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "任何已通过第一道防线登录的设备均可直接修改所有配置",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "添加白名单失败",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "加载中…",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "重连中…",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "暂停（会话过期）",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "错误",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "未连接",
+  "n": 2,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression",
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "📖 微信使用说明",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "📖 QQ 使用说明",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🌐 QQ 开放平台",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "📖 飞书使用说明",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🌐 飞书开放平台",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "📖 Telegram 使用说明",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🌐 @BotFather 申请 Bot",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "收起命令",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "命令列表",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "/new <提示词> — 新建会话并开始（当前工作区）",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/new <提示词> @N — 在指定工作区新建会话",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/sessions（或 /list）— 列出会话（按工作区分组，带标题）",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/use N（或 /resume N）— 切换到会话 N",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/workspaces — 列出所有可用工作区",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/end — 结束当前会话（回到无活动会话状态）",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/stop — 停止当前任务",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/status — 查看 Agent 状态与会话摘要",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/yes 或 /no（或 1/2）— 回应权限审批请求",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "/help — 显示完整命令帮助",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "连接状态",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "登录账号",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "活动会话",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "白名单 (已授权 {0} 个账号/群):",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "移出白名单",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "(空 — 扫码后首个发消息的微信用户将自动加入)",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "(空 — 首个发消息的用户将自动加入)",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "添加允许的微信 ID（如 xxx@im.wechat），按 Enter 添加",
+  "n": 1,
+  "len": 38,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "添加允许的用户/群 ID，按 Enter 添加",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "添加",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement",
+   "call:includes"
+  ]
+ },
+ {
+  "key": "使用已保存的凭证直接恢复连接，无需重新扫码",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "首次使用需扫码绑定",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "重新连接",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "连接",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "停止接收消息；凭证保留，可随时\"重新连接\"恢复",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "断开",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "确认解绑？这将清除保存的凭证。",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:confirm"
+  ]
+ },
+ {
+  "key": "清除登录凭证，下次需重新配置",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "解绑账号",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "开启后，白名单之外的新群首次 @机器人 即自动授权入白名单；关闭（默认）时新群必须先在此手动添加",
+  "n": 1,
+  "len": 48,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "群聊自动授权（新群首次 @机器人 自动加入白名单，默认关闭）",
+  "n": 1,
+  "len": 30,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "📱 手机 {0} 扫码直达对话",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "用 {0} 扫描左侧二维码，立即打开与 Bot 对话；发送首条消息自动完成白名单授权。",
+  "n": 1,
+  "len": 43,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "在 {0} 客户端打开 ↗",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "已扫码，请在手机上确认…",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请使用微信扫码登录（ClawBot）",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请扫码登录",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "💡 扫码自动创建引导：",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": " 可在终端运行 ",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": " 手机扫码一键自动创建应用并输出凭证；或在下方手动填入凭证。",
+  "n": 1,
+  "len": 30,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "Bot Token — Telegram @BotFather 下发的机器人 Token",
+  "n": 1,
+  "len": 44,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "请输入 Telegram Bot Token (如 123456789:ABCdef...)",
+  "n": 1,
+  "len": 46,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "隐藏密钥",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "显示明文",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🙈 隐藏",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "👁️ 显示",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "网络代理 (可选) — 支持国内 HTTP / HTTPS 代理",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "可选，例如 http://127.0.0.1:7890（为空则直连或读取环境变量）",
+  "n": 1,
+  "len": 41,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "AppID — QQ 开放平台机器人应用 ID",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "App ID — 飞书开放平台自建应用 ID (cli_xxx)",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请输入 AppID",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请输入 App ID (如 cli_a1b2c3d4...)",
+  "n": 1,
+  "len": 30,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "ClientSecret — QQ 开放平台机器人密钥",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "App Secret — 飞书开放平台应用密钥",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请输入 ClientSecret",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请输入 App Secret",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "📖 前往 QQ 开放平台申请机器人",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "📖 前往飞书开放平台创建企业自建应用",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "保存并连接",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "连接失败",
+  "n": 3,
+  "len": 4,
+  "files": [
+   "client/index.js",
+   "lib/feishu/index.js",
+   "lib/telegram/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression",
+   "Property"
+  ]
+ },
+ {
+  "key": "处理中…",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "扫码登录",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "登录失败",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "说明: 扫码成功后，向该微信 Bot 发送第一条消息即自动完成白名单授权。仅白名单内的微信用户能驱动 agent，其他人消息会被忽略。使用专用微信号，避免影响主号。",
+  "n": 1,
+  "len": 82,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "说明: 填入 QQ 开放平台机器人的 AppID 与 ClientSecret 后保存即自动连接。用户向 Bot 发送第一条消息即自动完成白名单授权。仅白名单内的 QQ 用户能驱动 agent，其他人消息会被忽略。",
+  "n": 1,
+  "len": 107,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "说明: 登录成功后，发送第一条消息即自动完成白名单授权。仅白名单内的用户能驱动 agent，其他人消息会被忽略。",
+  "n": 1,
+  "len": 56,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "{0}天 {1}小时 {2}分",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "{0}小时 {1}分",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "{0}分钟",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "📊 宿主系统与运行看板",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "CPU 核心与型号",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "{0} 核心 ({1})",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "DSH 运行时间 (Uptime)",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "Node 进程堆内存",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "系统内存占用: {0} GB / {1} GB",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "诊断请求异常",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🔍 网络连通性一键诊断",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "一键检测本地反向代理端口、局域网 IPv4、Cloudflare Anycast 延迟以及国内 npmmirror 镜像源连通性。",
+  "n": 1,
+  "len": 65,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "正在探测连通性…",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🔄 重新诊断网络",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🔍 开始一键诊断",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 所有网络探测项正常",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "▲ 检测到部分延迟较高或异常",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "正在执行网络端口与云端节点连通性探测…",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "✓ 备份文件已成功导出并下载到本地！",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "导出备份失败",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "导出异常",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "✓ 配置已成功导入并刷新生效！",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "导入配置失败",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "导入解析失败: {0}",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🗄️ 全局配置备份与恢复",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "支持一键导出或导入恢复本插件所有配置（包含各 IM 平台凭证、授权白名单、公网隧道与安全认证规则）。",
+  "n": 1,
+  "len": 50,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "正在导出…",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "📥 导出配置备份 (.json)",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "正在导入…",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "📤 导入配置恢复",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "正在向 DSH 服务发送重启指令…",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "DSH 服务正在重启中，正在自动重新连接…",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🎉 重启成功！已重新建立连接，正在刷新页面…",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "重连等待超时，请手动刷新页面。",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🔄 DSH 服务平滑重启",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "优雅退出并重新拉起当前 DSH 进程与所有插件服务，前端将在几秒后自动探测重连并刷新页面。",
+  "n": 1,
+  "len": 45,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔄 立即重启 DSH 服务",
+  "n": 3,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "正在调度…",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "🗂️ 远程工作区管理 (目录浏览器)",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "在移动端或远程设备上可视点选电脑上的文件夹或直接输入路径添加至 DSH。",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "+ 远程添加工作区",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "正在读取工作区列表…",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "暂无已注册工作区，点击右上角「+ 远程添加工作区」即可浏览添加。",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "正在调度 DSH 服务重启…",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🎉 重启成功！已自动加载最新版本。正在刷新页面…",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "已成功升级到 v{0}！",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "升级失败",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "升级请求失败",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "DSH 已成功升级到 v{0}！",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "更新日志",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "反馈 Issue",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "版本检查中…",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "· 已是最新",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "(网络超时)",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "发现 DSH 新版本 v{0}",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "重新检查 npm 线上版本",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "检查中…",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "检查更新",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "发现新版本 v{0}（当前 v{1}）",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "正在自动升级…",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "✓ 升级完成",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "一键升级到 v{0}",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✨ 更新亮点：",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "已成功升级到 v{0}！需要重启 DSH 服务使新版本生效",
+  "n": 1,
+  "len": 29,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "稍后手动重启",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "正在处理…",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "▴ 折叠手动命令行",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "▾ 查看手动升级命令 (如需)",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "DSH 有新版本 v{0}（当前 v{1}）",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "正在升级 DSH…",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "✓ DSH 升级完成",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "一键升级 DSH 到 v{0}",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "查看官方升级方式 ↗",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "升级 DSH 命令行工具后需重启 DSH 服务生效。",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "当前 DSH 非 npm 全局安装，无法一键自动升级，请按官方渠道手动更新。",
+  "n": 1,
+  "len": 38,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "局域网",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "公网隧道",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "IM 机器人",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全认证",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "运维监控",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "访问会话已失效，请刷新页面重新登录",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:setErr"
+  ]
+ },
+ {
+  "key": "管理员权限",
+  "n": 4,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "管理密码解锁",
+  "n": 4,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "局域网访问",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "同一 Wi-Fi 下的设备可直接扫码访问",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "固定域名模式",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "免登录临时域名",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "自建隧道",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "VPS 自建 · 固定地址",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "Cloudflare 隧道",
+  "n": 2,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "自行部署登记",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "另有 ",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": " 个隧道入口在运行，可在下方「隧道配置」中查看与管理",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "固定域名模式（Token 运行 · 重启 URL 保持不变）",
+  "n": 1,
+  "len": 30,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "一键获取公网地址（免登录临时随机域名）",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "连接自己部署的隧道服务器，获得固定域名",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "微信",
+  "n": 3,
+  "len": 2,
+  "files": [
+   "client/index.js",
+   "lib/wechat/index.js",
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "Property",
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "ClawBot 扫码直连 · 无需公网",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "官方机器人 · 私聊/群聊/按钮",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "飞书",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "官方 WebSocket 长连接 · 免公网",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "官方 Bot API",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "即将支持",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "访问密码",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请输入后台管理密码解锁管理权限。",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "当前未设置独立管理密码，输入您的访问密码即可解锁。",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "管理控制台已锁定（仅限电脑本机管理）",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "当前设备通过远程局域网或公网接入。已开启「仅限电脑本机管理」最高安全策略，远程设备禁止查看与修改任何网络与机器人配置。如需管理请在电脑本机（127.0.0.1）上操作。",
+  "n": 1,
+  "len": 84,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "❓ 远程如何救急解除锁定？",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🛟 救急解除锁定指引：",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "电脑本机直连修改",
+  "n": 2,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "：直接在运行本程序的电脑本机打开本控制台（127.0.0.1 享有物理免锁特权），可随时修改策略或清除密码。",
+  "n": 1,
+  "len": 54,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "服务器 / 无头环境",
+  "n": 2,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "：救急重置步骤参见 GitHub README 的「三重容灾保命体系」章节。",
+  "n": 2,
+  "len": 38,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "管理控制台已锁定",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔑 使用管理密码解锁",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔐 使用访问密码解锁",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "当前设备为远程访问。为保护您的网络与平台配置安全，",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "输入",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "验证中…",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "解锁管理权限",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "❓ 忘记",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "🛟 找回与重置",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "指引：",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "：直接在运行本程序的电脑本机打开本控制台（127.0.0.1 享有物理免锁特权），可随时修改或清除密码。",
+  "n": 1,
+  "len": 52,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔑 立即输入",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "解锁",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "🔓 管理员权限已解锁（当前临时会话有效）",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔒 重新锁定后台",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔒 后台管理权限未解锁（修改敏感配置需先解锁）",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "⚠️ 尚未设置任何访问密码 / 管理密码，远程访客可免密进入！",
+  "n": 1,
+  "len": 31,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "🔑 解锁管理权限",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔐 立即设置密码",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "🔒 解锁后台管理权限",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "当前操作需要后台管理员权限。为保护您的网络配置与机器人平台安全，请输入管理密码解锁：",
+  "n": 1,
+  "len": 42,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "当前操作需要后台管理权限。未设置独立管理密码，输入您的访问密码即可解锁：",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "取消",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "立即解锁",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "💡 提示：若未单独配置管理密码，请输入初次设置的访问密码；电脑本机（127.0.0.1）访问享有免密管理特权。",
+  "n": 1,
+  "len": 56,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:createElement"
+  ]
+ },
+ {
+  "key": "打开菜单",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "button[aria-label*=\"打开侧边栏\"], button[title*=\"打开侧边栏\"]",
+  "n": 1,
+  "len": 51,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:querySelector"
+  ]
+ },
+ {
+  "key": "新会话",
+  "n": 7,
+  "len": 3,
+  "files": [
+   "client/index.js",
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "AssignmentExpression",
+   "call:includes",
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "新建会话",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "client/index.js",
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "AssignmentExpression",
+   "Property"
+  ]
+ },
+ {
+  "key": "button[aria-label=\"新建会话\"]",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:querySelector"
+  ]
+ },
+ {
+  "key": "会话",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "<svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg><span>返回对话</span>",
+  "n": 1,
+  "len": 233,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "button[class*=\"toggleButton\"][aria-label*=\"收起\"]",
+  "n": 1,
+  "len": 47,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:querySelector"
+  ]
+ },
+ {
+  "key": "button[aria-label*=\"面板\"], button[aria-label*=\"工作区\"], div[class*=\"toggleCluster\"] button, button[class*=\"subagent\"], div[class*=\"headerActions\"] button, div[class*=\"titleRow\"] button",
+  "n": 1,
+  "len": 181,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:closest"
+  ]
+ },
+ {
+  "key": "button[aria-label*=\"收起侧边栏\"], button[title*=\"收起侧边栏\"]",
+  "n": 1,
+  "len": 51,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:closest"
+  ]
+ },
+ {
+  "key": "操作",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "视图",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "搜索",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "设置",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "button[aria-label*=\"操作\"], button[class*=\"iconButton\"], button",
+  "n": 1,
+  "len": 61,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:querySelector"
+  ]
+ },
+ {
+  "key": "添加工作区",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:===",
+   "call:includes"
+  ]
+ },
+ {
+  "key": "新建工作区",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:==="
+  ]
+ },
+ {
+  "key": "打开工作区",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:===",
+   "call:includes"
+  ]
+ },
+ {
+  "key": "打开文件夹",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "cmp:===",
+   "call:includes"
+  ]
+ },
+ {
+  "key": "button[aria-label*=\"工作区\"][aria-label*=\"添加\"], button[aria-label*=\"工作区\"][aria-label*=\"打开\"]",
+  "n": 1,
+  "len": 88,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:matches"
+  ]
+ },
+ {
+  "key": "\n      <!-- 移动端顶部下拉指示条 -->\n      <div class=\"dsh-ws-drag-handle\" style=\"width: 36px; height: 4px; background: var(--dsw-alias-border-l2, #d1d5db); border-radius: 2px; margin: 8px auto 0 auto; display: none;\"></div>\n\n      <!-- 弹窗顶部标题栏 -->\n      <div style=\"padding: 12px 16px; border-bottom: 1px solid var(--dsw-alias-border-l2, #e5e7eb); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--dsw-alias-bg-layer-2, #f9fafb);\">\n        <div style=\"display: flex; align-items: center; gap: 8px; overflow: hidden;\">\n          <span style=\"font-size: 20px; flex-shrink: 0;\">🗂️</span>\n          <div style=\"overflow: hidden;\">\n            <div style=\"font-size: 15px; font-weight: 600; color: var(--dsw-alias-label-primary, #111827); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">选择电脑工作区</div>\n            <div style=\"font-size: 11px; color: var(--dsw-alias-label-tertiary, #6b7280); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">点击进入文件夹，或点击「+ 选为工作区」直接添加并切换</div>\n          </div>\n        </div>\n        <button id=\"dsh-ws-close-btn\" style=\"border: none; background: none; font-size: 18px; cursor: pointer; color: var(--dsw-alias-label-tertiary, #9ca3af); padding: 4px 8px; border-radius: 6px; line-height: 1; flex-shrink: 0;\">✕</button>\n      </div>\n\n      <!-- 管理权限解锁块（远程访问需要管理密码；local_only 策略下不显示，仅提示） -->\n      {0}\n\n      <div style=\"padding: 12px 16px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px;\">\n        <!-- 提示信息横幅 -->\n        {1}\n\n        <!-- 快速直达与磁盘横向滑动栏 (极简省空间) -->\n        <div class=\"dsh-ws-chips-scroll\">\n          {2}\n          <span style=\"color: var(--dsw-alias-border-l2, #d1d5db); margin: 0 1px; flex-shrink: 0;\">|</span>\n          {3}\n        </div>\n\n        <!-- 交互式面包屑路径导航条 (Breadcrumbs Bar) -->\n        <div style=\"background: var(--dsw-alias-bg-layer-3, #f3f4f6); border: 1px solid var(--dsw-alias-border-l2, #e5e7eb); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; gap: 6px;\">\n          <div class=\"dsh-ws-chips-scroll\" style=\"flex: 1;\">\n            <span style=\"font-size: 12px; margin-right: 2px; flex-shrink: 0;\">📂</span>\n            {4}\n          </div>\n\n          <div style=\"display: flex; align-items: center; gap: 4px; flex-shrink: 0;\">\n            {5}\n            <button id=\"dsh-ws-refresh-btn\" title=\"刷新目录\" style=\"border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 3px 6px; border-radius: 6px; font-size: 11px; cursor: pointer;\">\n              🔄\n            </button>\n          </div>\n        </div>\n\n        <!-- 当前所在目录确认卡片 (Primary Action Card) -->\n        <div style=\"background: var(--dsw-alias-state-info-bg, #eff6ff); border: 1px solid var(--dsw-alias-state-info-border, #bfdbfe); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;\">\n          <div style=\"display: flex; align-items: center; justify-content: space-between; gap: 6px;\">\n            <span style=\"font-size: 11px; font-weight: 600; color: var(--dsw-alias-brand-primary, #2563eb); flex-shrink: 0;\">当前目录:</span>\n            <span style=\"font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--dsw-alias-label-primary, var(--dsw-alias-brand-primary, #1e3a8a)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: right; font-weight: 600;\">{6}</span>\n          </div>\n          <button id=\"dsh-ws-add-current-btn\" style=\"border: none; background: var(--dsw-static-blue-600, #2563eb); color: #fff; height: 36px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-shadow: 0 2px 4px rgba(37,99,235,0.25); transition: opacity 0.1s;\" {7}>\n            {8}\n          </button>\n        </div>\n\n        <!-- 子目录列表与过滤栏 -->\n        <div style=\"border: 1px solid var(--dsw-alias-border-l2, #e5e7eb); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; background: var(--dsw-alias-bg-layer-1, #fff);\">\n          <!-- 实时过滤搜索框 -->\n          <div style=\"padding: 7px 10px; background: var(--dsw-alias-bg-layer-2, #f9fafb); border-bottom: 1px solid var(--dsw-alias-border-l2, #e5e7eb); display: flex; align-items: center; justify-content: space-between; gap: 6px;\">\n            <div style=\"display: flex; align-items: center; gap: 6px; flex: 1;\">\n              <span style=\"font-size: 11px; color: var(--dsw-alias-label-tertiary, #9ca3af);\">🔍</span>\n              <input id=\"dsh-ws-filter-input\" type=\"text\" value=\"{9}\" placeholder=\"过滤子文件夹…\" style=\"border: none; background: transparent; font-size: 12px; width: 100%; color: var(--dsw-alias-label-primary, #111827); outline: none;\" />\n            </div>\n            <span style=\"font-size: 10px; color: var(--dsw-alias-label-tertiary, #6b7280); flex-shrink: 0;\">\n              {10} 个文件夹\n            </span>\n          </div>\n\n          <!-- 子文件夹滚动列表 (移动端舒适大点按区域) -->\n          <div style=\"max-height: 240px; min-height: 120px; overflow-y: auto; padding: 2px 0;\">\n            {11}\n          </div>\n        </div>\n\n        <!-- 手动输入路径折叠区 -->\n        <div>\n          <div style=\"display: flex; align-items: center; justify-content: space-between;\">\n            <button id=\"dsh-ws-toggle-manual\" style=\"border: none; background: none; color: var(--dsw-alias-label-tertiary, #6b7280); font-size: 11px; cursor: pointer; padding: 2px 0; text-decoration: underline;\">\n              {12}\n            </button>\n          </div>\n          {13}\n        </div>\n\n        <!-- 已在 DSH 注册的工作区展示 (支持一键切换) -->\n        {14}\n      </div>\n\n      <!-- 弹窗底部操作条 -->\n      <div style=\"padding: 8px 16px; border-top: 1px solid var(--dsw-alias-border-l2, #e5e7eb); display: flex; align-items: center; justify-content: space-between; background: var(--dsw-alias-bg-layer-2, #f9fafb); flex-shrink: 0;\">\n        <span style=\"font-size: 10px; color: var(--dsw-alias-label-tertiary, #6b7280);\">\n          💡 点击文件夹可逐级进入\n        </span>\n        <button id=\"dsh-ws-cancel-btn\" style=\"border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 5px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 500;\">关闭</button>\n      </div>\n    ",
+  "n": 1,
+  "len": 6485,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "解锁失败",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "正在切换工作区…",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "✓ 已切换至工作区！",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "读取目录失败",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "当前策略仅限电脑本机管理，远程无法解锁",
+  "n": 2,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "请输入或选择工作区路径",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "✓ 工作区「{0}」已选定，正在切换…",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "添加工作区失败",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "添加工作区异常",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "收起/展开输入框",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "call:setAttribute"
+  ]
+ },
+ {
+  "key": "✏️ 点击输入消息…",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "展开输入框",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "收起输入框，最大化对话阅读区",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "远程访问",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": [
+   "ArrowFunctionExpression"
+  ]
+ },
+ {
+  "key": "\n    /* DSH Bridge 隐藏 Tab 栏原生滚动条并保持平滑滑动 */\n    .dsh-tabbar-container {\n      scrollbar-width: none !important;\n      -ms-overflow-style: none !important;\n    }\n    .dsh-tabbar-container::-webkit-scrollbar {\n      display: none !important;\n      width: 0 !important;\n      height: 0 !important;\n    }\n\n    /* DSH Bridge 移动端自适应与触控交互增强样式 */\n    :root {\n      --dsh-mobile-header-h: 52px;\n      --dsh-mobile-safe-top: env(safe-area-inset-top, 0px);\n      --dsh-mobile-safe-bottom: env(safe-area-inset-bottom, 0px);\n    }\n\n    @media (max-width: 768px) {\n      /* 1. 主框架为 Header 腾出顶部空间 */\n      div[class*=\"_frame\"] {\n        display: flex !important;\n        flex-direction: column !important;\n        width: 100vw !important;\n        height: 100dvh !important;\n        margin: 0 !important;\n        padding-top: var(--dsh-mobile-header-h) !important;\n        position: relative !important;\n        grid-template-columns: 1fr !important;\n        overflow: hidden !important;\n        box-sizing: border-box !important;\n      }\n\n      /* 2. 顶部原生导航条：100% 还原 DeepSeek App (左侧双横线，右侧(+)，中间留白，无多余设置按钮) */\n      .dsh-mobile-app-header {\n        position: fixed !important;\n        top: 0 !important;\n        left: 0 !important;\n        right: 0 !important;\n        height: var(--dsh-mobile-header-h) !important;\n        padding-top: var(--dsh-mobile-safe-top) !important;\n        background: transparent !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: space-between !important;\n        padding-left: 16px !important;\n        padding-right: 16px !important;\n        z-index: 9998 !important;\n        box-sizing: border-box !important;\n        user-select: none !important;\n        pointer-events: none !important;\n      }\n\n      /* 左侧双横线按钮 (DeepSeek App 原生图标) */\n      .dsh-header-menu-btn {\n        width: 40px;\n        height: 40px;\n        border-radius: 50%;\n        border: none;\n        background: transparent;\n        color: var(--dsw-alias-label-primary, #111827);\n        display: inline-flex;\n        align-items: center;\n        justify-content: flex-start;\n        cursor: pointer;\n        padding: 0;\n        transition: opacity 0.15s;\n        pointer-events: auto !important;\n      }\n      .dsh-header-menu-btn:active {\n        opacity: 0.6;\n      }\n\n      /* 右侧 (+) 新建会话按钮 (DeepSeek App 原生图标) */\n      .dsh-header-new-btn {\n        width: 40px;\n        height: 40px;\n        border-radius: 50%;\n        border: none;\n        background: transparent;\n        color: var(--dsw-alias-label-primary, #111827);\n        display: inline-flex;\n        align-items: center;\n        justify-content: flex-end;\n        cursor: pointer;\n        padding: 0;\n        transition: opacity 0.15s;\n        pointer-events: auto !important;\n      }\n      .dsh-header-new-btn:active {\n        opacity: 0.6;\n      }\n\n      /* 中间动态会话标题 (单行居中打点截断，100% 还原原生 App 导航体验) */\n      .dsh-mobile-header-title {\n        flex: 1 1 auto !important;\n        min-width: 0 !important;\n        text-align: center !important;\n        font-size: 15px !important;\n        font-weight: 600 !important;\n        color: var(--dsw-alias-label-primary, #111827) !important;\n        overflow: hidden !important;\n        text-overflow: ellipsis !important;\n        white-space: nowrap !important;\n        padding: 0 10px !important;\n        user-select: none !important;\n        pointer-events: none !important;\n        letter-spacing: -0.2px !important;\n      }\n\n      /* 3. 中间主内容区与输入框 */\n      div[class*=\"_centerCol\"] {\n        flex: 1 1 100% !important;\n        width: 100% !important;\n        min-width: 0 !important;\n        max-width: 100% !important;\n        display: flex !important;\n        height: 100% !important;\n      }\n\n      div[class*=\"_detailsCol\"],\n      div[class*=\"toggleCluster\"],\n      div[class*=\"W-zNGW_toggleCluster\"] {\n        display: none !important;\n      }\n\n      /* 3.0 工作区 Workbench / 任务管理 / 多 Tab 栏移动端自适应适配 */\n      body:not(.dsh-workbench-open) div[class*=\"nArs4W_panel\"],\n      body:not(.dsh-workbench-open) div[class*=\"workbench_panel\"],\n      body:not(.dsh-workbench-open) div[class*=\"workbenchPanel\"],\n      div[class*=\"nArs4W_panel\"][class*=\"panelHidden\"],\n      div[class*=\"workbench_panel\"][class*=\"panelHidden\"],\n      div[class*=\"workbenchPanel\"][class*=\"panelHidden\"],\n      div[class*=\"panelHidden\"] {\n        display: none !important;\n        visibility: hidden !important;\n        pointer-events: none !important;\n        width: 0 !important;\n        height: 0 !important;\n        max-height: 0 !important;\n        z-index: -1 !important;\n        opacity: 0 !important;\n        transform: translateX(105%) !important;\n      }\n\n      body.dsh-workbench-open div[class*=\"nArs4W_panel\"]:not([class*=\"panelHidden\"]),\n      body.dsh-workbench-open div[class*=\"workbench_panel\"]:not([class*=\"panelHidden\"]),\n      body.dsh-workbench-open div[class*=\"workbenchPanel\"]:not([class*=\"panelHidden\"]) {\n        display: flex !important;\n        visibility: visible !important;\n        pointer-events: auto !important;\n        top: var(--dsh-mobile-header-h, 52px) !important;\n        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;\n        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;\n        z-index: 50 !important;\n        box-sizing: border-box !important;\n        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;\n        transform: none !important;\n        opacity: 1 !important;\n      }\n\n      /* Tab 栏：横向滑动手势 + 干净的底部边框，杜绝与顶部移动端 Header 重叠 */\n      div[class*=\"nArs4W_tabBar\"],\n      div[class*=\"workbench_tabBar\"],\n      div[class*=\"tabBar\"] {\n        min-height: 40px !important;\n        height: 40px !important;\n        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;\n        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: space-between !important;\n        padding: 0 8px !important;\n        gap: 6px !important;\n        overflow: visible !important;\n        box-sizing: border-box !important;\n      }\n\n      div[class*=\"nArs4W_tabList\"],\n      div[class*=\"tabList\"] {\n        display: flex !important;\n        align-items: center !important;\n        gap: 6px !important;\n        flex: 1 1 auto !important;\n        min-width: 0 !important;\n        overflow-x: auto !important;\n        scrollbar-width: none !important;\n        -webkit-overflow-scrolling: touch !important;\n      }\n      div[class*=\"nArs4W_tabList\"]::-webkit-scrollbar,\n      div[class*=\"tabList\"]::-webkit-scrollbar {\n        display: none !important;\n      }\n\n      /* 单个 Tab 胶囊化，文字超长自动打点，防止 Tab 互相挤压 */\n      div[class*=\"nArs4W_tab\"],\n      div[class*=\"workbench_tab\"] {\n        flex: 0 0 auto !important;\n        max-width: 170px !important;\n        min-width: 70px !important;\n        height: 30px !important;\n        padding: 0 8px 0 10px !important;\n        border-radius: 6px !important;\n        font-size: 12.5px !important;\n        display: inline-flex !important;\n        align-items: center !important;\n        justify-content: space-between !important;\n        gap: 6px !important;\n        background: var(--dsw-alias-bg-layer-2, #f3f4f6) !important;\n        color: var(--dsw-alias-label-secondary, #6b7280) !important;\n        cursor: pointer !important;\n        user-select: none !important;\n        box-sizing: border-box !important;\n      }\n\n      div[class*=\"nArs4W_tabActive\"],\n      div[class*=\"workbench_tabActive\"] {\n        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;\n        color: var(--dsw-alias-label-primary, #111827) !important;\n        font-weight: 600 !important;\n        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;\n      }\n\n      span[class*=\"nArs4W_tabTitle\"],\n      span[class*=\"tabTitle\"] {\n        overflow: hidden !important;\n        text-overflow: ellipsis !important;\n        white-space: nowrap !important;\n        flex: 1 1 auto !important;\n      }\n\n      button[class*=\"nArs4W_tabClose\"],\n      button[class*=\"tabClose\"] {\n        width: 18px !important;\n        height: 18px !important;\n        border-radius: 50% !important;\n        display: inline-flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        flex-shrink: 0 !important;\n        opacity: 0.6 !important;\n        padding: 0 !important;\n      }\n\n      button[class*=\"nArs4W_tabBarPlus\"],\n      button[class*=\"tabBarPlus\"] {\n        width: 28px !important;\n        height: 28px !important;\n        border-radius: 50% !important;\n        display: inline-flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        flex-shrink: 0 !important;\n      }\n\n      /* 移动端面板右上角“返回对话 / ✕ 收起”按钮：常驻右侧，醒目且易触达 */\n      .dsh-mobile-panel-close-btn {\n        margin-left: 8px !important;\n        flex: 0 0 auto !important;\n        height: 28px !important;\n        padding: 0 10px !important;\n        border-radius: 14px !important;\n        font-size: 12px !important;\n        font-weight: 600 !important;\n        background: #2563eb !important;\n        color: #ffffff !important;\n        border: none !important;\n        display: inline-flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        gap: 4px !important;\n        cursor: pointer !important;\n        user-select: none !important;\n        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.28) !important;\n        white-space: nowrap !important;\n        transition: transform 0.1s, opacity 0.15s !important;\n        z-index: 10 !important;\n      }\n      .dsh-mobile-panel-close-btn:active {\n        transform: scale(0.95) !important;\n        opacity: 0.85 !important;\n      }\n\n      /* 3.1 会话对话头部顶栏：移动端防挤压与空间释放优化（严格排除 .dsh-mobile-app-header） */\n      div[class*=\"_centerCol\"] header,\n      header[class*=\"wSkVaW_header\"] {\n        padding: 4px 16px 2px 16px !important;\n        position: relative !important;\n        overflow: visible !important;\n      }\n\n      div[class*=\"wSkVaW_titleRow\"],\n      div[class*=\"titleRow\"] {\n        display: flex !important;\n        flex-direction: row !important;\n        align-items: center !important;\n        justify-content: space-between !important;\n        gap: 8px !important;\n        min-height: 32px !important;\n        width: 100% !important;\n        box-sizing: border-box !important;\n      }\n\n      /* 移动端将原有嵌入在内容区的长面包屑标题隐藏（已统一提升至顶部导航栏正中），彻底释放第二行空间 */\n      nav[class*=\"wSkVaW_crumbs\"],\n      nav[class*=\"crumbs\"],\n      div[class*=\"wSkVaW_crumbs\"],\n      div[class*=\"crumbs\"],\n      [class*=\"wSkVaW_crumbs\"] {\n        display: none !important;\n      }\n\n      /* 子代理/智能体模式胶囊 (Actions)：紧凑圆角胶囊 */\n      div[class*=\"wSkVaW_headerActions\"],\n      div[class*=\"headerActions\"] {\n        flex: 0 0 auto !important;\n        display: inline-flex !important;\n        align-items: center !important;\n        gap: 4px !important;\n        margin-left: 0 !important;\n      }\n\n      button[class*=\"h8S2Va_trigger\"],\n      button[class*=\"subagent\"] {\n        min-height: 26px !important;\n        height: 26px !important;\n        padding: 2px 8px !important;\n        font-size: 11.5px !important;\n        line-height: 16px !important;\n        border-radius: 13px !important;\n        background: var(--dsw-alias-bg-layer-2, rgba(0, 0, 0, 0.04)) !important;\n        white-space: nowrap !important;\n        flex-shrink: 0 !important;\n      }\n\n      /* Session Log 导出下载按钮 (Utilities)：在移动端极简为 28px 圆形纯图标按钮，隐藏长文本，极大释放顶部空间 */\n      div[class*=\"wSkVaW_headerUtilities\"],\n      div[class*=\"headerUtilities\"] {\n        flex: 0 0 auto !important;\n        margin-left: 4px !important;\n        display: inline-flex !important;\n        align-items: center !important;\n      }\n\n      button[class*=\"nL4_yW_sessionLogButton\"],\n      button[class*=\"sessionLogButton\"] {\n        min-width: 28px !important;\n        width: 28px !important;\n        height: 28px !important;\n        padding: 0 !important;\n        border-radius: 50% !important;\n        display: inline-flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        flex-shrink: 0 !important;\n        border: 1px solid var(--dsw-alias-border-l2, rgba(0, 0, 0, 0.1)) !important;\n        background: var(--dsw-alias-bg-layer-2, rgba(0, 0, 0, 0.03)) !important;\n        color: var(--dsw-alias-label-secondary, #6b7280) !important;\n        margin-left: 0 !important;\n        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;\n      }\n\n      button[class*=\"nL4_yW_sessionLogButton\"]:hover:not(:disabled),\n      button[class*=\"sessionLogButton\"]:hover:not(:disabled) {\n        background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, 0.06)) !important;\n        color: var(--dsw-alias-label-primary, #111827) !important;\n      }\n\n      button[class*=\"nL4_yW_sessionLogButton\"] span,\n      button[class*=\"sessionLogButton\"] span {\n        display: none !important;\n      }\n\n      button[class*=\"nL4_yW_sessionLogButton\"] svg,\n      button[class*=\"sessionLogButton\"] svg {\n        width: 13px !important;\n        height: 13px !important;\n        margin: 0 !important;\n      }\n\n      /* 子代理展开菜单在移动端右对齐与宽度自适应 */\n      div[class*=\"h8S2Va_menu\"] {\n        max-width: calc(100vw - 32px) !important;\n        left: auto !important;\n        right: 0 !important;\n      }\n\n      /* 输入框底座：DeepSeek App 居中及底部固定 */\n      div[class*=\"wSkVaW_scrollBody\"] {\n        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;\n      }\n\n      /* ── 移动端输入框折叠模式（body.dsh-composer-collapsed）──────────────\n         折叠后隐藏吸底输入区，让消息 viewArea 自动伸展到全高，最大化阅读区。\n         入口：聊天头部工具栏（Session 下载钮旁）的折叠按钮，或折叠态底部细输入条点它唤回。\n         状态持久化到 localStorage。 */\n      body.dsh-composer-collapsed div[class*=\"wSkVaW_composerSeat\"] {\n        display: none !important;\n      }\n      body.dsh-composer-collapsed div[class*=\"wSkVaW_viewArea\"] {\n        flex: 1 1 auto !important;\n        height: auto !important;\n        min-height: 0 !important;\n      }\n      /* 折叠时滚动区底部对齐 safe-area，避免内容被 iPhone 底部横条遮挡 */\n      body.dsh-composer-collapsed div[class*=\"wSkVaW_scrollBody\"] {\n        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;\n      }\n\n      /* 折叠输入框按钮：注入在聊天头部工具栏（Session 下载钮旁），\n         与 DSH sessionLogButton 同规格（28px 圆形图标钮），视觉与原生一致 */\n      .dsh-header-fold-btn {\n        min-width: 28px !important;\n        width: 28px !important;\n        height: 28px !important;\n        padding: 0 !important;\n        border-radius: 50% !important;\n        display: inline-flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        flex-shrink: 0 !important;\n        border: 1px solid var(--dsw-alias-border-l2, rgba(0, 0, 0, 0.1)) !important;\n        background: var(--dsw-alias-bg-layer-2, rgba(0, 0, 0, 0.03)) !important;\n        color: var(--dsw-alias-label-secondary, #6b7280) !important;\n        cursor: pointer !important;\n        transition: opacity 0.15s !important;\n        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;\n        -webkit-tap-highlight-color: transparent !important;\n      }\n      .dsh-header-fold-btn:active {\n        opacity: 0.6 !important;\n      }\n      .dsh-header-fold-btn svg {\n        width: 15px !important;\n        height: 15px !important;\n      }\n\n      /* 折叠态底部细输入条：点击唤起输入框（位于原输入区位置，sticky 底部） */\n      .dsh-composer-collapsed-bar {\n        display: none !important;\n        position: sticky !important;\n        bottom: 0 !important;\n        margin: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) 12px !important;\n        padding: 11px 16px !important;\n        border-radius: 22px !important;\n        background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;\n        border: 1px solid rgba(0, 0, 0, 0.07) !important;\n        color: var(--dsw-alias-label-tertiary, #8b93a1) !important;\n        font-size: 13.5px !important;\n        line-height: 1.4 !important;\n        cursor: pointer !important;\n        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;\n        -webkit-tap-highlight-color: transparent !important;\n        z-index: 40 !important;\n        box-sizing: border-box !important;\n      }\n      body.dsh-composer-collapsed .dsh-composer-collapsed-bar {\n        display: block !important;\n      }\n\n      /* 输入卡片：DeepSeek App 圆角大胶囊造型 */\n      div[class*=\"uV2eYG_card\"] {\n        border-radius: 26px !important;\n        padding: 14px 16px 12px !important;\n        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;\n        border: 1px solid rgba(0, 0, 0, 0.07) !important;\n        background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;\n      }\n\n      /* 输入框底部工具栏：弹性自适应，彻底杜绝权限选择器(Full access)与模型选择器重叠碰撞 */\n      div[class*=\"uV2eYG_row\"] {\n        display: flex !important;\n        align-items: center !important;\n        justify-content: space-between !important;\n        gap: 6px !important;\n        width: 100% !important;\n        padding: 2px 2px 4px !important;\n        box-sizing: border-box !important;\n      }\n\n      div[class*=\"uV2eYG_tools\"] {\n        display: flex !important;\n        align-items: center !important;\n        gap: 6px !important;\n        flex: 0 0 auto !important;\n        min-width: 0 !important;\n      }\n\n      div[class*=\"uV2eYG_modes\"] {\n        display: flex !important;\n        align-items: center !important;\n        gap: 4px !important;\n        flex: 0 0 auto !important;\n        min-width: 0 !important;\n      }\n\n      button[class*=\"Sh0Q9G_trigger\"] {\n        flex: 0 0 auto !important;\n        min-width: 0 !important;\n      }\n\n      div[class*=\"uV2eYG_trailing\"] {\n        display: flex !important;\n        align-items: center !important;\n        justify-content: flex-end !important;\n        gap: 6px !important;\n        flex: 1 1 auto !important;\n        min-width: 0 !important;\n      }\n\n      div[class*=\"_7KE1Ra_root\"] {\n        flex: 0 1 auto !important;\n        min-width: 0 !important;\n        max-width: 180px !important;\n      }\n\n      button[class*=\"_7KE1Ra_trigger\"] {\n        max-width: 100% !important;\n        min-width: 0 !important;\n        flex: 1 1 auto !important;\n        padding: 0 4px 0 6px !important;\n      }\n\n      span[class*=\"_7KE1Ra_triggerLabel\"] {\n        overflow: hidden !important;\n        text-overflow: ellipsis !important;\n        white-space: nowrap !important;\n        min-width: 0 !important;\n      }\n\n      /* 4. 原生侧边栏抽屉化 (Drawer) */\n      div[class*=\"_sidebarCol\"] {\n        position: fixed !important;\n        left: 0 !important;\n        top: 0 !important;\n        bottom: 0 !important;\n        height: 100dvh !important;\n        width: 290px !important;\n        max-width: 82vw !important;\n        z-index: 10000 !important;\n        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;\n        transform: translateX(-105%);\n        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);\n        overflow-y: auto !important;\n        border-right: 1px solid rgba(0, 0, 0, 0.06) !important;\n        pointer-events: auto !important;\n      }\n      body.dsh-drawer-open div[class*=\"_sidebarCol\"] {\n        transform: translateX(0) !important;\n        box-shadow: 4px 0 28px rgba(0, 0, 0, 0.25) !important;\n        pointer-events: auto !important;\n      }\n\n      /* 抽屉内部：强制 100% 宽度，无论内部状态如何均正常展开并展示 DSH 自带的顶部收起侧边栏图标 */\n      body.dsh-drawer-open div[class*=\"hHd-Xa_root\"] {\n        width: 100% !important;\n        max-width: 100% !important;\n        min-width: 100% !important;\n        display: flex !important;\n        flex-direction: column !important;\n      }\n      body.dsh-drawer-open div[class*=\"hHd-Xa_collapsed\"] div[class*=\"hHd-Xa_regionArea\"],\n      body.dsh-drawer-open div[class*=\"hHd-Xa_collapsed\"] button[class*=\"hHd-Xa_newSession\"],\n      body.dsh-drawer-open div[class*=\"hHd-Xa_collapsed\"] div[class*=\"qDHVXG_root\"] {\n        display: flex !important;\n        visibility: visible !important;\n      }\n      div[class*=\"hHd-Xa_logoRow\"] {\n        display: flex !important;\n        align-items: center !important;\n        justify-content: space-between !important;\n        width: 100% !important;\n        padding: 10px 14px 6px 14px !important;\n        box-sizing: border-box !important;\n      }\n      div[class*=\"hHd-Xa_logoRow\"] button[class*=\"hHd-Xa_toggle\"] {\n        display: inline-flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        width: 32px !important;\n        height: 32px !important;\n        border-radius: 8px !important;\n        color: var(--dsw-alias-label-secondary, #6b7280) !important;\n        background: transparent !important;\n        border: none !important;\n        cursor: pointer !important;\n        margin-left: auto !important;\n        transition: background 0.15s, color 0.15s !important;\n      }\n      div[class*=\"hHd-Xa_logoRow\"] button[class*=\"hHd-Xa_toggle\"]:active {\n        background: var(--dsw-alias-bg-layer-2, rgba(0, 0, 0, 0.06)) !important;\n        color: var(--dsw-alias-label-primary, #111827) !important;\n      }\n\n      /* 设置弹窗打开时解除抽屉隐藏限制 */\n      div[class*=\"_sidebarCol\"]:has(div[class*=\"VOzbGW_overlay\"]) {\n        transform: none !important;\n        width: 100vw !important;\n        max-width: 100vw !important;\n        background: transparent !important;\n        box-shadow: none !important;\n        pointer-events: none !important;\n      }\n\n      /* 5. 半透明背景遮罩 */\n      .dsh-mobile-backdrop {\n        position: fixed;\n        inset: 0;\n        background: rgba(0, 0, 0, 0.4);\n        z-index: 9999;\n        display: none !important;\n      }\n      body.dsh-drawer-open .dsh-mobile-backdrop {\n        display: block !important;\n        pointer-events: auto !important;\n      }\n\n      /* 6. 设置中心全自适应适配 */\n      div[class*=\"VOzbGW_overlay\"] {\n        position: fixed !important;\n        inset: 0 !important;\n        width: 100vw !important;\n        height: 100dvh !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        background: rgba(0, 0, 0, 0.45) !important;\n        backdrop-filter: blur(4px) !important;\n        -webkit-backdrop-filter: blur(4px) !important;\n        z-index: 10002 !important;\n        padding: 10px !important;\n        box-sizing: border-box !important;\n        pointer-events: auto !important;\n      }\n      div[class*=\"VOzbGW_panel\"] {\n        width: 100% !important;\n        max-width: 100% !important;\n        height: 92dvh !important;\n        max-height: 92dvh !important;\n        display: flex !important;\n        flex-direction: row !important;\n        border-radius: 18px !important;\n        overflow: hidden !important;\n        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;\n        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;\n      }\n      nav[class*=\"VOzbGW_nav\"] {\n        width: 78px !important;\n        min-width: 78px !important;\n        max-width: 78px !important;\n        padding: 10px 4px !important;\n        box-sizing: border-box !important;\n        border-right: 1px solid var(--dsw-alias-border-l2, #e5e7eb) !important;\n        display: flex !important;\n        flex-direction: column !important;\n        gap: 6px !important;\n        overflow-y: auto !important;\n      }\n      nav[class*=\"VOzbGW_nav\"] button[class*=\"VOzbGW_navCell\"],\n      button[class*=\"VOzbGW_navCell\"] {\n        padding: 8px 2px !important;\n        display: flex !important;\n        flex-direction: column !important;\n        align-items: center !important;\n        justify-content: center !important;\n        text-align: center !important;\n        height: auto !important;\n        min-height: 48px !important;\n        gap: 4px !important;\n        border-radius: 10px !important;\n      }\n      span[class*=\"VOzbGW_navLabel\"] {\n        font-size: 10.5px !important;\n        line-height: 1.2 !important;\n        white-space: normal !important;\n        word-break: break-all !important;\n        text-align: center !important;\n      }\n      div[class*=\"VOzbGW_content\"] {\n        flex: 1 1 auto !important;\n        min-width: 0 !important;\n        width: calc(100% - 78px) !important;\n        max-width: calc(100% - 78px) !important;\n        display: flex !important;\n        flex-direction: column !important;\n        overflow: hidden !important;\n      }\n      div[class*=\"VOzbGW_options\"] {\n        flex: 1 1 auto !important;\n        width: 100% !important;\n        max-width: 100% !important;\n        box-sizing: border-box !important;\n        padding: 0 14px 20px !important;\n        overflow-x: hidden !important;\n        overflow-y: auto !important;\n        -webkit-overflow-scrolling: touch !important;\n      }\n\n      /* 设置中心选项行手机自适应（垂直流式，防文字单字折行） */\n      div[class*=\"VOzbGW_options\"] div[class*=\"_row\"] {\n        display: flex !important;\n        flex-direction: column !important;\n        align-items: stretch !important;\n        gap: 8px !important;\n        width: 100% !important;\n        padding: 12px 0 !important;\n        box-sizing: border-box !important;\n      }\n      div[class*=\"VOzbGW_options\"] div[class*=\"_rowText\"] {\n        width: 100% !important;\n        max-width: 100% !important;\n      }\n      div[class*=\"VOzbGW_options\"] button[class*=\"_selector\"],\n      div[class*=\"VOzbGW_options\"] select,\n      div[class*=\"VOzbGW_options\"] input {\n        width: 100% !important;\n        max-width: 100% !important;\n        box-sizing: border-box !important;\n      }\n\n      /* 7. 代码块、表格与徽标自适应 */\n      pre, code, pre > code, table {\n        max-width: 100% !important;\n        overflow-x: auto !important;\n        -webkit-overflow-scrolling: touch !important;\n        font-size: 12.5px !important;\n      }\n\n      /* 状态徽标与药丸按钮永不折字 */\n      span[style*=\"border-radius: 999\"],\n      span[style*=\"border-radius:999\"] {\n        white-space: nowrap !important;\n        flex-shrink: 0 !important;\n        min-width: max-content !important;\n      }\n\n      /* 二维码与图片移动端弹性缩放 */\n      img[alt=\"QR\"], img[src^=\"data:image\"] {\n        max-width: 100% !important;\n        box-sizing: border-box !important;\n      }\n\n      /* 8. 确保所有 Popover 弹出菜单、操作气泡、下拉框位于抽屉之上且支持触控交互 */\n      div[class*=\"_portal\"],\n      div[class*=\"portal\"],\n      div[class*=\"popup\"],\n      div[class*=\"dropdown\"],\n      div[class*=\"menu\"],\n      div[role=\"menu\"],\n      div[role=\"dialog\"] {\n        z-index: 10005 !important;\n        pointer-events: auto !important;\n      }\n\n      /* 9. 移动端侧边栏：会话与工作区三点操作按钮始终清晰可见且易于点击 */\n      div[class*=\"sessionRow\"] span[class*=\"rowActions\"],\n      div[class*=\"sessionRow\"] button[class*=\"iconButton\"],\n      div[class*=\"treeBody\"] button[class*=\"iconButton\"] {\n        opacity: 0.8 !important;\n        display: inline-flex !important;\n        visibility: visible !important;\n        pointer-events: auto !important;\n      }\n      div[class*=\"sessionRow\"]:active {\n        background: var(--dsw-alias-bg-layer-2, #f3f4f6) !important;\n      }\n\n      /* 全局 overlayLayer 绝不被染黑 */\n      div[class*=\"overlayLayer\"],\n      div[class*=\"uV2eYG_overlayAnchor\"] {\n        background: transparent !important;\n        pointer-events: none !important;\n      }\n      div[class*=\"overlayLayer\"] > * {\n        pointer-events: auto !important;\n      }\n    }\n\n    /* 远程工作区选择弹窗移动端/桌面端自适应样式 */\n    #dsh-remote-workspace-modal {\n      position: fixed !important;\n      inset: 0 !important;\n      z-index: 100000 !important;\n      background: rgba(0, 0, 0, 0.65) !important;\n      backdrop-filter: blur(5px) !important;\n      display: flex !important;\n      align-items: center !important;\n      justify-content: center !important;\n      padding: 16px !important;\n      box-sizing: border-box !important;\n      font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif !important;\n      color: var(--dsw-alias-label-primary, #111827) !important;\n    }\n\n    .dsh-ws-dialog-card {\n      background: var(--dsw-alias-bg-layer-1, #ffffff) !important;\n      border: 1px solid var(--dsw-alias-border-l1, #e5e7eb) !important;\n      border-radius: 16px !important;\n      width: 100% !important;\n      max-width: 620px !important;\n      max-height: 88vh !important;\n      display: flex !important;\n      flex-direction: column !important;\n      box-shadow: 0 25px 35px -5px rgba(0,0,0,0.3), 0 12px 16px -5px rgba(0,0,0,0.2) !important;\n      overflow: hidden !important;\n      animation: dshModalFadeIn 0.2s ease-out !important;\n    }\n\n    .dsh-ws-chips-scroll {\n      display: flex !important;\n      align-items: center !important;\n      gap: 6px !important;\n      overflow-x: auto !important;\n      white-space: nowrap !important;\n      scrollbar-width: none !important;\n      -ms-overflow-style: none !important;\n      -webkit-overflow-scrolling: touch !important;\n      padding: 2px 0 !important;\n    }\n    .dsh-ws-chips-scroll::-webkit-scrollbar {\n      display: none !important;\n    }\n\n    @media (max-width: 640px) {\n      #dsh-remote-workspace-modal {\n        align-items: flex-end !important;\n        padding: 0 !important;\n      }\n\n      .dsh-ws-dialog-card {\n        max-height: 92dvh !important;\n        height: 92dvh !important;\n        border-bottom-left-radius: 0 !important;\n        border-bottom-right-radius: 0 !important;\n        border-left: none !important;\n        border-right: none !important;\n        border-bottom: none !important;\n        max-width: 100vw !important;\n        width: 100vw !important;\n        margin: 0 !important;\n        animation: dshBottomSheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;\n      }\n\n      .dsh-ws-drag-handle {\n        display: block !important;\n      }\n    }\n\n    @keyframes dshModalFadeIn {\n      from { opacity: 0; transform: scale(0.96); }\n      to { opacity: 1; transform: scale(1); }\n    }\n\n    @keyframes dshBottomSheetUp {\n      from { transform: translateY(100%); }\n      to { transform: translateY(0); }\n    }\n\n    /* 深色模式适配：dsh-bridge 目录浏览器弹窗使用了 DSH 主题系统未定义的\n       state-*-bg / state-*-border / state-*-primary 变量，补上深色模式值，避免浅色 fallback 永远生效 */\n    body[data-ds-dark-theme] {\n      --dsw-alias-state-info-bg: rgba(65, 118, 230, 0.12);\n      --dsw-alias-state-info-border: rgba(65, 118, 230, 0.25);\n      --dsw-alias-state-info-primary: #60a5fa;\n      --dsw-alias-state-success-bg: rgba(34, 197, 94, 0.12);\n      --dsw-alias-state-success-border: rgba(34, 197, 94, 0.25);\n      --dsw-alias-state-success-primary: #4ade80;\n      --dsw-alias-state-warn-bg: rgba(245, 158, 11, 0.12);\n      --dsw-alias-state-warn-border: rgba(245, 158, 11, 0.25);\n      --dsw-alias-state-warn-primary: #fbbf24;\n      --dsw-alias-state-error-bg: rgba(239, 68, 68, 0.12);\n      --dsw-alias-state-error-border: rgba(239, 68, 68, 0.25);\n      --dsw-alias-state-error-primary: #f87171;\n    }\n\n    /* 深色模式：直接覆盖弹窗内所有使用 #fff/#ffffff fallback 的内联背景，\n       确保即使 CSS 变量未正确继承，弹窗也不会显示白色背景 */\n    body[data-ds-dark-theme] #dsh-remote-workspace-modal .dsh-ws-dialog-card,\n    body[data-ds-dark-theme] #dsh-remote-workspace-modal .dsh-ws-dialog-card * {\n      --dsw-alias-bg-layer-1: #1b1b1c;\n      --dsw-alias-bg-layer-2: #2c2c2e;\n      --dsw-alias-bg-layer-3: #353638;\n      --dsw-alias-border-l2: #3c3c3d;\n      --dsw-alias-label-primary: #f9fafb;\n      --dsw-alias-label-secondary: #adb2b8;\n      --dsw-alias-label-tertiary: #81858c;\n      --dsw-alias-brand-primary: #f9fafb;\n      --dsw-alias-label-primary-foreground: #0f1115;\n    }\n\n    @media (min-width: 769px) {\n      .dsh-mobile-app-header,\n      .dsh-mobile-backdrop,\n      .dsh-mobile-panel-close-btn {\n        display: none !important;\n      }\n    }\n",
+  "n": 1,
+  "len": 31518,
+  "files": [
+   "client/mobile-styles.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "管理员密码错误",
+  "n": 4,
+  "len": 7,
+  "files": [
+   "client/unlock-manager.js",
+   "lib/auth/manager.js",
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "LogicalExpression",
+   "Property"
+  ]
+ },
+ {
+  "key": "解锁请求失败",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "client/unlock-manager.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "解锁并访问",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "管理员尚未设置访问密码（仅密码模式），请联系管理员在控制台「安全认证」中设置密码后再访问。",
+  "n": 1,
+  "len": 45,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "无法访问（未设置密码）",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "当前为「仅安全 Token」模式，请使用管理员分享的专属二维码或带 Token 的链接访问（不支持密码登录）。",
+  "n": 1,
+  "len": 55,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "需专属 Token",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "当前访问认证已开启，但管理员尚未设置任何访问密码 —— 免密开放状态，任何访客均可直接进入。请管理员尽快在控制台「安全认证」中设置访问密码。",
+  "n": 1,
+  "len": 70,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "直接进入",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "远程访问 · 尚未设置密码",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "远程安全访问认证",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请输入管理员设置的访问密码",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "（尚未设置密码）",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "请输入访问密码",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n  <meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n  <meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black-translucent\">\n  <meta name=\"mobile-web-app-capable\" content=\"yes\">\n  <meta name=\"theme-color\" content=\"#121413\">\n  <title>远程访问认证 - DeepSeek Harness</title>\n  <style>\n    :root {\n      --bg: #121413;\n      --card-bg: rgba(26, 29, 27, 0.85);\n      --card-border: rgba(255, 255, 255, 0.08);\n      --brand: #22c55e;\n      --brand-hover: #16a34a;\n      --brand-glow: rgba(34, 197, 94, 0.25);\n      --text: #f3f4f6;\n      --text-secondary: #9ca3af;\n      --input-bg: rgba(18, 20, 19, 0.7);\n      --input-border: rgba(255, 255, 255, 0.12);\n      --error-bg: rgba(239, 68, 68, 0.12);\n      --error-border: rgba(239, 68, 68, 0.3);\n      --error-text: #f87171;\n    }\n\n    * {\n      box-sizing: border-box;\n      margin: 0;\n      padding: 0;\n      -webkit-tap-highlight-color: transparent;\n    }\n\n    body {\n      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;\n      background-color: var(--bg);\n      background-image: \n        radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.12) 0%, transparent 50%),\n        radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);\n      color: var(--text);\n      min-height: 100vh;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      padding: 20px;\n    }\n\n    .container {\n      width: 100%;\n      max-width: 400px;\n      perspective: 1000px;\n    }\n\n    .card {\n      background: var(--card-bg);\n      backdrop-filter: blur(20px);\n      -webkit-backdrop-filter: blur(20px);\n      border: 1px solid var(--card-border);\n      border-radius: 20px;\n      padding: 36px 28px;\n      box-shadow: \n        0 20px 40px -15px rgba(0, 0, 0, 0.5),\n        0 0 0 1px rgba(255, 255, 255, 0.05);\n      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);\n    }\n\n    @keyframes fadeIn {\n      from { opacity: 0; transform: translateY(16px) scale(0.98); }\n      to { opacity: 1; transform: translateY(0) scale(1); }\n    }\n\n    .logo-area {\n      text-align: center;\n      margin-bottom: 28px;\n    }\n\n    .logo-icon {\n      width: 56px;\n      height: 56px;\n      margin: 0 auto 16px;\n      border-radius: 16px;\n      background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.05));\n      border: 1px solid rgba(34, 197, 94, 0.3);\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      box-shadow: 0 8px 16px -4px var(--brand-glow);\n    }\n\n    .logo-icon svg {\n      width: 32px;\n      height: 32px;\n      fill: var(--brand);\n    }\n\n    h1 {\n      font-size: 20px;\n      font-weight: 600;\n      letter-spacing: -0.01em;\n      color: #ffffff;\n      margin-bottom: 6px;\n    }\n\n    .subtitle {\n      font-size: 13px;\n      color: var(--text-secondary);\n      line-height: 1.5;\n    }\n\n    .alert {\n      background: var(--error-bg);\n      border: 1px solid var(--error-border);\n      color: var(--error-text);\n      padding: 10px 14px;\n      border-radius: 10px;\n      font-size: 13px;\n      margin-bottom: 20px;\n      display: flex;\n      align-items: center;\n      gap: 8px;\n      animation: shake 0.4s ease;\n    }\n\n    @keyframes shake {\n      0%, 100% { transform: translateX(0); }\n      20%, 60% { transform: translateX(-6px); }\n      40%, 80% { transform: translateX(6px); }\n    }\n\n    .form-group {\n      margin-bottom: 20px;\n    }\n\n    label {\n      display: block;\n      font-size: 12px;\n      font-weight: 500;\n      color: var(--text-secondary);\n      margin-bottom: 8px;\n      text-transform: uppercase;\n      letter-spacing: 0.05em;\n    }\n\n    .input-wrapper {\n      position: relative;\n      display: flex;\n      align-items: center;\n    }\n\n    input[type=\"password\"], input[type=\"text\"] {\n      width: 100%;\n      background: var(--input-bg);\n      border: 1px solid var(--input-border);\n      border-radius: 12px;\n      padding: 14px 44px 14px 16px;\n      font-size: 15px;\n      color: #ffffff;\n      outline: none;\n      transition: all 0.2s ease;\n      font-family: inherit;\n    }\n\n    input:focus {\n      border-color: var(--brand);\n      box-shadow: 0 0 0 3px var(--brand-glow);\n      background: rgba(18, 20, 19, 0.9);\n    }\n\n    .toggle-pwd {\n      position: absolute;\n      right: 12px;\n      background: none;\n      border: none;\n      cursor: pointer;\n      color: var(--text-secondary);\n      padding: 6px;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      border-radius: 6px;\n      transition: color 0.2s;\n    }\n\n    .toggle-pwd:hover {\n      color: #ffffff;\n    }\n\n    .submit-btn {\n      width: 100%;\n      background: var(--brand);\n      color: #0b150f;\n      border: none;\n      border-radius: 12px;\n      padding: 14px;\n      font-size: 15px;\n      font-weight: 600;\n      cursor: pointer;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      gap: 8px;\n      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);\n      box-shadow: 0 4px 12px var(--brand-glow);\n    }\n\n    .submit-btn:hover {\n      background: var(--brand-hover);\n      transform: translateY(-1px);\n      box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);\n    }\n\n    .submit-btn:active {\n      transform: translateY(1px);\n    }\n\n    .submit-btn:disabled {\n      opacity: 0.6;\n      cursor: not-allowed;\n      transform: none;\n    }\n\n    .spinner {\n      width: 18px;\n      height: 18px;\n      border: 2px solid rgba(11, 21, 15, 0.3);\n      border-top-color: #0b150f;\n      border-radius: 50%;\n      animation: spin 0.6s linear infinite;\n      display: none;\n    }\n\n    @keyframes spin {\n      to { transform: rotate(360deg); }\n    }\n\n    .footer {\n      text-align: center;\n      margin-top: 24px;\n      font-size: 12px;\n      color: rgba(255, 255, 255, 0.35);\n    }\n\n    .footer a {\n      color: var(--text-secondary);\n      text-decoration: none;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"card\">\n      <div class=\"logo-area\">\n        <div class=\"logo-icon\">\n          <svg viewBox=\"0 0 24 24\">\n            <path d=\"M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z\"/>\n          </svg>\n        </div>\n        <h1>DeepSeek Harness</h1>\n        <div class=\"subtitle\">{0}</div>\n      </div>\n\n      {1}\n\n      <div id=\"errorAlert\" class=\"alert\" style=\"{2}\">\n        <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n          <circle cx=\"12\" cy=\"12\" r=\"10\"></circle>\n          <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line>\n          <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line>\n        </svg>\n        <span id=\"errorMsg\">{3}</span>\n      </div>\n\n      <form id=\"loginForm\" onsubmit=\"return handleLogin(event)\">\n        <div class=\"form-group\">\n          <label for=\"password\">访问密码 / PIN 码</label>\n          <div class=\"input-wrapper\">\n            <input type=\"password\" id=\"password\" name=\"password\" placeholder=\"{4}\" autocomplete=\"current-password\" autofocus {5}>\n            <button type=\"button\" class=\"toggle-pwd\" onclick=\"togglePassword()\" title=\"显示/隐藏密码\">\n              <svg id=\"eyeIcon\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                <path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"></path>\n                <circle cx=\"12\" cy=\"12\" r=\"3\"></circle>\n              </svg>\n            </button>\n          </div>\n        </div>\n\n        <button type=\"submit\" id=\"submitBtn\" class=\"submit-btn\">\n          <span class=\"spinner\" id=\"btnSpinner\"></span>\n          <span id=\"btnText\">{6}</span>\n        </button>\n      </form>\n\n      {7}\n\n      <div style=\"margin-top: 16px; text-align: center;\">\n        <a href=\"javascript:void(0)\" onclick=\"toggleForgotGuide()\" style=\"font-size: 12px; color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s;\">\n          ❓ 忘记密码怎么办？\n        </a>\n      </div>\n\n      <div id=\"forgotGuide\" style=\"display: none; margin-top: 14px; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 12px; line-height: 1.6; color: var(--text-secondary); text-align: left;\">\n        <div style=\"font-weight: 600; color: #f3f4f6; margin-bottom: 4px;\">🛟 找回与重置密码指引：</div>\n        <div>1. <strong>电脑本机免密直连</strong>：在运行本程序的电脑本机打开本控制台，物理机享有永久免密特权，可直接修改或清除密码。</div>\n        <div style=\"margin-top: 4px;\">2. <strong>服务器 / 无头环境</strong>：救急重置步骤请参见 <a href=\"https://github.com/wenbin-wb/dsh-bridge#readme\" target=\"_blank\" style=\"color: #93c5fd;\">GitHub README</a> 的「三重容灾保命体系」章节。</div>\n      </div>\n\n      <div class=\"footer\">\n        由 <a href=\"https://github.com/wenbin-wb/dsh-bridge\" target=\"_blank\">dsh-bridge</a> 安全网关守护\n      </div>\n    </div>\n  </div>\n\n  <script>\n    function toggleForgotGuide() {\n      const g = document.getElementById('forgotGuide');\n      g.style.display = g.style.display === 'none' ? 'block' : 'none';\n    }\n\n    function togglePassword() {\n      const input = document.getElementById('password');\n      const icon = document.getElementById('eyeIcon');\n      if (input.type === 'password') {\n        input.type = 'text';\n        icon.innerHTML = '<path d=\"M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24\"></path><line x1=\"1\" y1=\"1\" x2=\"23\" y2=\"23\"></line>';\n      } else {\n        input.type = 'password';\n        icon.innerHTML = '<path d=\"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z\"></path><circle cx=\"12\" cy=\"12\" r=\"3\"></circle>';\n      }\n    }\n\n    async function handleLogin(e) {\n      e.preventDefault();\n      const pwd = document.getElementById('password').value;\n      const btn = document.getElementById('submitBtn');\n      const spinner = document.getElementById('btnSpinner');\n      const btnText = document.getElementById('btnText');\n      const alert = document.getElementById('errorAlert');\n      const errorMsg = document.getElementById('errorMsg');\n\n      btn.disabled = true;\n      spinner.style.display = 'inline-block';\n      btnText.textContent = '验证中…';\n      alert.style.display = 'none';\n\n      try {\n        const resp = await fetch('/__dsh_bridge__/login', {\n          method: 'POST',\n          headers: { 'Content-Type': 'application/json' },\n          body: JSON.stringify({ password: pwd })\n        });\n        const data = await resp.json();\n        if (data.ok) {\n          btnText.textContent = '✓ 认证成功，正在跳转…';\n          setTimeout(() => {\n            window.location.reload();\n          }, 300);\n        } else {\n          errorMsg.textContent = data.error || '访问密码错误';\n          alert.style.display = 'flex';\n          alert.style.animation = 'none';\n          void alert.offsetWidth; // 触发 reflow\n          alert.style.animation = 'shake 0.4s ease';\n          btn.disabled = false;\n          spinner.style.display = 'none';\n          btnText.textContent = '解锁并访问';\n          document.getElementById('password').focus();\n          document.getElementById('password').select();\n        }\n      } catch (err) {\n        errorMsg.textContent = '网络请求失败，请重试';\n        alert.style.display = 'flex';\n        btn.disabled = false;\n        spinner.style.display = 'none';\n        btnText.textContent = '解锁并访问';\n      }\n      return false;\n    }\n  </script>\n</body>\n</html>",
+  "n": 1,
+  "len": 11710,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "尝试次数过多，请稍后再试",
+  "n": 2,
+  "len": 12,
+  "files": [
+   "lib/auth/manager.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "当前已配置为仅限电脑本机管理设置",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/auth/manager.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "尝试次数过多，请 60 秒后再试",
+  "n": 2,
+  "len": 16,
+  "files": [
+   "lib/auth/manager.js",
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property",
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "当前仅允许专属安全 Token 扫码访问，不支持密码登录",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/auth/manager.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "访问密码错误",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "lib/auth/manager.js",
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property",
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "操作已被拦截：当前策略为仅限电脑本机管理",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "该操作涉及敏感配置：请先在「安全认证」中设置访问密码或管理密码后再执行",
+  "n": 1,
+  "len": 35,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "操作已被拦截：需要管理员权限，请先在控制台输入管理密码解锁",
+  "n": 1,
+  "len": 29,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "AuthManager 未初始化",
+  "n": 5,
+  "len": 16,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "仅密码模式需要先设置访问密码：请先在下方「设置外部访客访问密码」处设置密码，再开启安全防护",
+  "n": 1,
+  "len": 45,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "仅密码模式需要先设置访问密码：请先在下方「设置外部访客访问密码」处设置密码后再切换",
+  "n": 1,
+  "len": 41,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "备份导出服务不可用",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "备份导入服务不可用",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "请求过于频繁，请等待 {0} 秒后再试",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "添加工作区请求过于频繁，请等待 {0} 秒后再试",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "PlatformManager 未初始化",
+  "n": 6,
+  "len": 20,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "缺少 platformId 参数",
+  "n": 6,
+  "len": 16,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "平台未注册: {0}",
+  "n": 6,
+  "len": 10,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "call:fail"
+  ]
+ },
+ {
+  "key": "登录启动失败",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/bridge-rpc.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "不支持的平台: {0}-{1}",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "下载超时（5分钟）",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "重定向次数过多",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "下载失败: HTTP {0}",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "正在初始化...",
+  "n": 2,
+  "len": 8,
+  "files": [
+   "lib/cloudflared-manager.mjs",
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:_setState",
+   "Property"
+  ]
+ },
+ {
+  "key": "cloudflared 启动失败: %s",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:error"
+  ]
+ },
+ {
+  "key": "cloudflared 启动失败: {0}",
+  "n": 3,
+  "len": 21,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_scheduleRestart",
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "{0}（已自动重试 {1} 次仍失败，请检查网络/Token，或点击「关闭」停止）",
+  "n": 1,
+  "len": 41,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_setState"
+  ]
+ },
+ {
+  "key": "{0}，{1}s 后自动重连（第 {2}/{3} 次）",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_setState"
+  ]
+ },
+ {
+  "key": "正在自动重连...",
+  "n": 2,
+  "len": 9,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_setState",
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "cloudflared 自动重连失败: %s",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:error"
+  ]
+ },
+ {
+  "key": "无法解析版本输出: {0}",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "版本不匹配: 期望 {0}，实际 {1}",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "优先使用系统全局 cloudflared: %s",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "检测到历史残留的未解压 cloudflared.tgz 压缩包，正在清理重新准备...",
+  "n": 1,
+  "len": 43,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "cloudflared 已存在且验证通过: %s (version=%s)",
+  "n": 1,
+  "len": 37,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "现有 cloudflared 二进制验证失败（%s），准备重新下载",
+  "n": 1,
+  "len": 33,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "现有 cloudflared 二进制验证失败 (%s)，准备重新下载",
+  "n": 1,
+  "len": 34,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "正在下载 cloudflared (~30MB)...",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_setState"
+  ]
+ },
+ {
+  "key": "从 %s 下载 cloudflared",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "下载 cloudflared: {0}/{1} MB ({2}%)",
+  "n": 1,
+  "len": 33,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_setState"
+  ]
+ },
+ {
+  "key": "解压 cloudflared 压缩包失败: %s",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:error"
+  ]
+ },
+ {
+  "key": "解压 cloudflared 失败: {0}",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "下载的 cloudflared 版本校验失败: {0}",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "cloudflared 下载并准备完成 (version=%s, sha256=%s)",
+  "n": 1,
+  "len": 43,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "准备 cloudflared 失败: {0}",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "已取消",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "正在连接 Cloudflare...",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "启动 cloudflared: %s %s",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "固定隧道已建立 ({0})",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "固定隧道已建立",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "cloudflared 固定隧道就绪: %s",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "Token 模式",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "临时隧道已建立",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_setState"
+  ]
+ },
+ {
+  "key": "cloudflared 临时隧道就绪: %s",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "隧道已注册，等待就绪...",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_setState"
+  ]
+ },
+ {
+  "key": "cloudflared 进程意外退出 (code={0}{1})",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:_scheduleRestart"
+  ]
+ },
+ {
+  "key": "等待隧道 URL 超时（%ss），终止进程并进入自动重试",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "等待隧道 URL 超时（{0}秒）",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "停止 cloudflared...",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "<script data-dsh-bridge-polyfill=\"2\">\n!function () {\n  try {\n    var S = self.AbortSignal;\n    if (typeof S !== 'function') return;\n    if (typeof S.any !== 'function') {\n      S.any = function (signals) {\n        var list = Array.prototype.slice.call(signals || []);\n        var c = new self.AbortController();\n        var onAbort = function (ev) {\n          var src = ev && ev.target ? ev.target : ev;\n          cleanup();\n          try { c.abort(src ? src.reason : undefined); } catch (e) { c.abort(); }\n        };\n        var cleanup = function () {\n          for (var i = 0; i < list.length; i++) {\n            try { list[i].removeEventListener('abort', onAbort); } catch (e) {}\n          }\n        };\n        for (var i = 0; i < list.length; i++) {\n          if (list[i] && list[i].aborted) {\n            try { c.abort(list[i].reason); } catch (e) { c.abort(); }\n            return c.signal;\n          }\n        }\n        for (var i = 0; i < list.length; i++) {\n          try { list[i].addEventListener('abort', onAbort, { once: true }); } catch (e) {}\n        }\n        return c.signal;\n      };\n    }\n    if (typeof S.timeout !== 'function') {\n      S.timeout = function (ms) {\n        var c = new self.AbortController();\n        setTimeout(function () {\n          try { c.abort(new Error('The operation timed out.')); } catch (e) { c.abort(); }\n        }, Math.max(0, Number(ms) || 0));\n        return c.signal;\n      };\n    }\n  } catch (e) { /* 环境异常时不影响页面其余脚本 */ }\n}();\n</script>",
+  "n": 1,
+  "len": 1489,
+  "files": [
+   "lib/compat.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "处理失败",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/feishu/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "已批准",
+  "n": 2,
+  "len": 3,
+  "files": [
+   "lib/feishu/gateway.js",
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "ConditionalExpression",
+   "Property"
+  ]
+ },
+ {
+  "key": "已拒绝",
+  "n": 2,
+  "len": 3,
+  "files": [
+   "lib/feishu/gateway.js",
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "ConditionalExpression",
+   "Property"
+  ]
+ },
+ {
+  "key": "已操作",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "lib/feishu/gateway.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "操作成功：{0}",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/feishu/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "App ID 与 App Secret 未配置",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "lib/feishu/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "请填写完整的 App ID 和 App Secret",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "lib/feishu/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "[文件: {0}]",
+  "n": 4,
+  "len": 9,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/qq/node.js",
+   "lib/telegram/node.js",
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "ArrowFunctionExpression"
+  ]
+ },
+ {
+  "key": "⚠️ 操作权限确认 (#{0})",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/feishu/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "| 项目 | 详情 |",
+  "n": 3,
+  "len": 11,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **调用工具** | `{0}` |",
+  "n": 3,
+  "len": 20,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **申请原因** | {0} |",
+  "n": 3,
+  "len": 18,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **等待超时** | {0} 分钟 (超时自动拒绝) |",
+  "n": 3,
+  "len": 30,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "✓ 批准执行",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "✕ 拒绝执行",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "## ⚠️ 操作权限确认 (#{0})",
+  "n": 2,
+  "len": 19,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "> 回复 `/yes` (或 `1`) 批准执行",
+  "n": 2,
+  "len": 24,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "> 回复 `/no` (或 `2`) 拒绝执行",
+  "n": 2,
+  "len": 23,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "✓ **已批准执行**",
+  "n": 2,
+  "len": 11,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "❌ **已拒绝执行**",
+  "n": 2,
+  "len": 11,
+  "files": [
+   "lib/feishu/node.js",
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "以太网",
+  "n": 2,
+  "len": 3,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": " (Wi-Fi 无线网卡)",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": " (有线网卡)",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": " (虚拟网卡 / WSL / 虚拟机)",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "无效请求",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "需要访问认证，请先登录",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "代理请求失败: %s",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:error"
+  ]
+ },
+ {
+  "key": "dsh-bridge: 无法连接 dsh web (127.0.0.1:{0}) — {1}",
+  "n": 1,
+  "len": 46,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:end"
+  ]
+ },
+ {
+  "key": "dsh-bridge: 代理已启动 0.0.0.0:%d -> 127.0.0.1:%d",
+  "n": 1,
+  "len": 44,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "退出码 {0}",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "dsh-bridge: 探测 DSH 版本失败: %s",
+  "n": 1,
+  "len": 27,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:debug"
+  ]
+ },
+ {
+  "key": "局域网选定 IP 更新为: %s",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "自动推荐",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "仅支持 http/https",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "请输入合法的公网隧道地址（https://...）",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "自建隧道已在运行",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "缺少配置：请在控制台配置 customTunnel.serverUrl 和 customTunnel.accessToken",
+  "n": 1,
+  "len": 62,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "Cloudflare 隧道已在运行",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "未找到 dsh 命令（可能通过源码/打包方式运行，非 npm 全局安装）",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "dsh 非标准 npm 全局安装（Electron/打包/源码/pnpm 等），无法自动升级；请按官方渠道手动更新",
+  "n": 1,
+  "len": 57,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "探测 dsh 安装形态失败，请按官方渠道手动更新",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "请求超时",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "检查失败",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "非法的版本号格式: {0}",
+  "n": 2,
+  "len": 13,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "进程退出码 {0}",
+  "n": 2,
+  "len": 9,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "升级成功",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "升级命令执行失败",
+  "n": 2,
+  "len": 8,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "当前 DSH 为非 npm 全局安装，无法自动升级；请按官方渠道手动更新",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "dsh-bridge: DSH 升级命令成功: %s %s",
+  "n": 1,
+  "len": 29,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "收到 DSH 重启请求，正在调度重启...",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:info"
+  ]
+ },
+ {
+  "key": "派生重启进程失败: %s，执行直接退出",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:error"
+  ]
+ },
+ {
+  "key": "DSH 服务正在重启中，前端将在几秒后自动重新连接…",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "缺少工作区目录路径",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "路径安全校验未通过",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "workspaceRegistry.create 失败: %s",
+  "n": 1,
+  "len": 31,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "workspaceRegistry.add 失败: %s",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "workspaceRegistry.register 失败: %s",
+  "n": 1,
+  "len": 33,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "sessions.create 初始化 session 提示: %s",
+  "n": 1,
+  "len": 34,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:debug"
+  ]
+ },
+ {
+  "key": "🏠 用户主目录",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "💻 桌面",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "📁 文档",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "📥 下载",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "{0}: 盘",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "C: 盘",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "根目录 /",
+  "n": 2,
+  "len": 5,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "读取文件夹失败: {0}",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "本地反向代理端口 ({0})",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "正常运行中 (代理目标端口: {0})",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "代理未启动",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "局域网 IP 分配与可用性",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "检测到有效局域网 IPv4: {0}",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "未检测到活跃局域网 IPv4 地址 (可能未连接 Wi-Fi/以太网)",
+  "n": 1,
+  "len": 35,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "连接超时 (3.5s)",
+  "n": 2,
+  "len": 11,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "Cloudflare Anycast 边缘网络",
+  "n": 2,
+  "len": 23,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "连接畅通 (延迟 {0}ms)",
+  "n": 2,
+  "len": 15,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "连接异常: {0} (临时公网隧道可能受阻)",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "国内 npm 高速镜像源 (npmmirror)",
+  "n": 2,
+  "len": 24,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "连接超时或异常: {0}",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "连接超时 (4.0s)",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "自建隧道部署服务器 ({0}{1})",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "服务器连通良好 (延迟 {0}ms · 状态: {1})",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "自建隧道部署服务器 ({0})",
+  "n": 2,
+  "len": 15,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "客户端在线运行中 (WebSocket 通道已建立)",
+  "n": 1,
+  "len": 26,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "无法连通自建服务器: {0}",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "自建隧道部署服务器",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "未配置自建服务器（若已部署自建隧道可在「公网隧道」中配置）",
+  "n": 1,
+  "len": 29,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "dsh-bridge: 当前 Node %s 缺少 AbortSignal.any/timeout，已安装兼容垫片。建议升级 Node 至 22.19+ 或 24+（见 package.json engines）。",
+  "n": 1,
+  "len": 107,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "dsh-bridge: [保命救急] 检测到 reset-auth 标记文件，已成功重置所有访问密码与安全策略！",
+  "n": 1,
+  "len": 56,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "无效的备份数据结构：缺少 config 节点",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "配置已成功导入并刷新生效！",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "❌ **无效会话编号**：`{0}`\n\n> 可用编号范围：`1 – {1}`（发送 `/sessions` 查看会话列表）",
+  "n": 1,
+  "len": 61,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "\n- **标题**：{0}",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ **已切换到会话 #{0}**{1}\n- **会话 ID**：`{2}`",
+  "n": 1,
+  "len": 38,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **当前没有活动会话**\n\n> 请先使用 `/sessions` 查看会话列表并通过 `/use 编号` 切换到目标会话，或通过 `/new <提示词>` 创建新会话。",
+  "n": 1,
+  "len": 86,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **缺少新标题参数**\n\n> 用法：`/rename <新标题>`\n> 示例：`/rename 优化登录交互逻辑`",
+  "n": 1,
+  "len": 59,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "✓ **会话重命名成功**\n- **会话 ID**：`{0}`\n- **新标题**：{1}",
+  "n": 1,
+  "len": 45,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **重命名失败**：{0}",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "## 🗂️ 可用工作区\n\n> 当前没有已注册的工作区。可使用 `/new <提示词> @<路径>` 指定项目目录。",
+  "n": 1,
+  "len": 58,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "## 🗂️ 可用工作区 (共 {0} 个)",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "> 新建会话：发送 `/new <提示词> @序号` 或 `/new <提示词> @路径`",
+  "n": 1,
+  "len": 45,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| 序号 | 工作区名称 | 目录路径 |",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "❌ **缺少工作区路径**\n\n> 用法：`/addworkspace <电脑绝对路径>`\n> 示例：`/addworkspace D:\\IdeaProjects\\my-app`",
+  "n": 1,
+  "len": 88,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "⚠️ **{0}**：`{1}`\n\n> 出于安全考虑，禁止将系统关键目录或敏感配置文件所在路径登记为工作区。",
+  "n": 1,
+  "len": 54,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "✓ **工作区添加成功**！",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "- **名称**：{0}",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "- **路径**：`{0}`",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "- **快捷编号**：`{0}`",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "> 发送 `/new <提示词> {0}` 即可直接在此工作区创建会话。",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "❌ **添加工作区失败**：{0}",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **无效工作区编号**：`{0}`\n\n> 请发送 `/workspaces` 查看可用工作区列表与编号。",
+  "n": 1,
+  "len": 54,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "ℹ️ **当前没有正在运行的 Agent 任务**",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "⏹ **已请求停止当前任务**",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "✓ **已结束当前会话**（没有活动会话）。\n\n> **后续操作**：\n> - `/new <提示词>` — 新建会话并开始\n> - `/sessions` — 查看历史会话列表\n> - `/help` — 查看常用指令帮助",
+  "n": 1,
+  "len": 112,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "## 📊 Agent 状态看板\n\n> 当前没有活动会话。\n> 发送 `/new <提示词>` 开始新任务，或发送 `/sessions` 查看已有会话。",
+  "n": 1,
+  "len": 77,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "空闲 (idle)",
+  "n": 2,
+  "len": 9,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "Property",
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "运行中 (running)",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "已暂停 (paused)",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "异常 (error)",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "尚未运行",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "## 📊 Agent 状态看板",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| 属性 | 当前状态 / 参数 |",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **会话 ID** | `{0}` |",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **会话标题** | {0} |",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **工作区** | `{0}` |",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **Agent 状态** | {0} |",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **累计事件** | {0} 条 |",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| **最近执行** | {0} |",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "❌ **未知指令**：`/{0}`\n\n{1}",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/platform/commands.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "{0} 次工具调用",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "思考中",
+  "n": 1,
+  "len": 3,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": " | 最近: {0}",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "[处理中] 第 {0} 轮 | {1}{2}",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "IM客户端",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "{0}\n\n<!-- [dsh-bridge 提示] 当前用户正通过【{1}】与你对话。若用户明确要求发送、导出或传送文件/图片/报表/代码脚本产物，请在本地生成/准备好文件后，在回复正文中附带明确发送指令：\n[SEND_FILE: <本地文件绝对路径>]\n例如：[SEND_FILE: C:\\path\\to\\report.xlsx]\n网关会自动解析该指令并将该文件直传至用户的聊天窗口，且在聊天文本中自动隐藏该指令。在日常编写代码、回复普通文本或未请求发送文件时，请勿输出此指令。 -->",
+  "n": 2,
+  "len": 244,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "\n- **工作区**：`{0}`",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "\n\n> 💡 发送任意消息即可直接与 Agent 对话。",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ **已创建新会话**\n- **会话 ID**：`{0}`{1}{2}",
+  "n": 1,
+  "len": 36,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **创建会话失败**：{0}",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **恢复会话失败**：{0}\n\n> 发送 `/new <提示词>` 可新建一个会话。",
+  "n": 1,
+  "len": 44,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "> 💤 **当前没有活动会话**\n> 发送 `/new <提示词>` 开始新会话，或发送 `/sessions` 查看已有会话。",
+  "n": 1,
+  "len": 65,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **执行出错**：{0}",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "❌ **处理出错**：{0}",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "⏹ **任务已停止**",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "⚠️ **达到模型单轮输出上限，本轮内容已截断**",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "lib/platform/conversation-bridge.js"
+  ],
+  "ctx": [
+   "call:sendText"
+  ]
+ },
+ {
+  "key": "[dsh-bridge] PlatformManager.register: 平台缺少 id，已忽略",
+  "n": 1,
+  "len": 50,
+  "files": [
+   "lib/platform/manager.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "\n\n[已截断：内容过长]",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/platform/message-split.js"
+  ],
+  "ctx": [
+   "cmp:+"
+  ]
+ },
+ {
+  "key": "新会话 (待输入)",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "\n- *…等共 {0} 个工作区*",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "❌ **路径不在已注册工作区列表中**：`{0}`\n\n**可用工作区：**\n{1}{2}\n\n> 提示：发送 `/workspaces` 查看完整列表",
+  "n": 1,
+  "len": 74,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "❌ **工作区目录不存在**：`{0}`",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "未分组会话",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "(未指定)",
+  "n": 8,
+  "len": 5,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "LogicalExpression",
+   "cmp:===",
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "未指定工作区",
+  "n": 3,
+  "len": 6,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "活跃会话",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "✓ 已完成",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "❌ 出错",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "⏹ 已停止",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "⚠️ 已阻塞",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "⚠️ 输出截断",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "⚡ 已中断",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "## 📋 会话列表\n\n> 暂无历史会话。发送 `/new <提示词>` 开始新会话。",
+  "n": 1,
+  "len": 43,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ReturnStatement"
+  ]
+ },
+ {
+  "key": "## 📋 会话列表 (共 {0} 个)",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "> 切换会话：发送 `/use 编号` 或 `/resume 编号`",
+  "n": 1,
+  "len": 34,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "📁 未指定工作区",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "| 序号 | 会话标题 / 摘要 | 时间 | 状态 |",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "`[当前]`",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "*…该工作区共 {0} 个会话，仅显示前 20 个（编号保持全列表序号，可用 /use 直接切换）*",
+  "n": 1,
+  "len": 50,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "*…共 {0} 个会话，仅显示前 50 个*",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "## 🤖 常用指令帮助",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "### 💬 会话控制",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| 指令 | 说明 | 示例 |",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/sessions` | 查看所有会话表格列表 | `/sessions` 或 `/list` |",
+  "n": 1,
+  "len": 52,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/use <编号>` | 切换到指定编号会话 | `/use 1` 或 `/resume 1` |",
+  "n": 1,
+  "len": 52,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/new <提示词>` | 在当前工作区新建会话 | `/new 帮我写个脚本` |",
+  "n": 1,
+  "len": 45,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/new <词> @N` | 在指定工作区新建会话 | `/new 帮我写个脚本 @1` |",
+  "n": 1,
+  "len": 49,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/rename <新标题>` | 重命名当前活动会话 | `/rename 优化登录交互` |",
+  "n": 1,
+  "len": 50,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/stop` | 中断停止当前正在执行的任务 | `/stop` |",
+  "n": 1,
+  "len": 37,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/end` | 结束当前会话（回到空闲） | `/end` |",
+  "n": 1,
+  "len": 34,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "### 📁 环境与状态",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| 指令 | 说明 |",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/workspaces` | 查看可用工作区表格列表 |",
+  "n": 1,
+  "len": 31,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/addworkspace <路径>` | 注册添加新的电脑工作区目录 |",
+  "n": 1,
+  "len": 40,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/status` | 查看 Agent 运行状态看板 |",
+  "n": 1,
+  "len": 31,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/help` | 查看此帮助菜单 |",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "### 🔐 权限确认",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| 指令 | 快捷数字 | 说明 |",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/yes` | `1` | 批准当前工具执行请求 |",
+  "n": 1,
+  "len": 29,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "| `/no` | `2` | 拒绝当前工具执行请求 |",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/platform/session-catalog.js"
+  ],
+  "ctx": [
+   "ArrayExpression"
+  ]
+ },
+ {
+  "key": "QQ Bot 缺少 AppID 或 ClientSecret",
+  "n": 1,
+  "len": 30,
+  "files": [
+   "lib/qq/gateway.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "QQ Bot 未返回 access_token",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "lib/qq/gateway.js"
+  ],
+  "ctx": [
+   "NewExpression"
+  ]
+ },
+ {
+  "key": "请先在配置面板填写 QQ 开放平台的 AppID 与 ClientSecret",
+  "n": 1,
+  "len": 39,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "新建对话",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "查看会话列表",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "恢复会话",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "切换会话",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "命令帮助",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "lib/qq/index.js",
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property",
+   "call:includes"
+  ]
+ },
+ {
+  "key": "新建",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "列表",
+  "n": 1,
+  "len": 2,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "帮助",
+  "n": 2,
+  "len": 2,
+  "files": [
+   "lib/qq/index.js",
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "dsh-bridge 常用命令",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "lib/qq/index.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "没有活动会话",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "恢复会话失败",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "🆕 新建会话",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "请升级QQ客户端后使用",
+  "n": 5,
+  "len": 11,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "📋 会话列表",
+  "n": 3,
+  "len": 7,
+  "files": [
+   "lib/qq/node.js",
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "会话列表",
+  "n": 2,
+  "len": 4,
+  "files": [
+   "lib/qq/node.js",
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property",
+   "call:includes"
+  ]
+ },
+ {
+  "key": "❓ 帮助",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "操作权限确认",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "已批准执行",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "已拒绝执行",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/qq/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "路径不能为空",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "非法路径字符 (Null byte)",
+  "n": 1,
+  "len": 18,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "路径解析失败: {0}",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全拦截：禁止访问系统敏感目录 ({0})",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全拦截：禁止访问 UNC 网络共享路径",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全拦截：禁止访问系统关键目录 ({0})",
+  "n": 1,
+  "len": 21,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全拦截：禁止访问敏感配置目录「{0}」",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "指定路径不是文件夹: {0}",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "无法访问指定路径 ({0})",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全拦截：符号链接指向系统敏感目录 ({0})",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全拦截：符号链接指向系统关键目录 ({0})",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "安全拦截：符号链接指向敏感配置目录「{0}」",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/security/path-validator.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "新建会话并开始执行 (/new <提示词>)",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "列出所有会话列表与切换",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "切换活动会话 (/use <N>)",
+  "n": 1,
+  "len": 17,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "列出本地所有可用工作区",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "查看 Agent 状态与会话摘要",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "停止当前正在运行的任务",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "结束当前活动会话",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "显示快捷按键与完整帮助",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/telegram/gateway.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "Telegram Bot Token 未配置",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/telegram/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "连接 Telegram API 失败，请检查 Bot Token 或网络代理",
+  "n": 1,
+  "len": 38,
+  "files": [
+   "lib/telegram/index.js"
+  ],
+  "ctx": [
+   "call:setStatus"
+  ]
+ },
+ {
+  "key": "请填写完整的 Telegram Bot Token",
+  "n": 1,
+  "len": 25,
+  "files": [
+   "lib/telegram/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "已配置 Token",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/telegram/index.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✓ 操作已批准",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "✕ 操作已拒绝",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "⚠️ 该审批已处理或已过期",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "call:answerCallbackQuery"
+  ]
+ },
+ {
+  "key": "⚡ 执行: /{0}",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "call:answerCallbackQuery"
+  ]
+ },
+ {
+  "key": "/new <提示词>",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "📁 工作区",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "📊 运行状态",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "⏹ 停止任务",
+  "n": 2,
+  "len": 6,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "Agent 状态",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "无活动会话",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "🔄 刷新状态",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "🚪 结束会话",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "可用会话",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "call:includes"
+  ]
+ },
+ {
+  "key": "📁 可用工作区",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "📊 查看状态",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/telegram/node.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "contextTokens Map 过大 ({0})，清理旧数据",
+  "n": 1,
+  "len": 32,
+  "files": [
+   "lib/wechat/gateway.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ },
+ {
+  "key": "二维码已过期，正在刷新…",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/wechat/index.js"
+  ],
+  "ctx": [
+   "Property"
+  ]
+ },
+ {
+  "key": "登录失败或超时",
+  "n": 1,
+  "len": 7,
+  "files": [
+   "lib/wechat/index.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "未知错误",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "LogicalExpression"
+  ]
+ },
+ {
+  "key": "媒体处理失败: {0}",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "媒体消息处理失败",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "ConditionalExpression"
+  ]
+ },
+ {
+  "key": "\n调试信息:\n{0}",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "AssignmentExpression"
+  ]
+ },
+ {
+  "key": "图片项缺少 image_item",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "图片缺 aes_key，字段: {0}",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "media 类型: {0}, param={1}",
+  "n": 1,
+  "len": 24,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "成功: {0} 字节",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "下载返回 null",
+  "n": 1,
+  "len": 9,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "文件项缺少 file_item",
+  "n": 1,
+  "len": 15,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "文件缺 media/encrypt_query_param，字段: {0}",
+  "n": 1,
+  "len": 37,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "文件缺 aes_key，字段: {0}",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "文件成功: {0} 字节",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "文件下载返回 null",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "视频项缺少 video_item",
+  "n": 1,
+  "len": 16,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "视频缺 media/encrypt_query_param，字段: {0}",
+  "n": 1,
+  "len": 37,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "视频缺 aes_key，字段: {0}",
+  "n": 1,
+  "len": 19,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "视频成功: {0} 字节",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "视频下载返回 null",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:push"
+  ]
+ },
+ {
+  "key": "处理媒体项 type={0} 失败: {1}",
+  "n": 1,
+  "len": 22,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "VariableDeclarator"
+  ]
+ },
+ {
+  "key": "[dsh-bridge wechat] media item aes_key 无法解析: {0}...",
+  "n": 1,
+  "len": 51,
+  "files": [
+   "lib/wechat/node.js"
+  ],
+  "ctx": [
+   "call:warn"
+  ]
+ }
+]

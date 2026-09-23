@@ -1,0 +1,39 @@
+{
+  "_": "Копия этого файла с именем config.json — единственное место, где живут личные значения. Всё остальное в репозитории обезличено.",
+  "windowsRoot": "F:\\Harness_AI",
+  "_windowsRoot": "Куда на Windows лягут модели, llama.cpp, логи и скрипты запуска. Нужно ~40 ГБ свободного места (модель + сборка).",
+  "wslDistro": "Ubuntu",
+  "_wslDistro": "Имя дистрибутива WSL2. Установщик создаст его, если такого нет.",
+  "harnessTag": "",
+  "_harnessTag": "Пусто = брать тег из stand.lock.json (проверенная связка). Задавайте только если сознательно ставите другую версию.",
+  "webPort": 3080,
+  "modelPort": 8080,
+  "_ports": "webPort — интерфейс DSH; modelPort — llama-server. Порт модели слушается на 0.0.0.0, чтобы WSL достучался до Windows.",
+  "tunnel": {
+    "enabled": false,
+    "domain": "",
+    "_": "Доступ с телефона через Cloudflare Tunnel. Пустой домен = туннель не настраивается, стенд работает только в локальной сети."
+  },
+  "model": {
+    "file": "Qwen3.8-27B-UD-Q3_K_XL.gguf",
+    "repo": "unsloth/Qwen3.8-27B-GGUF",
+    "mmproj": "mmproj-F16.gguf",
+    "_": "Что скачать. Мастер windows/20-model.ps1 подберёт это под вашу видеокарту сам; здесь — то, под что настроен репозиторий (RTX 5080, 16 ГБ)."
+  },
+  "server": {
+    "ctx": 65536,
+    "cacheType": "q4_0",
+    "specDraftNMax": 3,
+    "reasoningEffort": "medium",
+    "reasoningBudget": 5000,
+    "_": "Настройка llama-server. Мастер windows/30-tune.ps1 пересчитает ctx под объём вашей видеопамяти и проверит замером."
+  },
+  "features": {
+    "mobileBridge": true,
+    "betterSidebar": true,
+    "officePreview": true,
+    "graphMemory": true,
+    "turnRewind": true,
+    "_": "Какие плагины ставить. Патч-слои применяются только к включённым."
+  }
+}

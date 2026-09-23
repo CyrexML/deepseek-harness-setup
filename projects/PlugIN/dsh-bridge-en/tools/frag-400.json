@@ -1,0 +1,23 @@
+[
+["<!-- 移动端顶部下拉指示条 -->", "<!-- Mobile top drag indicator -->"],
+["<!-- 弹窗顶部标题栏 -->", "<!-- Modal title bar -->"],
+["选择电脑工作区", "Select a workspace on the computer"],
+["点击进入文件夹，或点击「+ 选为工作区」直接添加并切换", "Tap a folder to enter it, or tap \"+ Use as workspace\" to add and switch directly"],
+["<!-- 管理权限解锁块（远程访问需要管理密码；local_only 策略下不显示，仅提示） -->", "<!-- Admin unlock block (remote access needs the admin password; hidden under local_only policy, hint only) -->"],
+["<!-- 提示信息横幅 -->", "<!-- Notice banner -->"],
+["<!-- 快速直达与磁盘横向滑动栏 (极简省空间) -->", "<!-- Quick-access & drives horizontal scroll bar (compact) -->"],
+["<!-- 交互式面包屑路径导航条 (Breadcrumbs Bar) -->", "<!-- Interactive breadcrumbs bar -->"],
+["title=\"刷新目录\"", "title=\"Refresh directory\""],
+["<!-- 当前所在目录确认卡片 (Primary Action Card) -->", "<!-- Current directory confirmation card (Primary Action Card) -->"],
+["当前目录:", "Current directory:"],
+["<!-- 子目录列表与过滤栏 -->", "<!-- Subdirectory list & filter bar -->"],
+["<!-- 实时过滤搜索框 -->", "<!-- Live filter input -->"],
+["placeholder=\"过滤子文件夹…\"", "placeholder=\"Filter subfolders…\""],
+["{10} 个文件夹", "{10} folders"],
+["<!-- 子文件夹滚动列表 (移动端舒适大点按区域) -->", "<!-- Scrollable subfolder list (large tap targets for mobile) -->"],
+["<!-- 手动输入路径折叠区 -->", "<!-- Collapsible manual path input -->"],
+["<!-- 已在 DSH 注册的工作区展示 (支持一键切换) -->", "<!-- Workspaces already registered in DSH (one-tap switch) -->"],
+["<!-- 弹窗底部操作条 -->", "<!-- Modal footer bar -->"],
+["💡 点击文件夹可逐级进入", "💡 Tap a folder to drill down"],
+[">关闭</button>", ">Close</button>"]
+]

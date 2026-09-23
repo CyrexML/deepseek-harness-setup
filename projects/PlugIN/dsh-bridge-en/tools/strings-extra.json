@@ -1,0 +1,263 @@
+[
+ {
+  "key": "(✓ 已设置访客密码)",
+  "n": 1,
+  "len": 11,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "(⚠️ 尚未设置密码，直接输入 IP 将免密)",
+  "n": 1,
+  "len": 23,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "(✓ 已设置独立管理密码)",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "(未单独设置，默认使用上述访客访问密码)",
+  "n": 1,
+  "len": 20,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n        <div style=\"padding: 14px 16px; background: var(--dsw-alias-state-warn-bg, #fffbeb); border-bottom: 1px solid var(--dsw-alias-state-warn-border, #fde68a); flex-shrink: 0;\">\n          <div style=\"font-size: 12px; font-weight: 600; color: var(--dsw-alias-state-warn-primary, #92400e); margin-bottom: 6px;\">🔒 此操作需要管理员权限</div>\n          <div style=\"font-size: 11px; color: var(--dsw-alias-label-secondary, #6b7280); margin-bottom: 8px; line-height: 1.5;\">远程访问时浏览/添加工作区需输入后台管理密码解锁（与访问密码不同）。</div>\n          <form id=\"dsh-ws-unlock-form\" style=\"display: flex; gap: 8px;\">\n            <input id=\"dsh-ws-unlock-input\" type=\"password\" placeholder=\"请输入后台管理密码\" value=\"{0}\"\n              style=\"flex: 1; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, currentColor); outline: none; box-sizing: border-box;\" />\n            <button type=\"submit\" style=\"border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; border-radius: 8px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;\" {1}>{2}</button>\n          </form>\n          {3}\n        </div>\n      ",
+  "n": 1,
+  "len": 1264,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "解锁中…",
+  "n": 1,
+  "len": 4,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n              <button id=\"dsh-ws-up-btn\" data-path=\"{0}\" title=\"返回上一级\" style=\"border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 2px;\">\n                ⬆️ 上级\n              </button>\n            ",
+  "n": 1,
+  "len": 432,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "正在添加并切换…",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "👉 设为当前工作区并进入",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n              <div style=\"padding: 32px; text-align: center; font-size: 12px; color: var(--dsw-alias-label-tertiary, #6b7280); display: flex; flex-direction: column; align-items: center; gap: 6px;\">\n                <span style=\"font-size: 20px;\">⏳</span>\n                <span>正在读取目录内容…</span>\n              </div>\n            ",
+  "n": 1,
+  "len": 328,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n              <div style=\"padding: 26px 16px; text-align: center; font-size: 12px; color: var(--dsw-alias-label-tertiary, #6b7280); display: flex; flex-direction: column; align-items: center; gap: 4px;\">\n                <span style=\"font-size: 22px;\">📁</span>\n                <span>{0}</span>\n                <span style=\"font-size: 11px; color: var(--dsw-alias-label-tertiary, #9ca3af);\">（直接点击上方蓝色按钮即可进入当前目录）</span>\n              </div>\n            ",
+  "n": 1,
+  "len": 452,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "未找到匹配的子文件夹",
+  "n": 1,
+  "len": 10,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "当前文件夹下没有更多子文件夹",
+  "n": 1,
+  "len": 14,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n              <div class=\"dsh-ws-entry-row\" data-path=\"{0}\" style=\"display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--dsw-alias-border-l2, #f3f4f6); cursor: pointer; font-size: 12px; transition: background 0.1s; min-height: 40px;\">\n                <div class=\"dsh-ws-drill-btn\" data-path=\"{1}\" style=\"display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding: 2px 0;\">\n                  <span style=\"font-size: 16px; flex-shrink: 0;\">📁</span>\n                  <span style=\"font-family: ui-monospace, Menlo, monospace; font-weight: 500; color: var(--dsw-alias-label-primary, #111827); overflow: hidden; text-overflow: ellipsis;\">{2}</span>\n                  <span style=\"color: var(--dsw-alias-label-tertiary, #9ca3af); font-size: 12px; margin-left: 2px; flex-shrink: 0;\">›</span>\n                </div>\n                <button class=\"dsh-ws-pick-entry-btn\" data-path=\"{3}\" title=\"直接添加此子文件夹为工作区并进入\" style=\"border: 1px solid var(--dsw-alias-state-success-border, #a7f3d0); background: var(--dsw-alias-state-success-bg, #ecfdf5); color: var(--dsw-alias-state-success-primary, #059669); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; margin-left: 8px; white-space: nowrap; transition: all 0.1s;\">\n                  + 选为工作区\n                </button>\n              </div>\n            ",
+  "n": 1,
+  "len": 1531,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "▼ 收起绝对路径手动输入",
+  "n": 1,
+  "len": 12,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "▶ 手动粘贴/输入绝对路径",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n            <div style=\"margin-top: 6px; display: flex; gap: 6px;\">\n              <input id=\"dsh-ws-manual-input\" type=\"text\" value=\"{0}\" placeholder=\"输入电脑绝对路径，例如 C:\\Projects\\my-app\" style=\"flex: 1; font-family: ui-monospace, Menlo, monospace; font-size: 11px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); outline: none;\" />\n              <button id=\"dsh-ws-manual-jump-btn\" style=\"border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-2, #f9fafb); color: var(--dsw-alias-label-primary, #111827); padding: 0 10px; border-radius: 8px; font-size: 11px; cursor: pointer; white-space: nowrap;\">\n                前往\n              </button>\n              <button id=\"dsh-ws-manual-add-btn\" style=\"border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; padding: 0 12px; border-radius: 8px; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;\">\n                添加并进入\n              </button>\n            </div>\n          ",
+  "n": 1,
+  "len": 1135,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n          <div style=\"padding-top: 2px;\">\n            <div style=\"font-size: 11px; font-weight: 600; color: var(--dsw-alias-label-tertiary, #6b7280); margin-bottom: 4px;\">已注册工作区 ({0} 个，点击直接切换)：</div>\n            <div style=\"display: flex; flex-direction: column; gap: 4px; max-height: 80px; overflow-y: auto;\">\n              {1}\n            </div>\n          </div>\n        ",
+  "n": 1,
+  "len": 374,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "\n                <div class=\"dsh-ws-registered-row\" data-ws-id=\"{0}\" data-ws-path=\"{1}\" style=\"display: flex; align-items: center; justify-content: space-between; background: var(--dsw-alias-bg-layer-2, #f9fafb); border: 1px solid var(--dsw-alias-border-l2, #e5e7eb); border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: background 0.1s;\">\n                  <div style=\"overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;\">\n                    <span style=\"font-weight: 600; color: var(--dsw-alias-brand-primary, #4f6ef7);\">@{2} {3}</span>\n                    <span style=\"color: var(--dsw-alias-label-tertiary, #6b7280); margin-left: 6px; font-family: ui-monospace, Menlo, monospace; font-size: 10px;\">{4}</span>\n                  </div>\n                  <button class=\"dsh-ws-switch-btn\" data-ws-id=\"{5}\" data-ws-path=\"{6}\" style=\"border: 1px solid var(--dsw-alias-brand-primary, #4f6ef7); background: var(--dsw-alias-state-info-bg, #eff6ff); color: var(--dsw-alias-brand-primary, #4f6ef7); padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; flex-shrink: 0; margin-left: 6px; white-space: nowrap;\">\n                    进入 ➔\n                  </button>\n                </div>\n              ",
+  "n": 1,
+  "len": 1283,
+  "files": [
+   "client/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "仅凭专属 Token 进入 · 无 Token 将无法访问",
+  "n": 1,
+  "len": 29,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "当前为免密开放状态 · 请管理员尽快在控制台设置访问密码",
+  "n": 1,
+  "len": 28,
+  "files": [
+   "lib/auth/login-template.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "配置错误（",
+  "n": 1,
+  "len": 5,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "请检查 Token 与参数",
+  "n": 1,
+  "len": 13,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "cloudflared 退出，code={0} signal={1}",
+  "n": 1,
+  "len": 34,
+  "files": [
+   "lib/cloudflared-manager.mjs"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "客户端在线运行中",
+  "n": 1,
+  "len": 8,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "待连接/就绪",
+  "n": 1,
+  "len": 6,
+  "files": [
+   "lib/index.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "dsh-bridge: 检测到宿主 DSH 的 connection RPC 注册回归（cannot get property \"webServer\" without inject，",
+  "n": 1,
+  "len": 91,
+  "files": [
+   "lib/connection-compat.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "见 dsh-client-connection 的 register()）；已用 webServer 解析兜底完成通道注册。",
+  "n": 1,
+  "len": 62,
+  "files": [
+   "lib/connection-compat.js"
+  ],
+  "ctx": []
+ },
+ {
+  "key": "此为宿主侧问题（DSH 0.1.5-alpha.1 起），插件侧垫片会在上游修复后自动空转。",
+  "n": 1,
+  "len": 46,
+  "files": [
+   "lib/connection-compat.js"
+  ],
+  "ctx": []
+ }
+]

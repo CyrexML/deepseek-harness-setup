@@ -1,0 +1,23 @@
+{
+ "1000": "(✓ visitor password set)",
+ "1001": "(⚠️ no password set; entering the IP directly needs no password)",
+ "1002": "(✓ separate admin password set)",
+ "1003": "(not set separately; the visitor access password above is used by default)",
+ "1005": "Unlocking…",
+ "1007": "Adding and switching…",
+ "1008": "👉 Set as current workspace and enter",
+ "1011": "No matching subfolders found",
+ "1012": "No more subfolders in this folder",
+ "1014": "▼ Hide manual absolute path input",
+ "1015": "▶ Paste/type an absolute path manually",
+ "1019": "Entry with dedicated Token only · no access without a Token",
+ "1020": "Currently open access · the administrator should set an access password in the console as soon as possible",
+ "1021": "Configuration error (",
+ "1022": "check the Token and parameters",
+ "1023": "cloudflared exited, code={0} signal={1}",
+ "1024": "Client online",
+ "1025": "Waiting for connection / ready",
+ "1026": "dsh-bridge: detected a connection RPC registration regression in the DSH host (cannot get property \"webServer\" without inject, ",
+ "1027": "see register() in dsh-client-connection); the channel was registered using the webServer resolution fallback. ",
+ "1028": "This is a host-side issue (since DSH 0.1.5-alpha.1); the plugin-side shim becomes a no-op once it is fixed upstream."
+}

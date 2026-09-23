@@ -1,0 +1,111 @@
+[
+ {
+  "key": "（未识别到 cloudflared metrics 地址），连接器若静默假死将无法自动发现",
+  "where": [
+   "lib/cloudflared-manager.mjs:801",
+   "lib/cloudflared-manager.mjs:801",
+   "lib/cloudflared-manager.mjs:801"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "未从 cloudflared 输出识别到 metrics 地址，本次运行跳过健康探活",
+  "where": [
+   "lib/cloudflared-manager.mjs:802",
+   "lib/cloudflared-manager.mjs:802",
+   "lib/cloudflared-manager.mjs:802"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "（连接器若静默假死将无法自动发现，请检查 cloudflared 版本是否变更了 metrics 日志文案）",
+  "where": [
+   "lib/cloudflared-manager.mjs:803",
+   "lib/cloudflared-manager.mjs:803",
+   "lib/cloudflared-manager.mjs:803"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "隧道健康探活连续 %d 次失败（%s）：连接器可能已无健康边缘连接，",
+  "where": [
+   "lib/cloudflared-manager.mjs:870",
+   "lib/cloudflared-manager.mjs:870",
+   "lib/cloudflared-manager.mjs:870"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "转入降级观察，达 %d 次将强制重建",
+  "where": [
+   "lib/cloudflared-manager.mjs:871",
+   "lib/cloudflared-manager.mjs:871",
+   "lib/cloudflared-manager.mjs:871"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "健康探活连续 {0} 次失败：连接器已无健康边缘连接，",
+  "where": [
+   "lib/cloudflared-manager.mjs:872",
+   "lib/cloudflared-manager.mjs:872",
+   "lib/cloudflared-manager.mjs:872"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "正在观察能否自行恢复（{0}/{1}）",
+  "where": [
+   "lib/cloudflared-manager.mjs:873",
+   "lib/cloudflared-manager.mjs:873",
+   "lib/cloudflared-manager.mjs:873"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "隧道连接器连续 %d 次探活失败（约 %d 分钟）：判定为假死，",
+  "where": [
+   "lib/cloudflared-manager.mjs:885",
+   "lib/cloudflared-manager.mjs:885",
+   "lib/cloudflared-manager.mjs:885"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "终止进程以触发重建；该重建不设终态上限，网络恢复后仍会自愈",
+  "where": [
+   "lib/cloudflared-manager.mjs:886",
+   "lib/cloudflared-manager.mjs:886",
+   "lib/cloudflared-manager.mjs:886"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ },
+ {
+  "key": "{0}；⚠️ 运行时健康探活未启用",
+  "where": [
+   "lib/cloudflared-manager.mjs:800",
+   "lib/cloudflared-manager.mjs:800"
+  ],
+  "ctx": [
+   "cmp"
+  ]
+ }
+]

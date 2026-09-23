@@ -1,0 +1,35 @@
+Этот репозиторий содержит только собственный код: скрипты установки и удаления,
+патч-слои, шаблоны настроек и документацию. Исходники и сборки перечисленных
+ниже проектов здесь НЕ распространяются — установщик берёт их с официальных
+источников (реестр npm, GitHub) на машине пользователя, а патчи накладывает
+локально, уже после установки.
+
+Проекты, поверх которых работает стенд, и их лицензии:
+
+  DeepSeek Harness           MIT           https://github.com/deepseek-ai/deepseek-harness
+  dsh-better-sidebar         MIT           https://github.com/omdsh-dev/DSH-better-sidebar
+  @wenbin_wb/dsh-bridge      MIT           https://github.com/wenbin-wb/dsh-bridge
+  @anionex/dsh-turn-rewind   BSD-3-Clause  https://github.com/Anionex/dsh-turn-rewind
+  dsh-plugin                 MIT           https://github.com/dshplugin/dsh-plugin-hub
+  dsh-univer-office          Apache-2.0    https://github.com/dream-num/dsh-univer-office
+  dsh-context                Apache-2.0    https://github.com/bowenliang123/dsh-context
+  graph-memory               MIT           https://github.com/adoresever/graph-memory
+  llama.cpp                  MIT           https://github.com/ggml-org/llama.cpp
+
+Изменения, которые наши скрипты вносят в эти пакеты после установки, описаны
+в README («Зачем патч-слои») и в заголовке каждого скрипта: файл, якорь,
+причина правки. Ни один изменённый файл этих проектов в репозиторий не входит.
+
+Единственное исключение — словари перевода интерфейса моста
+(projects/PlugIN/dsh-bridge-en/tools/strings.json, occ.json, tr-*.json). Это
+СТРОКИ ИНТЕРФЕЙСА, извлечённые из исходников @wenbin_wb/dsh-bridge (MIT), вместе
+с их позициями в файлах и нашими английскими переводами. Без них нельзя заново
+наложить перевод после обновления плагина, поэтому они входят в репозиторий на
+условиях MIT самого плагина: авторство и лицензия указаны выше, изменения (замена
+китайских строк на английские) описаны в projects/PlugIN/dsh-bridge-en/README.md.
+Исполняемого кода плагина в репозитории нет.
+
+Шаблон диалога templates/chat-agent.jinja — производная от шаблона, вшитого в
+модель Qwen3 (Apache-2.0): та же логика с одним изменённым условием, которое
+убирает повтор размышлений из истории. Условие и причина описаны в комментарии
+внутри файла.

@@ -1,0 +1,18 @@
+[
+["<html lang=\"zh-CN\">", "<html lang=\"en\">"],
+["<title>远程访问认证 - DeepSeek Harness</title>", "<title>Remote Access Authentication - DeepSeek Harness</title>"],
+["<label for=\"password\">访问密码 / PIN 码</label>", "<label for=\"password\">Access password / PIN</label>"],
+["title=\"显示/隐藏密码\"", "title=\"Show/hide password\""],
+["❓ 忘记密码怎么办？", "❓ Forgot your password?"],
+["🛟 找回与重置密码指引：", "🛟 Password recovery & reset guide:"],
+["<div>1. <strong>电脑本机免密直连</strong>：在运行本程序的电脑本机打开本控制台，物理机享有永久免密特权，可直接修改或清除密码。</div>", "<div>1. <strong>Local access on the computer</strong>: open this console directly on the computer running the program; the local machine is permanently exempt from the password and can change or clear it directly.</div>"],
+["2. <strong>服务器 / 无头环境</strong>：救急重置步骤请参见 ", "2. <strong>Server / headless environment</strong>: for emergency reset steps see the \"Triple disaster-recovery safety net\" section of the "],
+[" 的「三重容灾保命体系」章节。</div>", ".</div>"],
+["由 <a href=\"https://github.com/wenbin-wb/dsh-bridge\" target=\"_blank\">dsh-bridge</a> 安全网关守护", "Protected by the <a href=\"https://github.com/wenbin-wb/dsh-bridge\" target=\"_blank\">dsh-bridge</a> security gateway"],
+["btnText.textContent = '验证中…';", "btnText.textContent = 'Verifying…';"],
+["btnText.textContent = '✓ 认证成功，正在跳转…';", "btnText.textContent = '✓ Authenticated, redirecting…';"],
+["errorMsg.textContent = data.error || '访问密码错误';", "errorMsg.textContent = data.error || 'Wrong access password';"],
+["void alert.offsetWidth; // 触发 reflow", "void alert.offsetWidth; // trigger reflow"],
+["btnText.textContent = '解锁并访问';", "btnText.textContent = 'Unlock and access';"],
+["errorMsg.textContent = '网络请求失败，请重试';", "errorMsg.textContent = 'Network request failed, please try again';"]
+]

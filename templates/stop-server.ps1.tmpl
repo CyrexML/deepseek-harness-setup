@@ -1,0 +1,10 @@
+$pidfile = "@ROOT@\run\server.pid"
+if (Test-Path $pidfile) {
+    $serverPid = (Get-Content $pidfile | Select-Object -First 1).Trim()
+    if ($serverPid) {
+        Stop-Process -Id ([int]$serverPid) -Force -ErrorAction SilentlyContinue
+        Write-Host ("stopped PID " + $serverPid)
+    }
+    Remove-Item -Force $pidfile
+} else { Write-Host "no pid file" }
+Get-Process llama-server -ErrorAction SilentlyContinue | Stop-Process -Force

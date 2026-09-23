@@ -1,0 +1,6 @@
+{
+  "name": "dsh-bridge-en-tools",
+  "private": true,
+  "type": "module",
+  "dependencies": { "acorn": "8.15.0", "acorn-walk": "8.3.4", "esbuild": "0.25.5" }
+}

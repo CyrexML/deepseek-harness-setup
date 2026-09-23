@@ -1,0 +1,575 @@
+# The `standard` agent preset: the full coding agent, mounted once per process.
+#
+# This file is an AGENT-PLANE composition. The roster mounts it ONCE under a
+# standing scope; every session naming it joins by scope parentage, so the
+# tools and prompt sections registered here cover each joined agent while a
+# session's own state stays keyed per Session/Agent inside the plugins. The
+# host composition (`base.cordis.yml` + `web.cordis.yml`) keeps everything a
+# preset must not own: the registries themselves, the sandbox and approval
+# stack, persistence, and the model route.
+#
+# A service row here MUST sit inside a group carrying an `isolate` realm.
+# Without one it publishes into the root realm, where it is process-global —
+# another preset publishing the same name collides, and a host reader would
+# resolve one preset's instance for every session; `dsh-agent-presets` rejects
+# that at mount. `true` means an entry-local realm: this standing mount's own
+# private instance, apart from every other preset's. (A shared label does NOT
+# pool instances — `provide()` throws on the second registration under the
+# same realm symbol; labels join REALMS, and are not what this file needs.)
+
+# ── anchored: отложенная выдача схем инструментов ───────────────────────────
+#
+# Перенесено из xiaobright/dsh-anchored-standard (MIT), три модуля из семи.
+# Не взяты: custom-bash (решает проблему Windows/PTY, которой в WSL нет),
+# instruction-hint (гасит инъекцию AGENTS.md — нам она нужна),
+# context-gate (маргинально), skill-search (не взят — см. RESIDENT_DISCOVERY_TOOLS).
+#
+# Эта строка обязана идти ПЕРВОЙ: after-next трансформы waterfall применяются
+# в обратном порядке регистрации, поэтому фильтр каталога должен зарегистри-
+# роваться раньше всех, кто трогает ту же сборку.
+#
+# bootstrapTools — резидентный набор, замеренный по логам сессий 2026-09-09.
+# За 3 440 вызовов инструментов во всех пресетах (этот, standard-th065,
+# встроенный standard, cordis) модель звала только: bash, read, edit, write,
+# grep, glob (20), todo_write (15), ask_user_question (2). Всё остальное —
+# web_search, web_fetch, subagent, subagent_fork, workflow, ralph, skill,
+# exit_plan_mode, *_goal, send_message, interrupt_agent, list_agents,
+# job_kill, cordis_* — ноль вызовов. Поэтому набор совпадает с замеренным
+# спросом, а не с полным каталогом.
+#
+# glob/todo_write/ask_user_question добавлены 2026-09-09. glob до этого стоял
+# только в compactionTools, то есть был доступен ровно один запрос после
+# сжатия и практически отсутствовал. ask_user_question — не удобство, а
+# способность: без него агент не может задать вопрос вообще.
+#
+# Цена: 2 056 -> 2 957 токенов схем на запрос (замер по длине JSON схем из
+# request/header). Полный каталог standard — 6 512, из них 4 037 приходится
+# на инструменты, не вызванные ни разу.
+#
+# dev_tool_search оставлен, но на него больше не рассчитываем: за 9 сессий
+# и 456 вызовов в anchored-пресете он не был вызван НИ РАЗУ, каталог во всех
+# request/header оставался исходным. Разблокировка «в один вызов» —
+# теоретическая; всё, чего нет здесь, для модели отсутствует.
+#
+# compactionTools: после `compaction/end` каталог откатывается к
+# bootstrapTools + это, ровно на один запрос. glob отсюда убран — он теперь
+# резидентный. dev_tool_search оставлен сознательно (в оригинале его тут
+# нет): иначе после каждого сжатия модель до следующего своего сообщения
+# лишена возможности вернуть разблокированное.
+- id: tool-bootstrap
+  name: ./tool-bootstrap.mjs
+  config:
+    # web_fetch добавлен 2026-09-23: без него агент не может прочитать ни одной
+    # ссылки — «всё, чего нет здесь, для модели отсутствует» (см. выше), а
+    # dev_tool_search на практике не вызывается. Схема у него крошечная (один
+    # параметр url). web_search добавляется только когда задан ключ поиска:
+    # провайдер в сборке — deepseek-official с apiKeyEnv DEEPSEEK_API_KEY
+    # (packages/bundle/base/cordis.patch.yml:461), и без ключа инструмент
+    # только тратил бы ход на ошибку.
+    bootstrapTools: !!js "['read', 'write', 'edit', 'bash', 'grep', 'glob', 'todo_write', 'ask_user_question', 'dev_tool_search', 'web_fetch'].concat((process.env.DEEPSEEK_API_KEY || process.env.EXA_API_KEY || process.env.PERPLEXITY_API_KEY) ? ['web_search'] : [])"
+    promoteOn: either
+    includeSubagents: false
+    compactionTools: [dev_tool_search]
+
+- id: dev-tool-search
+  name: ./dev-tool-search.mjs
+
+# ── advisory: цена файла в токенах ──────────────────────────────────────────
+#
+# Правило «keep files small» в ~/.dsh/AGENTS.md не работает по трём причинам:
+# читается один раз в начале и не всплывает на 90-м шаге; написано про
+# СОЗДАНИЕ файлов, а про уже существующий index.html на 1039 строк не говорит
+# ничего; и называет число строк, которое модель не может соотнести с
+# бюджетом. Этот плагин закрывает все три: срабатывает в момент записи,
+# смотрит на текущий размер независимо от того, кто его создал, и сообщает
+# токены и долю рабочего цикла.
+#
+# НИКОГДА НЕ БЛОКИРУЕТ. tools/post-execute идёт ПОСЛЕ записи — блокирующее
+# решение здесь не предотвращает файл, а отвергает результат уже случившейся
+# записи, после чего модель начинает переписывать то, что уже лежит на диске.
+# Плагин всегда делегирует next() и только прикладывает заметку.
+#
+# 450/800 — не «приличная длина файла», а точка, где полное чтение перестаёт
+# быть по карману. Замер по проекту: 450 строк JS ≈ 5 990 токенов (33% цикла
+# 18 368) — нормальный файл; 800 ≈ 10 649 (58%) — уже больше половины цикла;
+# Cooking_APP/index.html на 1 039 строк ≈ 18 423 (100%) — весь цикл целиком,
+# и это та патология, ради которой плагин написан.
+#
+# Заметка выдаётся ОДИН раз на переход уровня для каждого файла в сессии:
+# повторяться на каждой записи она стоила бы больше контекста, чем сам файл.
+#
+# bytesPerToken и cycleTokens — калибровка от 2026-09-10, см. шапку .mjs.
+# Менялись thresholdRatio, retainRatio, потолок пересказа, резидентный
+# каталог или размер AGENTS.md — перемерить и поправить cycleTokens.
+- id: file-size-notice
+  name: ./file-size-notice.mjs
+  config:
+    warnLines: 450
+    urgentLines: 800
+    tools: [write, edit]
+    bytesPerToken: 3.08
+    cycleTokens: 18141
+    # Глобальные исключения: файлы, о которых не сообщать вовсе (данные,
+    # сгенерированное). Шаблоны с `*`, сверяются с путём инструмента.
+    exclude: []
+    # Пометка «файл единый» — ПРОЕКТНАЯ, лежит в самом проекте.
+    #
+    # «Раздели» — неверный совет для длинного, но неделимого кода: цикла
+    # обучения, сгенерированного файла, одного алгоритма. Три файла по 300
+    # строк стоят при чтении ровно столько же, сколько один на 900, если нужен
+    # весь. Настоящая мера там — чтение диапазонами, а не разрезка.
+    #
+    # Проект перечисляет такие файлы в `.dsh-size-exempt` в своём корне (ищется
+    # вверх по дереву): по одному шаблону на строку, `#` — комментарий,
+    # сверяется и с полным путём, и с одним именем файла. Помеченный файл не
+    # получает совета «раздели» и вовсе молчит на уровне warn; на уровне urgent
+    # приходит одна заметка с ценой и советом «открывай grep -n и диапазонами».
+    exemptFileName: .dsh-size-exempt
+    exemptMaxDepth: 12
+
+# ── advisory: цена чтения ───────────────────────────────────────────────────
+#
+# Разрезка index.html на девять модулей не дала ничего: агент прочитал их всё
+# равно. Замер по сессии c47f7d3f (2026-09-10): 9 шагов, 7 чтений, ВСЕ целиком,
+# один grep за прогон; 17 762 токена = 97% цикла против 18 423 у прежнего
+# единого файла. Экономия от всей разрезки — 661 токен, 3,6%.
+#
+# Разрезка дала ВОЗМОЖНОСТЬ читать узко, но не создала ПОВЕДЕНИЯ. Правила
+# «read narrowly» и «do not re-read» в AGENTS.md действовали весь тот прогон.
+# Поэтому здесь то же решение, что и с размером файлов: называть цену в той
+# валюте, которую агент тратит, в момент траты.
+#
+# Две заметки: накопленный бюджет чтения за цикл (пороги 45% и 75%, по одному
+# разу на уровень) и повторное чтение того же файла целиком. Счётчик
+# обнуляется на compaction/end — после сжатия бюджет начинается заново.
+#
+# Проверено переигрыванием того самого прогона: предупреждение срабатывает на
+# четвёртом чтении при 67%, когда впереди ещё три чтения на 4 847 токенов.
+#
+# bytesPerToken и cycleTokens — общие с file-size-notice, перемерять вместе.
+- id: read-budget-notice
+  name: ./read-budget-notice.mjs
+  config:
+    warnPercent: 45
+    urgentPercent: 75
+    tools: [read]
+    bytesPerToken: 3.08
+    cycleTokens: 18141
+
+# ── advisory: нужен ли проекту DECISIONS.md ─────────────────────────────────
+#
+# Карта в DECISIONS.md — самое дешёвое, что есть в этой конфигурации: девять
+# строк за ~150 токенов вместо 17 762 разведочного чтения (замер 2026-09-10).
+# Но новый проект начинается без неё, и создать её некому.
+#
+# Правилом это не решается: правило читается на первом шаге, когда проект — один
+# пустой файл и журнал бессмыслен, а к тридцатому шагу, когда он окупился бы,
+# правило уже далеко вверху контекста. Та же болезнь, что у правил про размер
+# файлов и про узкое чтение.
+#
+# Плагин НЕ создаёт файл и не решает за агента. Он задаёт вопрос один раз за
+# сессию, когда работа перестала быть разовой, и прямо говорит: если задача
+# одноразовая — игнорируй, журнал для выброшенной работы это мусор.
+#
+# Порог: 3 разных файла, затронутых в проекте за сессию (один файл — скрипт,
+# два — скрипт и тест, три — структура, по которой придётся ориентироваться).
+# После сжатия порог падает до 2: сжатие означает, что сессия уже переросла
+# одно окно, и следующая начнётся вслепую.
+#
+# Молчит навсегда, как только файл появился — в том числе если его только что
+# создал сам агент.
+- id: decisions-file-notice
+  name: ./decisions-file-notice.mjs
+  config:
+    fileName: DECISIONS.md
+    minFiles: 3
+    minFilesAfterCompaction: 2
+    tools: [write, edit]
+
+# ── identity ────────────────────────────────────────────────────────────────
+
+# The preset's own persona, shadowing the deployment default for this agent.
+# `{{model}}` and `{{cwd}}` resolve from the agent's own route and workspace.
+- id: persona
+  name: '@deepseek-ai/dsh-persona'
+  config:
+    prefix: >-
+      You are a coding agent powered by the {{model}} model. Your working directory is {{cwd}}.
+
+- id: agent-instructions
+  name: '@deepseek-ai/dsh-agent-instructions'
+  config:
+    # Умолчание базового бандла — 65536 байт, это до ~21 000 токенов при
+    # замеренных 3.08 байта на токен, треть окна, и платится на КАЖДОМ запросе.
+    #
+    # Это ПОТОЛОК бандла, а не фиксированная цена: платится ровно за то, что
+    # реально лежит на диске. Поднять его без проектных файлов не стоит ничего.
+    #
+    # При нехватке бюджета первым вытесняется самый широкий файл, то есть
+    # глобальный ~/.dsh/AGENTS.md — а он и есть носитель всех рабочих правил,
+    # поэтому запас держим сверх его размера, а не впритык.
+    #
+    # 8192: глобальный AGENTS.md после переписывания секции DECISIONS.md
+    # занимает 5138 байт, остаётся ~3 000 на проектный AGENTS.md — достаточно
+    # для файла правил уровня проекта. Полностью занятый бандл стоит ~2 660
+    # токенов на запрос.
+    #
+    # История: 4096 -> 6144 (2026-09-09, anchored освободил ~4 400 токенов
+    # каталога) -> 8192 -> 12288 (2026-09-13: глобальный AGENTS.md вырос до
+    # ~7 100 байт, и в Cooking_APP с проектным 1 527 сумма превысила 8192 —
+    # глобальный молча вытеснялся целиком, «omitted ~/.dsh/AGENTS.md» в каждом
+    # запросе; 12288 оставляет ~5 000 на проектный файл).
+    maxBytes: 12288
+
+# ── shell ───────────────────────────────────────────────────────────────────
+
+# `shell-env` stays in the HOST composition: `apps/cli/src/web.ts` injects it to
+# publish `DSH_WEB_URL`/`DSH_WEB_MODE`, and a host row that injects a service is
+# the criterion for host-plane ownership — injection resolves before any session
+# exists, so there is no agent to key by. Behind a preset realm those variables
+# never reached the model's shell at all. Both shell tools consume the host
+# registry from here; their executors (`bash-sandbox`/`pwsh-sandbox`) are
+# host-plane too.
+- id: tool-bash
+  name: '@deepseek-ai/dsh-tool-bash'
+  disabled: !!js process.platform === 'win32'
+
+- id: tool-pwsh
+  name: '@deepseek-ai/dsh-tool-pwsh'
+  disabled: !!js process.platform !== 'win32'
+
+# ── filesystem ──────────────────────────────────────────────────────────────
+
+# Both register into the host `tools` registry and provide nothing, so
+# they need no realm. The `fs` service and its policy stay in the host.
+- id: tool-fs
+  name: '@deepseek-ai/dsh-tool-fs'
+  # Потолок одного `read`. Умолчание пакета 50 KiB (read-render.ts:14) ≈ 14k
+  # токенов — один вызов съедает весь цикл между сжатиями. Замер 317a9aa7:
+  # read ALL-CONTEXT.tsv 34 410 симв. одним вызовом. 16 KiB ≈ 4,5k токенов;
+  # инструмент сам печатает «Output capped ... Use offset=N to continue»,
+  # то есть пагинация остаётся, дорогим становится только «всё сразу».
+  config:
+    readMaxBytes: 16384
+
+- id: tool-fs-search
+  name: '@deepseek-ai/dsh-tool-fs-search'
+  config:
+    sampleOverCapGlobResults: false
+
+# ── background jobs ────────────────────────────────────────────────────────
+
+# Only the model-facing controls. The task REGISTRY stays on the host plane:
+# its producers sit outside any realm this file could put it in — `tool-bash`
+# above resolves it with `ctx.get`, and an entry-local realm here is invisible
+# to every sibling row, so `run_in_background` would answer "background jobs
+# unavailable" while these controls sat in the catalog. The registry is keyed by
+# owning agent anyway, so one host instance serves every session. What a preset
+# chooses is whether its agent can collect and stop background work at all.
+- id: tool-jobs
+  name: '@deepseek-ai/dsh-tool-jobs'
+
+# ── skills ──────────────────────────────────────────────────────────────────
+
+# The skill REGISTRY lives in the host composition and is layered per scope:
+# these rows register into THIS preset's layer of it, so they need no realm.
+# `skill-filesystem` contributes local-root discovery for agents on this preset, and
+# `tool-skill` gives them the catalog and loader; the merged catalog also
+# carries whatever the deployment registered globally (repository plugins).
+- id: skill-filesystem
+  name: '@deepseek-ai/dsh-skill-filesystem'
+
+# 2026-09-15: каталог skills выключен в рабочем пресете. После снятия engramory
+# единственные skills — восемь univer (dsh-univer-office): ~800 токенов в
+# каждом префиксе и после каждого сжатия при нуле вызовов за 144 сессии.
+# Инструменты univer_* остаются доступны через dev_tool_search. Для работы с
+# документами (.xlsx/.docx/.pptx/.univer) — пресет «Local 64k + Office»,
+# который генерирует scripts/make-office-preset.sh из этого файла и в котором
+# эта строка включена. Проверка: в новой сессии нет user-role skill-catalog.
+- id: tool-skill
+  name: '@deepseek-ai/dsh-tool-skill'
+  disabled: true
+
+# ── goals ───────────────────────────────────────────────────────────────────
+
+# The goal service and session driver stay on the host plane, where the Gateway
+# can resolve them. The human command and model-facing tool register into this
+# preset's scoped layers.
+- id: command-goal
+  name: '@deepseek-ai/dsh-command-goal'
+
+- id: tool-goal
+  name: '@deepseek-ai/dsh-tool-goal'
+
+# ── plan mode ───────────────────────────────────────────────────────────────
+
+# Plan state is per-agent by nature, so an entry-local realm is not a
+# workaround here — it is the correct lifetime.
+- id: planning
+  name: cordis:group
+  group: true
+  isolate:
+    planMode: true
+  config:
+    - id: plan-mode
+      name: '@deepseek-ai/dsh-plan-mode'
+      config:
+        section: |
+              You are in plan mode. Stay in plan mode until exit_plan_mode succeeds or the user switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.
+
+              Explore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.
+
+              The tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.
+
+              Resolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.
+
+              Make the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.
+
+              When ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask "should I proceed?" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.
+
+# ── compaction ──────────────────────────────────────────────────────────────
+
+# `compaction-basic` reads `toolResultPrune` through `ctx.get`, so the pruner must
+# share this realm rather than sit outside it.
+#
+# `tokenMeter` is deliberately NOT in this realm: the meter stays on the HOST
+# plane, and the rows here resolve that one instance. It takes no configuration,
+# keys every fold by Session, and owns the context-meter projection units the
+# browser reads for every session — behind a realm those units would come and go
+# with whichever presets happen to be mounted. What a preset chooses is whether
+# its agent compacts at all, which is `compaction-basic` below.
+- id: compaction
+  name: cordis:group
+  group: true
+  isolate:
+    compaction: true
+    toolResultPruner: true
+  config:
+    # 2026-09-12: штатный класс заменён подклассом (шапка compaction-notools.mjs):
+    # пересказ без каталога инструментов (23 из 36 сжатий сессии 317a9aa7
+    # вернули tool-call вместо текста) и порог по usage сервера, а не по
+    # оценке метра (после qwen3.8-agent.jinja оценка завышает контекст ~вдвое).
+    - id: compaction-basic
+      name: ./compaction-notools.mjs
+      config:
+        # Окно 65 536 (profiles/web/cordis.patch.yml, с 2026-09-08). Порог
+        # считается как floor(contextWindow x ratio), то есть доля окна, а не
+        # абсолют: переход с 32k на 64k сам удвоил и порог, и запас.
+        #
+        # 0.65 выбиралось под окно 32 768 (порог 21 299, запас 11 469) и при
+        # 64k давало порог 42 598 с запасом 22 938 — вдвое больше, чем тогда
+        # признавалось достаточным, то есть окно простаивало.
+        #
+        # 0.75 -> порог 49 152, запас до стены 16 384. Не хватает: перемер по
+        # сессиям 2026-09-09/10 (Cooking_APP x3, PlugIN) дал худший прирост за
+        # один шаг 17 910 токенов (топ: 17 910 / 17 632 / 11 881 / 11 759 /
+        # 10 226) — больше, чем считалось на 2026-09-09 (14 357). Прирост и
+        # есть перелёт: проверка на agent/pre-step видит ПРЕДЫДУЩИЙ замер,
+        # поэтому реальный пик = порог + прирост одного шага, то есть
+        # 49 152 + 17 910 = 67 062 при стене 65 536.
+        #
+        # 0.7 -> порог 45 875, запас 19 661 > 17 910. Замеренные пики за те же
+        # прогоны: 59 818 / 54 708 / 53 646 / 49 970 — все выше 45 875, то есть
+        # сжатие будет срабатывать на шаг раньше, а не реже.
+        #
+        # 0.8 (умолчание пакета) — 52 428 + 17 910 = 70 338, за стеной.
+        # Окно 65536 = -c сервера (эпизод с 131072 закрыт 2026-09-13, см.
+        # cordis.patch.yml профиля): 0.70 × 65536 = 45 875.
+        thresholdRatio: 0.70
+
+        # Умолчание 0.16 = 10 485 токенов от окна (retainRatio считается от
+        # ОКНА, не от порога). Замер: сжатие роняло контекст с 44 308 до
+        # 19 043, теряя 25k, после чего модель 5-6 шагов набирала контекст
+        # заново. 0.25 = 16 384 -> падение до ~26k.
+        #
+        # 0.25 выбиралось, когда пересказ стоил 3 072. После подъёма maxTokens
+        # до 6 144 хвост и пересказ вместе съели цикл между сжатиями:
+        #   префикс 8 050 + хвост 16 384 + пересказ 6 144 = 30 578,
+        #   порог 45 875 -> на работу остаётся 15 297.
+        # Это МЕНЬШЕ худшего замеренного прироста за один шаг (17 910), то есть
+        # один тяжёлый шаг сразу после сжатия снова переводит порог.
+        #
+        # 0.20 = 13 107: 8 050 + 13 107 + 6 144 = 27 301, цикл 18 574 > 17 910.
+        # Цена — хвост короче на 3 277 токенов, примерно три шага истории.
+        #
+        # Префикс 8 050 замерен 2026-09-10 при 3.08 байта на токен: системный
+        # промпт 2 420 + схемы девяти инструментов 3 861 + AGENTS.md 1 773.
+        # Появится проектный AGENTS.md на все 8 192 байта — префикс дойдёт до
+        # ~9 050, цикл упадёт до ~17 570, то есть снова ниже 17 910. Запас
+        # держится ровно на том, что проектных AGENTS.md сейчас нет; заведёшь
+        # такой файл — перемерить и снимать хвост дальше (0.18 = 11 796).
+        retainRatio: 0.20
+
+        # Потолок самого пересказа. Умолчание пакета 8 192.
+        #
+        # Было 3 072 — выбрано по сессии 9d305367 из соображения «чекпойнт не
+        # должен съедать бюджет, который сжатие только что освободило».
+        # Не хватило: перемер логов 2026-09-09/10 показал, что при 3 072
+        # обрывается БОЛЬШИНСТВО сжатий — 12 из 19, 21 из 23, 25 из 27 и 2 из
+        # 10 закончились "summarization truncated at the token cap (incomplete
+        # checkpoint)". Оборванный чекпойнт означает, что сжатие не состоялось:
+        # порог остаётся перейдённым, сжатие запускается на следующем же шаге,
+        # контекст тем временем продолжает расти. Это, а не сам порог, —
+        # главная причина переполнений.
+        #
+        # Переход на nothink-маршрут (ниже) проблему не снял: дело не в том,
+        # что бюджет уходит на размышление, а в том, что восемь секций
+        # инструкции компактора в 3 072 токена не укладываются.
+        #
+        # 6 144: пост-сжатие = ~3 500 префикс + 16 384 хвост + до 6 144
+        # пересказ ≈ 26 000, при пороге 45 875 остаётся ~20 000 рабочего
+        # запаса. Если обрывы останутся — поднимать до умолчания 8 192.
+        maxTokens: 6144
+
+        # Маршрут пересказа — та же модель, но записью без мышления
+        # (profiles/web/cordis.patch.yml, id qwen38-27b-nothink).
+        #
+        # Причина: 2026-09-09 из 50 сжатий за день 46 закончились
+        # "summarization truncated at the token cap (incomplete checkpoint)".
+        # Рассуждение и пересказ делят один выходной бюджет: 3 072 уходили на
+        # размышление, чекпойнт не дописывался, порог оставался перейдённым — и
+        # сжатие запускалось снова на следующем же шаге, по ~95 с за попытку.
+        # Пересказ — работа вспомогательная, думать над ней не нужно.
+        #
+        # Если чекпойнт всё равно обрывается, поднимать здесь maxTokens
+        # (штатное умолчание пакета — 8192).
+        summarizationProvider: qwen-local
+        summarizationModel: qwen38-27b-nothink
+
+    - id: command-compact
+      name: '@deepseek-ai/dsh-command-compact'
+
+    - id: tool-result-pruner
+      name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+      config:
+        thresholdChars: 8192
+        headChars: 4096
+        tailChars: 1024
+
+# ── delegation and workflows ────────────────────────────────────────────────
+
+# The `subagents` registry and its spawn/fork backends live in the HOST
+# composition: the registry is a process singleton whose cross-session queries
+# the api-proxy serves to the browser, and a provider name may only be
+# registered once. This preset contributes the delegation TOOLS, which resolve
+# that host registry.
+#
+# `workflows` is different — nothing outside an agent reads it — so every row
+# that reaches it shares one entry-local realm here, and a consumer left
+# outside would resolve a host registry this preset does not populate.
+- id: delegation
+  name: cordis:group
+  group: true
+  isolate:
+    workflowEngine: true
+  config:
+    - id: tool-subagent-control
+      name: '@deepseek-ai/dsh-tool-subagent-control'
+
+    - id: tool-subagent-list-agents
+      name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
+
+    - id: tool-subagent
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: subagent
+        modelSelectionSettings: true
+        backgroundMode: continuable
+        # Worker-режим. Замер 317a9aa7: два из 13 worker'ов кончились
+        # max-tokens, пытаясь выдать словарь переводов текстом; их обрезанные
+        # ответы (36 066 и 33 060 символов) ушли родителю целиком как
+        # subagent-settled — ~20k токенов мусора в контексте родителя.
+        # maxTokens 4096 ограничивает цену такого провала четырьмя тысячами.
+        # Маршрут наследуется от родителя (modelSelectionSettings), поэтому
+        # provider/model здесь не задаются. Persona — правила worker'а,
+        # которые родитель в промпте задать забывает.
+        agentOptions:
+          maxTokens: 4096
+        persona: >-
+          You are a worker subagent with a fresh, small context. Your input is
+          on disk; your output goes to disk. Read input in ranges, never a
+          whole file over 16 KB. Write results with `write` to the path you were
+          given, verify with a script whose output is a few lines, and finish
+          with a closing message of at most 10 lines: what you wrote, where,
+          counts, and anything unfinished. Never print data, tables, or code in
+          your closing message or in send_message.
+
+    # Fork omits model selection so provider/model stay equal to the parent and
+    # the inherited history remains eligible for KV Cache reuse. This preset
+    # keeps fork continuable; parent and child inherit the same messaging tool,
+    # while the parent id and return guidance follow the inherited history.
+    - id: tool-subagent-fork
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: fork
+        toolName: subagent_fork
+        backgroundMode: continuable
+
+    # Production dsh does not install these optional providers. Install the
+    # matching Bundle in this Profile and restart the Host, then copy this
+    # preset and remove `disabled` from the matching tool row. Host availability
+    # alone grants no tool.
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: true
+      config:
+        provider: codex
+        toolName: subagent_codex
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: true
+      config:
+        provider: claude-code
+        toolName: subagent_claude_code
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+
+    - id: workflow-ptc
+      name: '@deepseek-ai/dsh-workflow-ptc'
+      config:
+        provider: spawn
+
+    - id: tool-workflow
+      name: '@deepseek-ai/dsh-tool-workflow'
+
+    - id: tool-ralph
+      name: '@deepseek-ai/dsh-tool-ralph'
+      config:
+        subagentProvider: spawn
+        maxRounds: 64
+
+# ── remaining model-facing rows ─────────────────────────────────────────────
+
+- id: tool-ask-user
+  name: '@deepseek-ai/dsh-tool-ask-user'
+
+- id: tool-todo
+  name: '@deepseek-ai/dsh-tool-todo'
+  config:
+    allowParallelInProgress: true
+
+# The `web` service and its search provider stay in the host composition; only
+# the model-facing tool is per-session.
+- id: tool-web
+  name: '@deepseek-ai/dsh-tool-web'
+  config:
+    fetch: true
+    searchTimeoutMs: 60000
+    # Пределы под окно 64k (комментарий ниже писался под 32k; сами лимиты
+    # оставлены — 12 000 символов на страницу разумны и при 64k).
+    # Умолчания пакета рассчитаны на большие окна и здесь
+    # смертельны: fetchMaxOutputChars 200000 символов — это ~57 000 токенов,
+    # почти вдвое больше всего окна, то есть один web_fetch крупной страницы
+    # гарантированно даёт CONTEXT_WINDOW_EXCEEDED.
+    # 12000 символов ≈ 3 400 токенов — примерно четверть рабочего бюджета.
+    fetchMaxOutputChars: 12000
+    # 8 источников со сниппетами — тоже несколько тысяч токенов. Трёх хватает,
+    # а нужную страницу модель дочитает через web_fetch.
+    searchMaxResults: 3
+    # Каждый запрос у родного провайдера DeepSeek — полный ход модели по
+    # латентности и токенам, отдельного поискового эндпоинта у него нет.
+    searchMaxQueries: 2
