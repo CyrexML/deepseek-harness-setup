@@ -91,16 +91,21 @@ jobs:
           }
           exit $bad
 
-      - name: .ps1 сохранены с BOM
+      - name: .ps1 с русским текстом сохранены с BOM
         shell: pwsh
         run: |
           # Windows PowerShell 5.1 читает файл без BOM как ANSI: русские
-          # комментарии превращаются в мусор и ломают разбор.
+          # комментарии превращаются в мусор и ломают разбор. Файлу из одних
+          # ASCII-символов BOM не нужен — требовать его от всех подряд значит
+          # ловить то, что ничего не ломает.
           $bad = 0
           Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
             $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
-            if ($bytes.Length -lt 3 -or $bytes[0] -ne 0xEF -or $bytes[1] -ne 0xBB -or $bytes[2] -ne 0xBF) {
-              Write-Host "нет BOM: $($_.FullName)"; $bad = 1
+            $hasBom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+            $nonAscii = $false
+            foreach ($b in $bytes) { if ($b -gt 0x7F) { $nonAscii = $true; break } }
+            if ($nonAscii -and -not $hasBom) {
+              Write-Host "не-ASCII без BOM: $($_.FullName)"; $bad = 1
             }
           }
           exit $bad
