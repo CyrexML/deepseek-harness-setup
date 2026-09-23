@@ -14,6 +14,37 @@ uninstall.
 
 Everything runs locally. Nothing is sent to a cloud.
 
+## What this is
+
+Not a set of tips, not a list of commands to run yourself. This is a **turnkey install**:
+you copy `config.json`, run `install.cmd` as administrator, and end up with a working
+system whose parts already fit together.
+
+What you get:
+
+- **a model on your own GPU** — the installer picks one that fits your VRAM, downloads it,
+  computes the context window and verifies the result by measurement;
+- **an agent that works with files** — reads the project, edits code, runs commands with
+  your approval, keeps decisions between sessions;
+- **a side panel** — explorer, editor and result view: HTML pages with working JavaScript,
+  PDFs, spreadsheets, diffs and git commits;
+- **your phone** — an interface that is actually usable on a phone, reachable from anywhere
+  through a tunnel;
+- **maintenance** — shortcuts, a power button, one-command updates, a complete uninstall,
+  and cleanup of what piles up.
+
+Why this is not the same as "installing the harness yourself": the harness is the core.
+Around it you still have to choose and wire up plugins, fix what does not work on a phone,
+pick a model for your card, compute the context window, set up startup, the tunnel and
+power behaviour. Here that is already done and pinned: **17 patch layers** where things
+break, every component version recorded in `stand.lock.json`, and model server settings
+computed for your GPU instead of copied from someone else's example.
+
+The honest limits: you need an NVIDIA GPU from 12 GB and Windows with WSL2; answer quality
+is the quality of the model you choose, not of the installer; and there is only one card,
+so your own GPU work (training a network) and the model take turns — there is
+[a section about that](#web-access-and-your-own-gpu-work).
+
 <p align="center">
   <img src="docs/images/phone-chat.png" width="260" alt="Agent chat on a phone">
   <img src="docs/images/phone-preview.png" width="260" alt="Project page rendered in the side panel">
@@ -96,8 +127,10 @@ The same thing in words — [docs/MODEL.md](docs/MODEL.md).
 
 - **Harness AI** on the desktop starts the model and the interface.
 - Interface: <http://127.0.0.1:3080>.
-- From a phone — over a Cloudflare Tunnel, enabled in `config.json`; details in
-  [docs/MOBILE.md](docs/MOBILE.md).
+- From a phone — three ways: the home network via a QR code, a temporary tunnel (an address
+  right away, no Cloudflare account) and a permanent domain. Set an access password before
+  exposing anything: the mobile interface reaches an agent that edits files on your
+  computer. Step by step: [docs/MOBILE.md](docs/MOBILE.md).
 
 **Stopping the stand: the power button in the top-left corner of the interface.** It works
 from the PC and from the phone, and offers four levels — stop the stand only, stop it
