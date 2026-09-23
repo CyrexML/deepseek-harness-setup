@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Шаг 4: патч-слои.
+# Step 4: the patch layers.
 #
-# Плагины и харнес доработаны нашими скриптами: без них половина того, ради
-# чего стенд собирался, не работает (см. таблицу в README). Каждый слой
-# идемпотентен и узнаётся по маркеру в файле, поэтому ensure-patches.sh можно
-# звать сколько угодно раз — он трогает только то, чего нет. Этот же скрипт
-# зовётся при каждом старте стенда: обновление плагина стирает правки.
+# Without them half of what the stand is built for does not work (see the table
+# in the README). Every layer is idempotent and identified by a marker inside the
+# patched file, so ensure-patches.sh can run any number of times and only touches
+# what is missing. It also runs on every start, because a plugin update wipes the
+# edits.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
@@ -23,8 +23,8 @@ done
 chmod +x "$STAND"/scripts/*.sh 2>/dev/null || true
 
 step "применение патч-слоёв"
-# Мосту (bridge) при недостающих строках перевода нужна живая модель; если её
-# нет, translate.sh честно скажет об этом и оставит непереведённое.
+# Translating new bridge strings needs a live model; without one translate.sh
+# says so and leaves them untranslated.
 bash "$STAND/scripts/ensure-patches.sh" 2>&1 | sed 's/^/    /'
 
 step "проверка"

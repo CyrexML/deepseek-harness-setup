@@ -109,9 +109,11 @@ $closeBtn.Add_Click({ $f.Close() })
 $f.Controls.Add($closeBtn)
 
 $stages = @{
-  model = 'Загружаю модель Qwen3.8-27B в видеопамять'
-  web   = 'Поднимаю веб-интерфейс DSH'
-  done  = 'Готово, открываю браузер'
+  model    = 'Загружаю модель Qwen3.8-27B в видеопамять'
+  web      = 'Поднимаю веб-интерфейс DSH'
+  done     = 'Готово, открываю браузер'
+  stopping = 'Останавливаю стенд'
+  stopped  = 'Стенд остановлен'
 }
 # Анимация по времени (Stopwatch), а не по тикам: ~60 к/с, плавные кривые.
 # Окно и панели — с двойной буферизацией, иначе бегунок мерцает.
@@ -166,8 +168,8 @@ $timer.Add_Tick({
         $track.Visible = $false; $hint.Visible = $false; $closeBtn.Visible = $true
         $script:fading = $true
         $script:doneT = $t + 24.2
-      } elseif ($status -eq 'done') {
-        $sub.Text = $stages.done
+      } elseif ($status -eq 'done' -or $status -eq 'stopped') {
+        $sub.Text = $stages[$status]
         $script:fading = $true
         $script:doneT = $t
       }

@@ -1,11 +1,11 @@
-﻿# Ярлыки, автозапуск и задача восстановления питания.
+﻿# Shortcuts, autostart and the power-restore task.
 #
 #   powershell -ExecutionPolicy Bypass -File windows\40-shortcuts.ps1
 #
-# Создаёт: ярлык «Harness AI» на рабочем столе и в меню «Пуск» (запускает стенд
-# скрытым окном через harness-launch.vbs), ярлык «Harness AI — стоп», задачу
-# планировщика, которая возвращает таймауты сна, если стенд упал вместе с
-# системой, и копирует скрипты запуска в <windowsRoot>\run.
+# Creates the Harness AI desktop and Start-menu shortcuts (launched windowless
+# through harness-launch.vbs), a stop shortcut, a scheduled task that restores
+# the sleep timeouts if the stand went down with the system, and copies the
+# launch scripts into <windowsRoot>\run.
 [CmdletBinding()]
 param()
 $ErrorActionPreference = 'Stop'
@@ -18,8 +18,7 @@ $runDir = Join-Path $root 'run'
 New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 
 Write-Step 'скрипты запуска в run\'
-# Скрипты живут внутри WSL (их ставит wsl/30-patches.sh вместе с остальным
-# деревом стенда); Windows-части нужны их копии рядом с моделью.
+# The scripts live inside WSL; the Windows side needs copies next to the model.
 $wslHome = (& wsl.exe -d $cfg.wslDistro -- bash -lc 'echo $HOME').Trim()
 $wslRunSource = "/mnt/$($root.Substring(0,1).ToLower())$($root.Substring(2) -replace '\\','/')/run"
 & wsl.exe -d $cfg.wslDistro -- bash -lc "cp `$HOME/Harness_AI/scripts/harness-start.ps1 `$HOME/Harness_AI/scripts/harness-stop.ps1 `$HOME/Harness_AI/scripts/harness-launch.vbs `$HOME/Harness_AI/scripts/harness-splash.ps1 `$HOME/Harness_AI/scripts/harness-idle-sleep.ps1 `$HOME/Harness_AI/scripts/harness-restore-power.ps1 `$HOME/Harness_AI/scripts/harness-hidden.vbs `$HOME/Harness_AI/scripts/harness.ico `$HOME/Harness_AI/scripts/splash-whale.png '$wslRunSource/' 2>/dev/null; true"
@@ -57,13 +56,13 @@ if (Test-Path $launch) {
 }
 
 Write-Step 'задача восстановления питания'
-# Лончер на время работы ставит таймауты сна в 0. Если Windows перезагрузится
-# сама (обновление), они остались бы нулевыми навсегда — задача возвращает их,
-# когда ни лончер, ни интерфейс больше не работают.
+# The launcher sets the sleep timeouts to 0 while it runs. If Windows reboots on
+# its own they would stay at 0 forever, so this task restores them once neither
+# the launcher nor the interface is alive.
 $restore = Join-Path $runDir 'harness-restore-power.ps1'
 if (Test-Path $restore) {
-  # Через wscript: действие powershell.exe мигает окном консоли раз в 15 минут —
-  # conhost создаёт окно раньше, чем PowerShell применяет -WindowStyle Hidden.
+  # Run through wscript: a powershell.exe action flashes a console window every
+  # 15 minutes, because conhost creates it before -WindowStyle Hidden applies.
   $hidden = Join-Path $runDir 'harness-hidden.vbs'
   $action = if (Test-Path $hidden) {
     New-ScheduledTaskAction -Execute "$env:WINDIR\System32\wscript.exe" -Argument "`"$hidden`" `"$restore`""

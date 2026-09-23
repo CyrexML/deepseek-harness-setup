@@ -1,14 +1,14 @@
-﻿# Автонастройка llama-server под вашу видеокарту + контрольный замер.
+﻿# Auto-tune llama-server for the local GPU, then measure the result.
 #
 #   powershell -ExecutionPolicy Bypass -File windows\30-tune.ps1
-#   ... -CheckOnly    ничего не менять, только замерить текущее состояние
-#   ... -ReserveMb 6000   оставить 6 ГБ видеопамяти СВОБОДНЫМИ под свои задачи
-#                         (обучение сети, Stable Diffusion, рендер): окно
-#                         контекста будет посчитано из остатка
+#   ... -CheckOnly    change nothing, only measure the current state
+#   ... -ReserveMb 6000   keep 6 GB of VRAM free for your own GPU work
+#                         (training, Stable Diffusion, rendering): the context
+#                         window is computed from what is left
 #
-# Что делает: считает, какое окно контекста влезает в свободную видеопамять,
-# пишет параметры в config.json, генерирует run\start-server.ps1 под них,
-# поднимает сервер и печатает скорость префилла и генерации.
+# It computes the context window that fits into free VRAM, writes the values into
+# config.json, generates run\start-server.ps1 from them, starts the server and
+# prints prefill and generation speed.
 [CmdletBinding()]
 param([switch]$CheckOnly, [int]$ReserveMb = 0)
 $ErrorActionPreference = 'Stop'
@@ -29,18 +29,16 @@ if (-not $CheckOnly) {
   Write-Step 'подбор окна контекста'
   $vramMb = Get-FreeVramMb
   $modelMb = [int]((Get-Item $modelPath).Length / 1MB)
-  # Запас: сама CUDA, буферы вычислений и проектор картинок. На замерах стенда
-  # (RTX 5080, 16 ГБ) это около 1200 МиБ сверх весов и кэша.
+  # Headroom for CUDA itself, compute buffers and the image projector: about
+  # 1200 MiB beyond weights and cache, measured on an RTX 5080 (16 GB).
   $overheadMb = 1200
-  # -ReserveMb: сколько видеопамяти не отдавать модели. По умолчанию 0 — окно
-  # берёт всё, что осталось, и на карте свободно 150–500 МиБ. Своей задаче на
-  # GPU (обучение, диффузия) столько не хватит, поэтому место под неё нужно
-  # отложить здесь: llama-server держит выделенную память, пока работает.
+  # -ReserveMb keeps VRAM away from the model. The default 0 lets the window take
+  # everything, leaving 150-500 MiB free - far too little for your own GPU work,
+  # and llama-server holds what it allocated for as long as it runs.
   $budgetMb = $vramMb - $modelMb - $overheadMb - $ReserveMb
   if ($ReserveMb -gt 0) { Write-Info "отложено под ваши задачи на GPU: $ReserveMb МиБ" }
-  # KV-кэш при сжатии q4_0: примерно 0.018 МиБ на токен на каждый миллиард
-  # параметров... на практике проще мерить: 64k окно = ~1500 МиБ
-  # на 27B-модели. Отсюда линейная оценка.
+  # KV cache at q4_0 compression, measured rather than derived: a 64k window
+  # costs ~1500 MiB on a 27B model, hence this linear estimate.
   $mbPer1k = 23
   $ctx = [math]::Floor($budgetMb / $mbPer1k) * 1024
   foreach ($cap in @(131072, 98304, 65536, 49152, 32768, 16384, 8192)) {

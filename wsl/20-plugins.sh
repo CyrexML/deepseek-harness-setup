@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Шаг 3: профиль DSH и плагины.
+# Step 3: the DSH profile and its plugins.
 #
-# Профиль — это папка ~/.dsh/profiles/web с обычным package.json: перечислены
-# плагины и порядок их загрузки (bundles). Версии ЗАКРЕПЛЕНЫ: связка «харнес +
-# плагины + патчи» проверена целиком, произвольный latest её ломает
-# (проверено: better-sidebar 0.19.1 на харнесе 0.1.3 = белый экран).
+# The profile is ~/.dsh/profiles/web with an ordinary package.json listing the
+# plugins and their load order. Versions are pinned: harness + plugins + patches
+# was verified as a whole, and an arbitrary latest breaks it (better-sidebar
+# 0.19.1 on harness 0.1.3 = white screen).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
@@ -15,9 +15,9 @@ mkdir -p "$PROFILE"
 want() { [ "$(cfg ".features.$1" true)" = "true" ]; }
 
 step "состав профиля"
-# Версии берутся из stand.lock.json — это и есть «проверенная связка». Диапазоны
-# (^1.2.3) здесь не годятся: через месяц соберётся другая сборка, а патч-слои
-# привязаны к конкретным строкам кода.
+# Versions come from stand.lock.json. Ranges (^1.2.3) are wrong here: a month
+# later they resolve to a different build, and patch layers are anchored to
+# specific lines of code.
 LOCK="$ROOT/stand.lock.json"
 [ -f "$LOCK" ] || die "нет $LOCK — без него неизвестно, какие версии ставить"
 ver() { node -e '

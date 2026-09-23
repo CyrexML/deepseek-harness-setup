@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Общие мелочи для шагов установки: вывод, чтение config.json, пути.
-# Подключается через `. "$HERE/lib.sh"`.
+# Shared helpers for the install steps: output, config.json access, paths.
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG="${HARNESS_CONFIG:-$ROOT/config.json}"
@@ -13,7 +12,7 @@ warn()      { printf '    %s!%s %s\n' "$c_warn" "$c_off" "$*" >&2; }
 die()       { printf '%sОШИБКА:%s %s\n' "$c_err" "$c_off" "$*" >&2; exit 1; }
 done_step() { printf '%s✓ %s%s\n\n' "$c_ok" "$*" "$c_off"; }
 
-# cfg <json-путь> [умолчание] — читает значение из config.json.
+# cfg <json-path> [default] - read a value out of config.json.
 #   cfg .harnessTag           → "v0.1.6-alpha.2"
 #   cfg .features.mobileBridge true
 cfg() {
@@ -32,14 +31,14 @@ cfg() {
   printf '%s' "$value"
 }
 
-# Путь Windows → путь WSL: F:\Harness_AI → /mnt/f/Harness_AI
+# Windows path -> WSL path: F:\Harness_AI -> /mnt/f/Harness_AI
 winpath() {
   local p="${1//\\//}"
   local drive="${p%%:*}"
   printf '/mnt/%s%s' "$(printf '%s' "$drive" | tr 'A-Z' 'a-z')" "${p#*:}"
 }
 
-# Есть ли sudo без пароля / нужен ли apt вообще.
+# Whether passwordless sudo exists and whether apt is needed at all.
 need_sudo_apt() {
   command -v git >/dev/null 2>&1 && command -v curl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1 && return 1
   command -v sudo >/dev/null 2>&1 || die "нет sudo, а пакеты не установлены — поставьте git curl python3 вручную"

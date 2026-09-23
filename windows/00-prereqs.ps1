@@ -1,10 +1,10 @@
-﻿# Шаг 0: то, без чего дальше ничего не поедет — WSL2, дистрибутив, драйвер NVIDIA.
+﻿# Step 0: what nothing else works without - WSL2, a distribution, the NVIDIA driver.
 #
 #   powershell -ExecutionPolicy Bypass -File windows\00-prereqs.ps1
 #
-# Может потребовать перезагрузку: включение WSL2 на чистой Windows — это
-# установка компонентов системы. Скрипт скажет об этом прямо и его можно
-# запустить повторно после перезагрузки — он продолжит с того же места.
+# May require a reboot: enabling WSL2 on a clean Windows installs system
+# components. The script says so and can be run again afterwards - it continues
+# from the same place.
 [CmdletBinding()]
 param()
 $ErrorActionPreference = 'Stop'
@@ -65,12 +65,11 @@ if ($verbose -match "$($cfg.wslDistro)\s+\w+\s+1\b") {
 Write-Ok 'WSL2'
 
 Write-Step 'доступ WSL → Windows по сети'
-# llama-server слушает на Windows, интерфейс живёт в WSL. Правило брандмауэра
-# нужно, иначе запросы из WSL в порт модели молча теряются.
-# ВАЖНО: правило ограничено подсетью WSL (172.16.0.0/12) и петлёй. Открывать
-# порт всем ("любой адрес") нельзя: llama-server работает без ключа доступа, и
-# в общей сети — гостевой Wi-Fi, общежитие, офис — к модели и видеокарте смог
-# бы обратиться кто угодно с этой сети.
+# llama-server listens on Windows, the interface runs in WSL; without this rule
+# requests from WSL to the model port are silently dropped.
+# Scoped to the WSL subnet and loopback on purpose: llama-server runs without an
+# API key, so an "any address" rule would hand the model and the GPU to everyone
+# on the same network.
 $rule = "Harness AI: llama-server $($cfg.modelPort)"
 $allowFrom = @('172.16.0.0/12', '127.0.0.1')
 $existing = Get-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue
@@ -79,8 +78,8 @@ if (-not $existing) {
       -Protocol TCP -LocalPort $cfg.modelPort -RemoteAddress $allowFrom -Profile Any | Out-Null
   Write-Ok "правило брандмауэра добавлено (только из WSL)"
 } else {
-  # Правило могло остаться от прежней версии установщика — без ограничения по
-  # адресу. Молча оставлять его нельзя, поэтому сужаем на месте.
+  # A rule left by an older installer version may have no address restriction;
+  # narrow it in place rather than leaving it open.
   $from = ($existing | Get-NetFirewallAddressFilter).RemoteAddress
   if ($from -contains 'Any') {
     Set-NetFirewallRule -DisplayName $rule -RemoteAddress $allowFrom | Out-Null

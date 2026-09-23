@@ -1,4 +1,4 @@
-﻿# Общие мелочи для шагов установки на стороне Windows.
+﻿# Shared helpers for the Windows-side install steps.
 
 $script:StandRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
@@ -24,9 +24,9 @@ function Read-StandConfig {
   }
   $cfg = Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json
 
-  # Диск из настроек может не существовать: в примере стоит F:, а у человека
-  # только C:. Тогда выбираем сами — диск с наибольшим свободным местом (не
-  # меньше 40 ГБ) — и записываем выбор обратно, чтобы все шаги видели одно и то же.
+  # The configured drive may not exist: the example says F:, the machine may only
+  # have C:. Fall back to the drive with the most free space and write the choice
+  # back, so every step sees the same path.
   $drive = ($cfg.windowsRoot -replace '^([A-Za-z]):.*$', '$1')
   if ($drive -and -not (Test-Path "${drive}:\")) {
     $best = Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue |
@@ -43,7 +43,7 @@ function Read-StandConfig {
 }
 
 # Set-StandConfig @{ 'server.ctx' = 65536; 'model.file' = 'x.gguf' }
-# Точка в ключе — вложенность. Значения пишутся в config.json на месте.
+# A dot in the key means nesting; values are written into config.json in place.
 function Set-StandConfig {
   param([hashtable]$Values)
   $path = Get-StandConfigPath
@@ -65,14 +65,14 @@ function Set-StandConfig {
   ($cfg | ConvertTo-Json -Depth 12) | Set-Content -Path $path -Encoding UTF8
 }
 
-# Выполнить bash-скрипт внутри WSL, показывая вывод как есть.
+# Run a bash command inside WSL, passing its output through unchanged.
 function Invoke-Wsl {
   param([string]$Distro, [string]$Command)
   & wsl.exe -d $Distro -- bash -lc $Command
   if ($LASTEXITCODE -ne 0) { throw "шаг в WSL вернул код $LASTEXITCODE" }
 }
 
-# Путь Windows → путь внутри WSL: F:\Harness_AI → /mnt/f/Harness_AI
+# Windows path -> WSL path: F:\Harness_AI -> /mnt/f/Harness_AI
 function ConvertTo-WslPath {
   param([string]$Path)
   $p = $Path -replace '\\', '/'

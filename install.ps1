@@ -1,15 +1,15 @@
-﻿# Установка стенда «Harness AI» одной командой.
+﻿# One-command install of the Harness AI stand.
 #
-#   правый клик по install.cmd → «Запуск от имени администратора»
-# или
+#   right-click install.cmd -> Run as administrator
+# or
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #
-# Ключи:
-#   -SkipModel     не трогать модель (если она уже скачана и настроена)
-#   -SkipLlama     не ставить движок llama.cpp
-#   -Step <имя>    выполнить только один шаг: prereqs, llama, wsl, model, tune, shortcuts, verify
+# Flags:
+#   -SkipModel     leave the model alone (already downloaded and tuned)
+#   -SkipLlama     skip the llama.cpp engine
+#   -Step <name>   run one step only: prereqs, llama, wsl, model, tune, shortcuts, verify
 #
-# Каждый шаг идемпотентен: прерванную установку можно просто запустить заново.
+# Every step is idempotent: an interrupted install can simply be started again.
 [CmdletBinding()]
 param(
   [switch]$SkipModel,
@@ -30,8 +30,8 @@ function Step-Model     { if (-not $SkipModel) { & powershell -NoProfile -Execut
 function Step-Tune      { if (-not $SkipModel) { & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\30-tune.ps1" } }
 function Step-Shortcuts { & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\40-shortcuts.ps1" }
 
-# Дерево установщика копируется внутрь WSL: оттуда его запускают шаги Linux, и
-# там же остаются наши скрипты для последующего обслуживания стенда.
+# The installer tree is copied into WSL: the Linux steps run from there, and the
+# maintenance scripts stay there afterwards.
 function Copy-ToWsl {
   Write-Step 'копирую установщик внутрь WSL'
   $wslHere = ConvertTo-WslPath $here

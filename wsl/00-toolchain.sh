@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# Шаг 1: инструменты внутри WSL. Идемпотентен — повторный запуск ничего не ломает.
+# Step 1: the toolchain inside WSL. Idempotent - running it again breaks nothing.
 #
-# Ставит: системные пакеты, Node.js (в ~/.local/node, без sudo и без конфликта
-# с системным), pnpm через corepack. Всё, что ставится, потом снимается
-# деинсталлятором (wsl/uninstall.sh).
+# Installs system packages, Node.js (into ~/.local/node, without sudo and without
+# clashing with a system one) and pnpm through corepack.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"

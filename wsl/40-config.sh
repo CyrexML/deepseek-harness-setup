@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Шаг 5: настройки DSH — маршрут на модель, пресет агента, параметры интерфейса.
+# Step 5: DSH settings - the route to the model, the agent preset, UI options.
 #
-# Всё пишется из шаблонов templates/ с подстановкой значений из config.json.
-# Существующие настройки пользователя не затираются: если файл уже есть и в нём
-# нет нашей метки, он сохраняется рядом с суффиксом .before-install.
+# Everything is written from templates/ with values substituted from config.json.
+# Existing user settings are not overwritten: a file without this installer's
+# marker is kept beside the new one with a .before-install suffix.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
@@ -36,11 +36,10 @@ subst "$TPL/cordis.patch.yml.tmpl" > "$PROFILE/cordis.patch.yml"
 ok "модель $MODEL_ID, окно $CTX"
 
 step "пресет агента ($PRESET)"
-# Правило про работу на видеокарте в правилах агента. Файл ~/.dsh/AGENTS.md
-# читается в начале каждой сессии, и это единственный канал, который работает,
-# когда модель сама выясняет обстановку до первой команды: подсказка на запуске
-# срабатывает только если запуск случился. Дописывается ОДИН раз, по маркеру,
-# и чужого содержимого не трогает.
+# The GPU rule goes into the agent's working rules. ~/.dsh/AGENTS.md is read at
+# the start of every session, and it is the only channel that works when the
+# model probes the machine before running anything - a launch-time notice only
+# fires if a launch happened. Appended ONCE, by marker, leaving the rest alone.
 if [ -f "$TPL/agents-gpu.md" ]; then
   agents="$DSHDIR/AGENTS.md"
   if ! grep -q 'dsh-local: gpu-work-rule' "$agents" 2>/dev/null; then
@@ -55,9 +54,10 @@ mkdir -p "$DSHDIR/.agent-presets"
 if [ -d "$TPL/presets/local-64k" ]; then
   rm -rf "$DSHDIR/.agent-presets/$PRESET"
   cp -r "$TPL/presets/local-64k" "$DSHDIR/.agent-presets/$PRESET"
-  # Порог сжатия и размер окна внутри пресета должны совпадать с -c сервера.
-  # Подстановка во ВСЕ файлы пресета: помимо окна и модели там есть @HARNESS_DIR@ —
-  # модули пресета импортируют базовые классы из сборки харнеса по абсолютному пути.
+  # Compaction threshold and window size inside the preset must match the
+  # server's -c. Substitution covers every preset file: besides the window and
+  # the model they carry @HARNESS_DIR@, since preset modules import base classes
+  # from the harness build by absolute path.
   HARNESS_DIR="${HARNESS_DIR:-$HOME/tools/deepseek-harness}"
   find "$DSHDIR/.agent-presets/$PRESET" -type f \( -name '*.yml' -o -name '*.mjs' \) -print0 |
     xargs -0 sed -i -e "s|@CTX@|$CTX|g" -e "s|@MODEL_ID@|$MODEL_ID|g" -e "s|@HARNESS_DIR@|$HARNESS_DIR|g"
@@ -69,7 +69,7 @@ fi
 step "настройки интерфейса (settings.yaml)"
 keep_old "$DSHDIR/settings.yaml"
 if [ -f "$DSHDIR/settings.yaml" ] && grep -qF "$MARK" "$DSHDIR/settings.yaml"; then
-  ok "уже наши — не трогаю"
+  ok "уже применены — не трогаю"
 else
   subst "$TPL/settings.yaml.tmpl" > "$DSHDIR/settings.yaml"
   ok "записаны"

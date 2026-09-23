@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Удаление стенда изнутри WSL (то же, что делает uninstall.ps1, но без Windows-части).
+# Remove the stand from inside WSL (what uninstall.ps1 does, minus the Windows side).
 #
 #   bash wsl/uninstall.sh [--keep-data] [--yes]
 #
-# Удаляет: ~/Harness_AI (скрипты и тулчейны), ~/tools/deepseek-harness (харнес),
-# ~/harness-stand (копия установщика) и, если не задан --keep-data, ~/.dsh
-# (переписки, память агента, профиль с плагинами, настройки).
-# НЕ удаляет: Node.js в ~/.local/node и системные пакеты — их могли ставить не только мы.
+# Removes ~/Harness_AI (scripts and toolchains), ~/tools/deepseek-harness, the
+# installer copy in ~/harness-stand and, unless --keep-data, ~/.dsh (chats, agent
+# memory, the plugin profile, settings).
+# Leaves Node.js in ~/.local/node and system packages: other software may use them.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"

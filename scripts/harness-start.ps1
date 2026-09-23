@@ -225,12 +225,19 @@ try {
   Log ('start hidden=' + $Hidden)
   Write-Host '=== Harness AI ===' -ForegroundColor Cyan
 
-  # Ветка переключателя. Стоит ДО развёртывания .ps1: на выключении копировать
-  # нечего, а лишний вызов wsl.exe только замедлил бы отклик ярлыка.
+  # Toggle branch, before deploying the .ps1 files: a shutdown has nothing to
+  # copy, and an extra wsl.exe call would only slow the shortcut down.
+  #
+  # The splash is shown here on purpose. Launched from the shortcut the console
+  # is hidden, so without it a click on a running system stopped everything in
+  # complete silence and looked exactly like "the launcher does not work".
   if (Test-SystemRunning) {
     Log 'toggle: system running -> stopping'
     Write-Host 'система уже работает — этот клик её выключает' -ForegroundColor Yellow
+    Set-Stage 'stopping'
+    Start-Splash
     Stop-Everything
+    Set-Stage 'stopped'
     # Скрытому окну спросить не у кого: второй клик гасит только харнесс,
     # WSL остаётся; выбор «с WSL» — кнопка Power в вебе.
     if (-not $Hidden) { Confirm-WslShutdown }
@@ -240,10 +247,13 @@ try {
     exit 0
   }
 
-  # Правило проекта: источник .ps1 в scripts/, run/ — цель развёртывания.
-  # Разворачиваем на каждом запуске, чтобы правки в репозитории не разъезжались
-  # с тем, что реально исполняется (расхождение уже ловилось в bench-08).
-  Wsl "cp $Repo/scripts/start-server.ps1 $Repo/scripts/stop-server.ps1 $Repo/scripts/harness-splash.ps1 $Repo/scripts/splash-whale.png /mnt/f/Harness_AI/run/"
+  # Project rule: scripts/ is the source, run/ is the deployment target. Copy on
+  # every start so what executes cannot drift from the repository (drift was
+  # caught once in bench-08, and again on 2026-09-24: the deployed launcher was
+  # nine days old because it was the one file that copied itself nowhere).
+  # harness-start.ps1 is included: PowerShell has already read it into memory, so
+  # replacing the file mid-run is safe and the NEXT click gets the fresh code.
+  Wsl "cp $Repo/scripts/start-server.ps1 $Repo/scripts/stop-server.ps1 $Repo/scripts/harness-splash.ps1 $Repo/scripts/splash-whale.png $Repo/scripts/harness-start.ps1 $Repo/scripts/harness-stop.ps1 /mnt/f/Harness_AI/run/"
   Remove-Item -Force $PowerRequest -ErrorAction SilentlyContinue
   Remove-Item -Force $LaunchStatus -ErrorAction SilentlyContinue
   Set-Stage 'model'
@@ -299,8 +309,20 @@ try {
   # ArgumentList пробелами без кавычек, и составная команда доезжает рваной.
   Write-Host 'запускаю веб-интерфейс...'
   Set-Stage 'web'
+
+  # The old URL must not be mistaken for the new one: the wait below greps
+  # web.log for "dsh web:", and a line left by the previous run would make a
+  # failed start look successful (seen on 2026-09-24).
+  Wsl ": > $WebLog"
+
+  # Absolute path, resolved once: Start-Process joins ArgumentList with spaces
+  # and quotes nothing, so the arguments must survive as separate tokens with no
+  # shell expansion - `bash -lc '...'` arrives torn apart, and a bare `~` never
+  # expands without a shell.
+  $wslHome = (& wsl.exe -d $Distro -- bash -lc 'printf %s "$HOME"')
+  if (-not $wslHome -or $wslHome -match '\s') { throw "не удалось определить домашний каталог в WSL: '$wslHome'" }
   $Holder = Start-Process wsl.exe -PassThru -WindowStyle Hidden -ArgumentList @(
-    '-d', $Distro, '--', 'bash', '-lc', 'bash "$HOME/Harness_AI/scripts/harness-web-fg.sh"'
+    '-d', $Distro, '--', 'bash', "$wslHome/Harness_AI/scripts/harness-web-fg.sh"
   )
 
   $url = $null

@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
-# Снять слепок рабочего стенда в stand.lock.json — «система в этом состоянии».
+# Snapshot the working stand into stand.lock.json: the system as it is now.
 #
 #   bash make-lock.sh
 #
-# Файл фиксирует ровно то, что проверено вместе: тег харнеса, версии плагинов,
-# список патч-слоёв с маркерами, настройки сервера модели. Шаги установки читают
-# его, поэтому у другого человека соберётся та же связка, а не «последние»
-# версии, которые могли разойтись.
+# The file pins exactly what was verified together: harness tag, plugin versions,
+# patch layers with their markers, model server settings. The install steps read
+# it, so another machine gets the same combination instead of whatever "latest"
+# has drifted to.
 #
-# Обновление стенда = поменять числа здесь (или запустить этот скрипт после
-# ручного обновления) и выложить новый lock. На машине пользователя его
-# применит `update.cmd` / `wsl/60-update.sh`.
+# Updating the stand means changing the numbers here (or re-running this script
+# after a manual update) and publishing the new lock; update.cmd applies it.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 export PATH="$HOME/.local/node/bin:$PATH"

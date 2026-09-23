@@ -1,19 +1,17 @@
-﻿# Движок модели: llama.cpp с поддержкой CUDA.
+﻿# Model engine: llama.cpp with CUDA support.
 #
 #   powershell -ExecutionPolicy Bypass -File windows\10-llama.ps1
-#   ... -Build       собрать из исходников (нужен CUDA Toolkit + CMake); обычно НЕ нужно
-#   ... -Cpu         принудительно поставить сборку без CUDA
+#   ... -Build       build from source (needs CUDA Toolkit + CMake); normally NOT needed
+#   ... -Cpu         force a build without CUDA
 #
-# Почему не «просто скачать последний релиз»:
-#   * у релизов с номером версии (v0.4.1 и подобных) НЕТ сборок под Windows —
-#     они лежат в накатных сборках вида b11132, поэтому релизы перебираются,
-#     пока не найдётся подходящий ассет;
-#   * сборок под CUDA несколько (12.4 и 13.4) — нужная выбирается по версии
-#     драйвера видеокарты, её печатает nvidia-smi;
-#   * рядом лежит ОТДЕЛЬНЫЙ архив cudart-… с библиотеками времени выполнения
-#     CUDA. Без него llama-server.exe не стартует («не найден cudart64_*.dll»),
-#     поэтому он скачивается вместе со сборкой. CUDA Toolkit не нужен —
-#     достаточно драйвера NVIDIA.
+# Why not "just download the latest release":
+#   * version-numbered releases carry no Windows binaries - those live in rolling
+#     builds like b11132, so releases are scanned until a usable asset appears;
+#   * several CUDA builds exist (12.4 and 13.4) and the right one follows the
+#     driver version that nvidia-smi reports;
+#   * the CUDA runtime ships as a SEPARATE cudart- archive; without it
+#     llama-server.exe fails to start with a missing cudart64_*.dll, so it is
+#     downloaded alongside. The CUDA Toolkit is not needed, only the driver.
 [CmdletBinding()]
 param([switch]$Build, [switch]$Cpu, [string]$Tag = '')
 $ErrorActionPreference = 'Stop'
@@ -25,8 +23,8 @@ $dst = Join-Path $cfg.windowsRoot 'llama.cpp'
 $binDir = Join-Path $dst 'build\bin\Release'
 $exe = Join-Path $binDir 'llama-server.exe'
 
-# Работоспособность проверяем запуском, а не наличием файла: не хватает
-# библиотек CUDA — exe есть, но падает сразу.
+# Health is checked by running the binary, not by its presence: with CUDA
+# libraries missing the exe exists but dies immediately.
 function Test-Engine {
     if (-not (Test-Path $exe)) { return $false }
     try {
@@ -42,9 +40,9 @@ if (Test-Engine) {
     return
 }
 
-# Максимальная версия CUDA, которую тянет установленный драйвер: nvidia-smi
-# печатает её в шапке («CUDA Version: 13.0»). Это НЕ требование поставить
-# Toolkit — это потолок драйвера.
+# Highest CUDA version the installed driver supports; nvidia-smi prints it in
+# its header ("CUDA Version: 13.0"). This is the driver's ceiling, not a
+# requirement to install the Toolkit.
 function Get-GpuInfo {
     try {
         $header = (& nvidia-smi 2>$null | Out-String)
@@ -98,14 +96,14 @@ $releases = if ($Tag) {
     Invoke-RestMethod -Uri 'https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=15' -Headers $headers
 }
 
-# Сборки под Windows лежат не в каждом релизе, поэтому идём по списку сверху вниз.
+# Not every release carries Windows binaries, so walk the list from the top.
 $pick = $null
 foreach ($rel in $releases) {
     $win = $rel.assets | Where-Object { $_.name -match '^llama-.*-bin-win-' -and $_.name -match 'x64\.zip$' }
     if (-not $win) { continue }
 
     if ($null -ne $gpu) {
-        # Из доступных вариантов CUDA берём самый свежий, который тянет драйвер.
+        # Of the available CUDA builds take the newest one the driver supports.
         $cudaAssets = $win | Where-Object { $_.name -match 'cuda-([0-9]+\.[0-9]+)-x64\.zip$' } | ForEach-Object {
             [void]($_.name -match 'cuda-([0-9]+\.[0-9]+)-x64\.zip$')
             [pscustomobject]@{ asset = $_; version = [double]$Matches[1] }
@@ -142,14 +140,14 @@ function Get-Asset {
 Write-Step 'установка'
 Get-Asset -Asset $pick.engine -What 'движок'
 if ($pick.runtime) {
-    # Библиотеки времени выполнения CUDA идут отдельным архивом; без них exe
-    # не стартует. Toolkit при этом не нужен.
+    # The CUDA runtime comes as its own archive; without it the exe will not
+    # start. The Toolkit is still not required.
     Get-Asset -Asset $pick.runtime -What 'библиотеки CUDA'
 } elseif ($pick.kind -ne 'CPU') {
     Write-Warn "в релизе нет архива cudart для $($pick.kind) — если сервер не запустится, поставьте CUDA Toolkit или выберите другой релиз ключом -Tag"
 }
 
-# В некоторых архивах файлы лежат в подпапке — поднимаем наверх.
+# Some archives nest everything in a subfolder - lift it up.
 if (-not (Test-Path $exe)) {
     $nested = Get-ChildItem $binDir -Directory | Where-Object { Test-Path (Join-Path $_.FullName 'llama-server.exe') } | Select-Object -First 1
     if ($nested) {

@@ -1,24 +1,24 @@
 {
-  "_": "Копия этого файла с именем config.json — единственное место, где живут личные значения. Всё остальное в репозитории обезличено.",
+  "_": "A copy of this file named config.json is the only place personal values live. Everything else in the repository is impersonal.",
   "windowsRoot": "F:\\Harness_AI",
-  "_windowsRoot": "Куда на Windows лягут модели, llama.cpp, логи и скрипты запуска. Нужно ~40 ГБ свободного места (модель + сборка).",
+  "_windowsRoot": "Where models, llama.cpp, logs and launch scripts go on Windows. Needs ~40 GB free (model + build).",
   "wslDistro": "Ubuntu",
-  "_wslDistro": "Имя дистрибутива WSL2. Установщик создаст его, если такого нет.",
+  "_wslDistro": "Name of the WSL2 distribution. The installer creates it if missing.",
   "harnessTag": "",
-  "_harnessTag": "Пусто = брать тег из stand.lock.json (проверенная связка). Задавайте только если сознательно ставите другую версию.",
+  "_harnessTag": "Empty = take the tag from stand.lock.json (the verified combination). Set it only to install a different version on purpose.",
   "webPort": 3080,
   "modelPort": 8080,
-  "_ports": "webPort — интерфейс DSH; modelPort — llama-server. Порт модели слушается на 0.0.0.0, чтобы WSL достучался до Windows.",
+  "_ports": "webPort is the DSH interface; modelPort is llama-server. The model port listens on 0.0.0.0 so WSL can reach Windows.",
   "tunnel": {
     "enabled": false,
     "domain": "",
-    "_": "Доступ с телефона через Cloudflare Tunnel. Пустой домен = туннель не настраивается, стенд работает только в локальной сети."
+    "_": "Phone access through a Cloudflare tunnel. An empty domain means no tunnel is configured and the stand stays on the local network."
   },
   "model": {
     "file": "Qwen3.8-27B-UD-Q3_K_XL.gguf",
     "repo": "unsloth/Qwen3.8-27B-GGUF",
     "mmproj": "mmproj-F16.gguf",
-    "_": "Что скачать. Мастер windows/20-model.ps1 подберёт это под вашу видеокарту сам; здесь — то, под что настроен репозиторий (RTX 5080, 16 ГБ)."
+    "_": "What to download. windows/20-model.ps1 picks this for your GPU; the value here is what the repository is tuned for (RTX 5080, 16 GB)."
   },
   "server": {
     "ctx": 65536,
@@ -26,7 +26,7 @@
     "specDraftNMax": 3,
     "reasoningEffort": "medium",
     "reasoningBudget": 5000,
-    "_": "Настройка llama-server. Мастер windows/30-tune.ps1 пересчитает ctx под объём вашей видеопамяти и проверит замером."
+    "_": "llama-server settings. windows/30-tune.ps1 recomputes ctx for your VRAM and verifies it by measurement."
   },
   "features": {
     "mobileBridge": true,
@@ -34,6 +34,6 @@
     "officePreview": true,
     "graphMemory": true,
     "turnRewind": true,
-    "_": "Какие плагины ставить. Патч-слои применяются только к включённым."
+    "_": "Which plugins to install. Patch layers apply only to the enabled ones."
   }
 }

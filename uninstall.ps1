@@ -1,26 +1,27 @@
-﻿# Полное удаление стенда «Harness AI».
+﻿# Complete removal of the Harness AI stand.
 #
 #   powershell -ExecutionPolicy Bypass -File uninstall.ps1
 #
-# Ключи:
-#   -KeepModel     оставить скачанные модели (13+ ГБ — качать заново долго)
-#   -KeepData      оставить переписки, память агента и настройки (~/.dsh)
-#   -KeepWsl       не удалять дистрибутив WSL целиком (по умолчанию он и не удаляется)
-#   -RemoveWsl     удалить дистрибутив WSL ЦЕЛИКОМ — вместе со всем, что в нём есть
-#   -Yes           не спрашивать подтверждения
+# Flags:
+#   -KeepModel     keep the downloaded models (13+ GB, slow to fetch again)
+#   -KeepData      keep chats, agent memory and settings (~/.dsh)
+#   -KeepWsl       do not remove the WSL distribution (the default anyway)
+#   -RemoveWsl     remove the WSL distribution ENTIRELY, with everything in it
+#   -Yes           do not ask for confirmation
 #
-# Что удаляется по умолчанию: ярлыки и задача планировщика, правило брандмауэра,
-# движок llama.cpp, каталоги стенда внутри WSL (~/Harness_AI, ~/tools/deepseek-harness,
-# ~/harness-stand) и данные DSH (~/.dsh). Модели — тоже, если не задан -KeepModel.
-# Windows, WSL, драйверы и Node.js не трогаются: их ставили не мы одни.
+# Removed by default: shortcuts and the scheduled task, the firewall rule, the
+# llama.cpp engine, the stand's directories inside WSL (~/Harness_AI,
+# ~/tools/deepseek-harness, ~/harness-stand) and DSH data (~/.dsh). Models too,
+# unless -KeepModel. Windows, WSL, drivers and Node.js are left alone: other
+# software may depend on them.
 [CmdletBinding()]
 param(
   [switch]$KeepModel,
   [switch]$KeepData,
   [switch]$KeepWsl,
   [switch]$RemoveWsl,
-  # Полное удаление «под ноль»: всё вышеперечисленное плюс дистрибутив WSL
-  # целиком. Отдельный ключ, потому что в дистрибутиве могут быть чужие данные.
+  # Wipe everything, including the WSL distribution. A separate flag because the
+  # distribution may hold unrelated data.
   [switch]$All,
   [switch]$Yes
 )

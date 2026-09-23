@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Шаг 2: сам DeepSeek Harness — клон нужного тега и сборка.
+# Step 2: DeepSeek Harness itself - clone the pinned tag and build it.
 #
-# Тег берётся из config.json (harnessTag). Это ВАЖНО: патч-слои привязаны к
-# конкретным строкам исходников, на 'main' они не лягут.
+# The tag matters: patch layers are anchored to specific source lines and will
+# not apply against 'main'.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
 
 REPO="${HARNESS_REPO:-https://github.com/deepseek-ai/deepseek-harness.git}"
-# Тег харнеса — из stand.lock.json (проверенная связка), config.json может его
-# переопределить, если человек сознательно ставит другую версию.
+# The tag comes from stand.lock.json (the verified combination); config.json can
+# override it for a deliberately different version.
 LOCK="$ROOT/stand.lock.json"
 TAG="$(cfg .harnessTag '')"
 if [ -z "$TAG" ] && [ -f "$LOCK" ]; then
@@ -36,8 +36,8 @@ else
     die "тега $TAG нет в репозитории — проверьте harnessTag в config.json"
   info "переключаюсь на $TAG"
   git -C "$DST" checkout --quiet --detach "$TAG"
-  # Смена тега без очистки оставляет lib/ от прежней версии, и сборка падает
-  # на «Could not resolve '@deepseek-ai/dsh-subprocess-local/output'».
+  # Switching tags without cleaning leaves lib/ from the previous version and the
+  # build fails on "Could not resolve '@deepseek-ai/dsh-subprocess-local/output'".
   ( cd "$DST" && pnpm clean >/dev/null 2>&1 || true )
   ok "переключено"
 fi

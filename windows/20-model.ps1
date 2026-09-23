@@ -1,9 +1,9 @@
-﻿# Мастер модели: подобрать под видеокарту, скачать, проверить.
+﻿# Model wizard: pick one for the GPU, download it, verify it.
 #
 # Запуск:  powershell -ExecutionPolicy Bypass -File windows\20-model.ps1
-# Ключи:   -ListOnly   только показать таблицу и выйти
-#          -Model <имя файла>  взять конкретный файл, без подбора
-#          -NoDownload только записать выбор в config.json (файл положите сами)
+# Flags:   -ListOnly   print the table and exit
+#          -Model <file name>  take a specific file, no matching
+#          -NoDownload write the choice into config.json only (place the file yourself)
 [CmdletBinding()]
 param(
   [switch]$ListOnly,
@@ -17,16 +17,14 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $cfg = Read-StandConfig
 $modelsDir = Join-Path $cfg.windowsRoot 'models'
 
-# Каталог проверенных вариантов. vramGb — СКОЛЬКО НУЖНО видеопамяти, чтобы
-# модель влезла целиком вместе с окном контекста; sizeGb — размер файла.
-# Каталог: сначала семейство, потом кванты от крупного к мелкому. Мастер берёт
-# самый крупный квант, который влезает в видеопамять вместе с окном контекста;
-# если не влезает ни один — предлагает тот же файл поменьше, а не другую модель.
+# Catalog of verified options, family first, then quants from large to small.
+# vramGb is how much VRAM the model needs in total (weights + context cache +
+# buffers); sizeGb is the file size. The wizard takes the largest quant that
+# fits; if none does, it offers a smaller quant of the same file rather than a
+# different model.
 #
-# vramGb — сколько всего видеопамяти нужно (вес модели + кэш контекста + буферы).
-# mtp    — модель умеет предсказывать несколько токенов вперёд (--spec-type
-#          draft-mtp): это +50-100% к скорости генерации, поэтому такие варианты
-#          в приоритете.
+# mtp marks models that can predict several tokens ahead (--spec-type
+# draft-mtp): +50-100% generation speed, which is why they come first.
 $catalog = @(
   @{ name='Qwen3.5-9B-MTP-UD-Q4_K_XL.gguf';  repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=10; sizeGb=6.1;  ctx=32768; mtp=$true;  family='Qwen3.5 9B'; note='самый скромный вариант: 10 ГБ видеопамяти' }
   @{ name='Qwen3.5-9B-MTP-UD-Q5_K_XL.gguf';  repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=12; sizeGb=6.9;  ctx=49152; mtp=$true;  family='Qwen3.5 9B'; note='минимальная рекомендуемая конфигурация' }
@@ -70,8 +68,8 @@ if ($Model) {
 } elseif ($fits) {
   $choice = $fits | Sort-Object vramGb -Descending | Select-Object -First 1
 } else {
-  # Видеопамяти мало даже под самый скромный вариант: берём его же, но честно
-  # предупреждаем — часть модели уйдёт на процессор и скорость упадёт.
+  # Not enough VRAM even for the smallest option: keep it, but say plainly that
+  # part of the model spills to the CPU and speed drops.
   $choice = $catalog[0]
   Write-Warn "видеопамяти $($gpu.gb) ГБ — меньше, чем нужно самому скромному варианту ($($choice.vramGb) ГБ)"
   Write-Info 'Ставлю его же: модель частично пойдёт на процессор, работать будет медленно.'
@@ -92,7 +90,7 @@ if (Test-Path $target) {
 } else {
   Write-Info "скачиваю $($choice.name) (~$($choice.sizeGb) ГБ) из $($choice.repo)"
   $url = "https://huggingface.co/$($choice.repo)/resolve/main/$($choice.name)?download=true"
-  # curl.exe есть в Windows 10+; он умеет докачку (-C -), в отличие от Invoke-WebRequest
+  # curl.exe ships with Windows 10+ and can resume (-C -), unlike Invoke-WebRequest
   & curl.exe -L --fail --retry 5 --retry-delay 5 -C - -o "$target" "$url"
   if ($LASTEXITCODE -ne 0) {
     Write-Warn 'автоматическая загрузка не удалась (сеть/зеркало). Скачайте файл вручную:'

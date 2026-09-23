@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Шаг 6: проверка живого стенда. Ничего не чинит — только докладывает.
+# Step 6: verify the running stand. Fixes nothing, only reports.
 #
-# Возврат 0 = всё поднялось. Каждая строка — одна проверка, её видно в выводе
-# установщика, поэтому при неудаче сразу понятно, на чём именно.
+# Exit 0 means everything came up. One line per check, so a failure points at the
+# exact step.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
@@ -36,8 +36,8 @@ fi
 step "модель"
 if curl -sf --max-time 10 "$MODEL_URL/health" 2>/dev/null | grep -q '"status":"ok"'; then
   ok "llama-server отвечает ($MODEL_URL)"
-  # Скорость генерации меряем на осмысленном ответе: на «привет» в 3 токена
-  # число получается бессмысленным (его съедают накладные расходы запроса).
+  # Measure generation speed on a real answer: a three-token reply is dominated
+  # by request overhead and the number means nothing.
   tps="$(curl -s --max-time 180 -X POST "$MODEL_URL/completion" \
       -H 'Content-Type: application/json' \
       -d '{"prompt":"Explain what a neural network is, in two sentences.","n_predict":128,"temperature":0,"stream":false}' |

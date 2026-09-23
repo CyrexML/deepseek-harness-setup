@@ -1,14 +1,14 @@
-﻿# Обновление стенда до состояния, записанного в репозитории.
+﻿# Update the stand to the state recorded in the repository.
 #
-#   двойной клик по update.cmd
-# или
+#   double-click update.cmd
+# or
 #   powershell -ExecutionPolicy Bypass -File windows\50-update.ps1
-#   ... -NoPull   не тянуть новую версию из GitHub, применить то, что уже лежит
+#   ... -NoPull   do not pull from GitHub, apply what is already here
 #
-# Что делает: забирает свежую версию установщика (git pull, если папка — клон),
-# снимает бэкап профиля, применяет stand.lock.json — версии харнеса и плагинов,
-# патч-слои, настройки, — перезапускает стенд и проверяет его. Если проверка не
-# прошла, печатает, чем откатиться: бэкап делается ДО изменений.
+# Pulls a fresh installer (git pull, when the folder is a clone), backs up the
+# profile, applies stand.lock.json - harness and plugin versions, patch layers,
+# settings - restarts the stand and verifies it. The backup is taken BEFORE any
+# change, and the rollback command is printed if verification fails.
 [CmdletBinding()]
 param([switch]$NoPull)
 $ErrorActionPreference = 'Stop'
