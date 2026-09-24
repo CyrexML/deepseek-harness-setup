@@ -1,6 +1,6 @@
 ﻿# Model wizard: pick one for the GPU, download it, verify it.
 #
-# Запуск:  powershell -ExecutionPolicy Bypass -File windows\20-model.ps1
+# Run:     powershell -ExecutionPolicy Bypass -File windows\20-model.ps1
 # Flags:   -ListOnly   print the table and exit
 #          -Model <file name>  take a specific file, no matching
 #          -NoDownload write the choice into config.json only (place the file yourself)
@@ -49,7 +49,7 @@ $gpu = Get-VramGb
 if ($null -eq $gpu) {
   Write-Warn 'nvidia-smi does not answer: no NVIDIA GPU found, or no driver installed.'
   Write-Info 'The stand is built for NVIDIA with CUDA. Without it the model runs on the CPU, 20-50 times slower.'
-  $gpu = @{ name = 'неизвестно'; gb = 8 }
+  $gpu = @{ name = 'unknown'; gb = 8 }
 } else {
   Write-Ok '{0}, {1} GB of VRAM' $gpu.name $gpu.gb
 }

@@ -1,10 +1,10 @@
-Этот репозиторий содержит только собственный код: скрипты установки и удаления,
-патч-слои, шаблоны настроек и документацию. Исходники и сборки перечисленных
-ниже проектов здесь НЕ распространяются — установщик берёт их с официальных
-источников (реестр npm, GitHub) на машине пользователя, а патчи накладывает
-локально, уже после установки.
+This repository contains only its own code: install and uninstall scripts, patch
+layers, configuration templates and documentation. The sources and builds of the
+projects listed below are NOT redistributed here - the installer fetches them
+from their official sources (the npm registry, GitHub) on the user's machine and
+applies the patches locally, after installation.
 
-Проекты, поверх которых работает стенд, и их лицензии:
+The projects the stand is built on, and their licenses:
 
   DeepSeek Harness           MIT           https://github.com/deepseek-ai/deepseek-harness
   dsh-better-sidebar         MIT           https://github.com/omdsh-dev/DSH-better-sidebar
@@ -16,20 +16,24 @@
   graph-memory               MIT           https://github.com/adoresever/graph-memory
   llama.cpp                  MIT           https://github.com/ggml-org/llama.cpp
 
-Изменения, которые наши скрипты вносят в эти пакеты после установки, описаны
-в README («Зачем патч-слои») и в заголовке каждого скрипта: файл, якорь,
-причина правки. Ни один изменённый файл этих проектов в репозиторий не входит.
+The changes these scripts make to those packages after installation are described
+in the README ("Why the patch layers") and in the header of every script: the
+file, the anchor and the reason. Not one modified file of those projects is part
+of this repository.
 
-Единственное исключение — словари перевода интерфейса моста
-(projects/PlugIN/dsh-bridge-en/tools/strings.json, occ.json, tr-*.json). Это
-СТРОКИ ИНТЕРФЕЙСА, извлечённые из исходников @wenbin_wb/dsh-bridge (MIT), вместе
-с их позициями в файлах и нашими английскими переводами. Без них нельзя заново
-наложить перевод после обновления плагина, поэтому они входят в репозиторий на
-условиях MIT самого плагина: авторство и лицензия указаны выше, изменения (замена
-китайских строк на английские) описаны в projects/PlugIN/dsh-bridge-en/README.md.
-Исполняемого кода плагина в репозитории нет.
+The single exception is the bridge UI translation dictionary
+(projects/PlugIN/dsh-bridge-en/tools/strings.json, occ.json, tr-*.json). Those are
+INTERFACE STRINGS extracted from the sources of @wenbin_wb/dsh-bridge (MIT),
+together with their positions in the files and the English translations. Without
+them the translation cannot be re-applied after a plugin update, so they are
+included under the plugin's own MIT terms: authorship and license are stated
+above, and the change (Chinese strings replaced by English) is described in
+projects/PlugIN/dsh-bridge-en/README.md. No executable code of the plugin is in
+this repository.
 
-Шаблон диалога templates/chat-agent.jinja — производная от шаблона, вшитого в
-модель Qwen3 (Apache-2.0): та же логика с одним изменённым условием, которое
-убирает повтор размышлений из истории. Условие и причина описаны в комментарии
-внутри файла.
+The stand's own code is under the MIT license, see LICENSE.
+
+The chat template templates/chat-agent.jinja is derived from the template baked
+into the Qwen3 model (Apache-2.0): the same logic with one changed condition that
+keeps repeated reasoning out of the history. The condition and the reason are
+described in a comment inside the file.

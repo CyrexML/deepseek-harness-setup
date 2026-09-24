@@ -1,9 +1,9 @@
-# Окончания строк задаются здесь, а не настройкой клиента.
+# Line endings are decided here, not by a client setting.
 #
-# Почему это важно: у многих на Windows включено core.autocrlf=true. Без этого
-# файла при клонировании .sh получили бы CRLF, и bash внутри WSL спотыкался бы
-# на каждом '\r' — установка падала бы с невнятной ошибкой в первой же строке.
-# Обратная сторона: .cmd и .vbs Windows должен видеть с CRLF.
+# Why it matters: many Windows machines have core.autocrlf=true. Without this
+# file a clone would give .sh files CRLF, bash inside WSL would trip over every
+# '\r', and the install would fail with an opaque error on the very first line.
+# The other side of it: Windows must see .cmd and .vbs with CRLF.
 * text=auto eol=lf
 
 *.sh   text eol=lf

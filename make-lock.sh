@@ -25,24 +25,24 @@ const fs = require('node:fs');
 const [profile, here, tag, commit, out] = process.argv.slice(2);
 
 const pkg = JSON.parse(fs.readFileSync(`${profile}/package.json`, 'utf8'));
-// Пишем ТОЧНЫЕ установленные версии, а не диапазоны из package.json: диапазон
-// через месяц приведёт к другой сборке.
+// Write the EXACT installed versions rather than the ranges from package.json:
+// a range resolves to a different build a month later.
 const plugins = {};
 for (const name of Object.keys(pkg.dependencies ?? {})) {
   try {
     const installed = JSON.parse(fs.readFileSync(`${profile}/node_modules/${name}/package.json`, 'utf8'));
     plugins[name] = pkg.dependencies[name].startsWith('git') || pkg.dependencies[name].startsWith('github:')
-      ? pkg.dependencies[name]          // git-зависимость: версия ничего не скажет
+      ? pkg.dependencies[name]          // a git dependency: the version says nothing
       : installed.version;
   } catch { plugins[name] = pkg.dependencies[name]; }
 }
 
-// Слои читаем из самого ensure-patches.sh: он и есть их реестр.
+// The layers are read from ensure-patches.sh itself: it is their registry.
 const ensure = fs.readFileSync(`${here}/scripts/ensure-patches.sh`, 'utf8');
 const layers = [...ensure.matchAll(/^layer\s+(\S+)\s+"[^"]+"\s+"([^"]+)"/gm)].map(m => ({ name: m[1], marker: m[2] }));
 
 const lock = {
-  _: 'Слепок проверенной связки. Меняется осознанно: правим числа и выкладываем новый lock.',
+  _: 'Snapshot of the verified combination. Changed deliberately: edit the numbers and publish a new lock.',
   createdAt: new Date().toISOString().slice(0, 10),
   harness: { tag, commit },
   plugins,
@@ -50,7 +50,7 @@ const lock = {
   bundles: pkg.dsh?.profile?.bundles ?? [],
 };
 fs.writeFileSync(out, JSON.stringify(lock, null, 2) + '\n');
-console.log(`харнес ${tag}, плагинов ${Object.keys(plugins).length}, слоёв ${layers.length}`);
+console.log(`harness ${tag}, plugins ${Object.keys(plugins).length}, layers ${layers.length}`);
 NODE
 
-echo "записан $OUT"
+echo "written $OUT"

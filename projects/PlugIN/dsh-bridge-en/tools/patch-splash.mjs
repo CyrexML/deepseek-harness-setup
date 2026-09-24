@@ -6,8 +6,8 @@
 // so it is painted before any bundle arrives. It is an overlay only: it never changes the app theme.
 // Removed with a fade as soon as #root gets its first child (fallback: 25 s).
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';

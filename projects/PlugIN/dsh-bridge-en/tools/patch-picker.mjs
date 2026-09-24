@@ -2,8 +2,8 @@
 // on remote/mobile too, instead of dsh-bridge's replacement modal. Set USE_NATIVE_PICKER=false to keep
 // bridge's modal. Idempotent. Usage: node patch-picker.mjs <plugin_dir>
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';
@@ -62,11 +62,11 @@ const SLOT = `  ctx.slots.inject('conversation.hero.workspace.directoryFlow', ()
           priority: -10,`;
 const SLOT_PATCHED = `  if (typeof window !== 'undefined' && window.__dshBridgeNativePicker === false) // dsh-bridge-en: keep the host's own picker
 ` + SLOT;
-// С 2.10.13 мост делает это сам: в регистрации слота появился его собственный
-// отказ в пользу родного выбора папки (`shouldYieldToOfficialPicker`). Тогда
-// наша правка не нужна — и якорь всё равно не совпадёт, потому что между
-// строками вставился новый код. Проверяем по имени функции, а не по версии
-// пакета: так патч переживёт и переименование версии, и бэкпорт.
+// Since 2.10.13 the bridge does this itself: the slot registration carries its
+// own deference to the native folder picker (`shouldYieldToOfficialPicker`). Then
+// this edit is unnecessary - and the anchor would not match anyway, because new
+// code was inserted between the lines. The check is by function name rather than
+// package version, so the patch survives both a version rename and a backport.
 const UPSTREAM_GUARD = 'shouldYieldToOfficialPicker';
 const m = s.split(SLOT).length - 1;
 if (s.includes(UPSTREAM_GUARD)) {

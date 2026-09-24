@@ -14,9 +14,9 @@ for i in $(seq 1 "$RUNS"); do
   st=$(cat "$OUT/run$i.log.start" 2>/dev/null || echo 0)
   en=$(cat "$OUT/run$i.log.end" 2>/dev/null || echo 0)
   rc=$(grep -a "EXIT=" "$OUT/run$i.log" 2>/dev/null | tail -1 | sed 's/EXIT=//')
-  if (cd "$REPO" && python3 -m pytest -q > "$OUT/run$i.pytest" 2>&1); then solved=ДА; else solved=НЕТ; fi
+  if (cd "$REPO" && python3 -m pytest -q > "$OUT/run$i.pytest" 2>&1); then solved=yes; else solved=no; fi
   printf 'run%-2s wall=%3ss rc=%s solved=%-3s steps=%s | %s\n' \
     "$i" "$((en-st))" "$rc" "$solved" "$((after-before))" "$(tail -1 "$OUT/run$i.pytest" | tr -d '\r')" \
     | tee -a "$OUT/summary.txt"
 done
-echo; echo "=== ИТОГ ==="; cat "$OUT/summary.txt"
+echo; echo "=== RESULT ==="; cat "$OUT/summary.txt"

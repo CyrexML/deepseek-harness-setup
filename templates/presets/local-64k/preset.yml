@@ -1,3 +1,3 @@
 name: Local 64k
-description: Рабочий пресет стенда. Порог сжатия 0.7 при окне 65 536, хвост 0.20, пересказ до 6144 токенов. Резидентный каталог из девяти инструментов (read/write/edit/bash/grep/glob/todo_write/ask_user_question/dev_tool_search), остальные — по требованию через dev_tool_search. Откат к малому каталогу на один запрос после сжатия.
+description: The stand working preset. Compaction threshold 0.7 on a 65536 window, 0.20 tail, summary up to 6144 tokens. A resident catalog of nine tools (read/write/edit/bash/grep/glob/todo_write/ask_user_question/dev_tool_search); everything else on demand through dev_tool_search. One request falls back to the small catalog after a compaction.
 order: 1

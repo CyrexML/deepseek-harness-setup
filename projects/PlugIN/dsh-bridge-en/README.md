@@ -1,59 +1,59 @@
-# dsh-bridge — English UI (v2.10.9)
+# dsh-bridge - English UI
 
-Плагин `@wenbin_wb/dsh-bridge` переведён с китайского на английский.
+The `@wenbin_wb/dsh-bridge` plugin translated from Chinese into English.
 
-* Живой плагин: `~/.dsh/profiles/web/node_modules/@wenbin_wb/dsh-bridge` (уже переведён).
-* `dist/` — готовая переведённая копия плагина (без `node_modules`).
-* Исходный (нетронутый) плагин: `../bridge-i18n/backup/dsh-bridge-2.10.8/ (2.10.8), backup-2.10.9/ (2.10.9)`.
-* `tools/` — инструментарий: `extract.mjs` (сбор строк через парсер acorn), `apply.mjs`
-  (замена по картам `tr-*.json` / `frag-*.json`), `postfix.mjs` (двуязычные матчеры под хост-UI).
-* `translate.sh [dir]` — повторно применить перевод (например, после `npm update` плагина).
-  Карты привязаны к китайскому тексту, поэтому на новой версии переведётся всё, что не изменилось.
-  **Новые строки** скрипт сам отправляет локальной Qwen (llama-server, `DSH_LLAMA_BASE_URL` или
-  `http://<шлюз WSL>:8080/v1`) через `tools/auto-translate.mjs`, проверяет плейсхолдеры и
-  отсутствие иероглифов и сохраняет в `tools/tr-auto.json`. Строки-матчеры (`includes`, `===`,
-  ключи объектов, CSS-селекторы) в автоперевод не идут — они попадают в `tools/review.json`
-  на ручную проверку. `NO_AUTO=1 ./translate.sh` — отключить обращение к модели.
-* После каждого обновления плагина: `./translate.sh`, затем перезапустить DSH.
+* Live plugin: `~/.dsh/profiles/web/node_modules/@wenbin_wb/dsh-bridge` (already translated).
+* `tools/` - the toolchain: `extract.mjs` (collects strings through the acorn parser),
+  `apply.mjs` (replaces them from the `tr-*.json` / `frag-*.json` maps), `postfix.mjs`
+  (bilingual matchers for the host UI).
+* `translate.sh [dir]` - re-apply the translation, for example after the plugin is updated.
+  The maps are keyed by the Chinese text, so on a new version everything unchanged is
+  translated again. **New strings** are sent to the local model (llama-server,
+  `DSH_LLAMA_BASE_URL`) through `tools/auto-translate.mjs`, which checks placeholders and the
+  absence of Chinese characters and stores the result in `tools/tr-auto.json`. Matcher strings
+  (`includes`, `===`, object keys, CSS selectors) are never auto-translated - they go into
+  `tools/review.json` for a human. `NO_AUTO=1 ./translate.sh` disables the model call.
+* After every plugin update: `./translate.sh`, then restart DSH.
 
-## Что намеренно оставлено по-китайски
-* Комментарии в коде и CSS-комментарии (`client/mobile-styles.js`) — пользователю не видны.
-* `lib/feishu/lark-bundled.mjs` — бандл SDK Lark.
-* Матчеры под aria-label хостового UI DSH (`新建会话`, `添加工作区`, `收起侧边栏` …) — оставлены
-  и **дополнены английскими** эквивалентами из локалей хоста (`New session`, `Add workspace`,
-  `Collapse sidebar` …). Раньше при `locale: en` они не срабатывали вовсе.
-* `以太网` в `lib/index.js` — распознавание имени сетевого адаптера на китайской Windows.
-* `README.md`, `CHANGELOG.md`, `releaseNotes` в package.json — есть `README.en.md`.
+## Deliberately left in Chinese
+* Code and CSS comments (`client/mobile-styles.js`) - invisible to the user.
+* `lib/feishu/lark-bundled.mjs` - a bundled SDK.
+* Matchers for the DSH host UI aria-labels - kept and **extended with the English**
+  equivalents from the host locales, since with `locale: en` they did not match at all.
+* The network adapter name in `lib/index.js` - recognising it on a Chinese Windows.
+* `README.md`, `CHANGELOG.md` and `releaseNotes` in package.json - `README.en.md` exists.
 
-## Связки клиент ↔ сервер
-Сообщения об ошибках сервера, по которым клиент решает показать окно разблокировки, переведены
-согласованно: `admin privileges required`, `password to unlock`, `local-machine admin only`
-(`lib/bridge-rpc.js`, `lib/auth/manager.js` ↔ `client/index.js`).
+## Client-server pairs
+Server error messages that make the client show the unlock dialog are translated consistently:
+`admin privileges required`, `password to unlock`, `local-machine admin only`
+(`lib/bridge-rpc.js`, `lib/auth/manager.js` <-> `client/index.js`).
 
-## Патч: better-sidebar в мобильной версии (`tools/patch-sidebar.mjs`)
-Мобильный CSS dsh-bridge прячет кнопку-тоггл better-sidebar (`div[class*="toggleCluster"]`) и показывает
-панель только при `body.dsh-workbench-open`, который ставился лишь по некоторым кликам — отсюда
-«нет кнопки» и «файлы открываются через раз». Патч:
-* добавляет в мобильную шапку кнопку «Toggle sidebar» (между заголовком и «+»), она программно
-  нажимает скрытый тоггл better-sidebar;
-* синхронизирует `dsh-workbench-open` с реальным состоянием панели через MutationObserver —
-  открытие файла из чата/агентом всегда показывает панель;
-* закрытие панели (заголовок, «+», «Back to chat», смена сессии) идёт через настоящий тоггл,
-  а не через ручное добавление класса (иначе React возвращал панель).
-Применяется автоматически из `translate.sh`; идемпотентен. Если после обновления bridge
-он напишет `MATCH COUNT 0` — значит автор изменил этот код, патч надо переложить.
+## Patch: better-sidebar on mobile (`tools/patch-sidebar.mjs`)
+The bridge's mobile CSS hides better-sidebar's toggle (`div[class*="toggleCluster"]`) and shows
+the panel only when `body.dsh-workbench-open` is set, which happened on some clicks only - hence
+"there is no button" and "files open every other time". The patch:
+* adds a "Toggle sidebar" button to the mobile header, which programmatically presses the hidden
+  better-sidebar toggle;
+* syncs `dsh-workbench-open` with the panel's real state through a MutationObserver, so opening a
+  file from the chat or by the agent always shows the panel;
+* closes the panel through the real toggle rather than by removing the class by hand (React put
+  the panel back otherwise).
+Applied automatically from `translate.sh`; idempotent. A `MATCH COUNT 0` after a bridge update
+means the author changed that code and the patch has to be re-anchored.
 
-## Патч: родной выбор папки + админ-замок (`tools/patch-picker.mjs`, `tools/picker-gate.js`)
-На телефоне bridge подменял диалог выбора workspace своей модалкой (перехват клика + регистрация в слоте
-хоста `directoryFlow` с `priority: -10`). Патч отключает оба пути (`USE_NATIVE_PICKER = true`), и с телефона
-открывается родной диалог DSH («Select Workspace Directory»: New folder, Show hidden files, edit path).
-Перед открытием `picker-gate.js` проверяет админ-доступ bridge (`listRemoteDirectories` с adminToken):
-если сервер требует пароль — показывает окно «Admin password required» и пропускает клик только после
-`unlockAdmin`. Сессия разблокировки та же, что у панели bridge («Lock the admin panel again» закрывает).
-Вернуть модалку bridge: `USE_NATIVE_PICKER = false` → `translate.sh` → перезапуск DSH.
+## Patch: native folder picker plus admin lock (`tools/patch-picker.mjs`, `tools/picker-gate.js`)
+On a phone the bridge replaced the workspace picker with its own modal (a click interception plus
+a registration in the host's `directoryFlow` slot with `priority: -10`). The patch disables both
+paths (`USE_NATIVE_PICKER = true`), so the phone opens the native DSH dialog ("Select Workspace
+Directory": New folder, Show hidden files, edit path). Before opening, `picker-gate.js` checks the
+bridge's admin access (`listRemoteDirectories` with adminToken): if the server requires a password
+it shows an "Admin password required" dialog and lets the click through only after `unlockAdmin`.
+The unlock session is the same one the bridge panel uses ("Lock the admin panel again" ends it).
+To bring the bridge modal back: `USE_NATIVE_PICKER = false` -> `translate.sh` -> restart DSH.
 
-## Headless-проверка на «телефоне»
-Playwright chromium из репозитория harness (`~/.cache/ms-playwright`, `LD_LIBRARY_PATH` на локально
-распакованный `libasound2`), вьюпорт iPhone 13, вход через `http://<LAN-IP>:3082/?auth=<auth.secretToken>`
-из `~/.dsh/dsh-bridge/config.json`. Скрипты-примеры остались в scratchpad сессии; логика — tap по
-`.dsh-header-sidebar-btn`, `.dsh-header-menu-btn`, `button[aria-label*="Add workspace"]`.
+## Headless check on a "phone"
+Playwright chromium from the harness repository (`~/.cache/ms-playwright`, with `LD_LIBRARY_PATH`
+pointing at a locally unpacked `libasound2`), an iPhone 13 viewport, entering through
+`http://<LAN-IP>:3082/?auth=<auth.secretToken>` from `~/.dsh/dsh-bridge/config.json`. The logic is
+taps on `.dsh-header-sidebar-btn`, `.dsh-header-menu-btn` and
+`button[aria-label*="Add workspace"]`.

@@ -1,35 +1,35 @@
-// bridge: мобильные правки интерфейса — окно вопросов и подсветка нажатий.
+// bridge: mobile interface fixes - the question card and the tap highlight.
 //
-// 1. ОКНО ВОПРОСОВ (ask_user_question). Хост рисует его карточкой на месте
-//    композера (packages/client/ui-user-questions/src/client/QuestionComposer.tsx,
-//    класс `.card` с `max-height: min(60vh, 520px)`). На телефоне 60% экрана плюс
-//    шапка моста и строка вкладок не оставляют от переписки почти ничего: если
-//    модель написала варианты ТЕКСТОМ в чате, прочитать их нельзя, а карточку
-//    приходится закрывать. Правки:
-//      * рамка карточки растягивалась на всё сиденье композера (на телефоне —
-//        на весь экран) и перехватывала касания: переписка под ней не
-//        прокручивалась даже у свёрнутой карточки. Теперь события гасятся на
-//        рамке и сиденье и возвращаются самой карточке;
-//      * высота карточки — clamp(260px, 58vh, 620px): подстраивается под экран;
-//      * в свёрнутом виде (тела `[data-question-scroll]` нет) заголовок
-//        ужимается до одной строки, то есть карточка превращается в узкую
-//        полосу над композером, а переписка открывается целиком;
-//      * кнопка «свернуть/развернуть» и крестик увеличены до 40×40 —
-//        по рекомендации к размеру цели нажатия они были 24×24.
-// 2. КРЕСТИК НЕ ДОЛЖЕН СРАБАТЫВАТЬ СЛУЧАЙНО. Он зовёт `pending.cancel()`
-//    (QuestionComposer.tsx:168) — для модели это отмена, и ход продолжается
-//    без ответа, что пользователь видит как «отправился пустой ответ».
-//    На телефоне промах по 24-пиксельной цели стоит дорого, поэтому перед
-//    отменой спрашиваем подтверждение.
-// 3. СИНЯЯ ВСПЫШКА ПРИ НАЖАТИИ. Android подсвечивает нажатую цель
-//    полупрозрачным синим (-webkit-tap-highlight-color) и оставляет синий
-//    фокус-контур после тапа. Мост гасил это лишь для своих кнопок (три
-//    правила в mobile-styles.js). Здесь — для всего интерфейса: подсветка
-//    убирается, вместо неё короткое затемнение (`:active`), а контур фокуса
-//    остаётся для клавиатуры (`:focus-visible`) — он нужен для доступности.
+// 1. THE QUESTION CARD (ask_user_question). The host draws it in place of the
+//    composer (packages/client/ui-user-questions/src/client/QuestionComposer.tsx,
+//    class `.card` with `max-height: min(60vh, 520px)`). On a phone 60% of the
+//    screen plus the bridge header and the tab row leave almost nothing of the
+//    conversation: if the model wrote the options as TEXT in the chat they cannot
+//    be read, and the card has to be closed. The fixes:
+//      * the card's frame stretched across the whole composer seat (the whole
+//        screen on a phone) and intercepted touches, so the conversation beneath
+//        would not scroll even with the card folded. Events are now dropped on
+//        the frame and the seat and returned to the card itself;
+//      * the card height is clamp(260px, 58vh, 620px), so it follows the screen;
+//      * when folded (no `[data-question-scroll]` body) the header shrinks to one
+//        line, turning the card into a narrow strip above the composer and
+//        opening the conversation completely;
+//      * the fold and close buttons are enlarged to 40x40 - they were 24x24,
+//        below the recommended touch target size.
+// 2. THE CLOSE BUTTON MUST NOT FIRE BY ACCIDENT. It calls `pending.cancel()`
+//    (QuestionComposer.tsx:168), which the model reads as a cancellation: the turn
+//    continues without an answer, which the user sees as "an empty answer was
+//    sent". On a phone, missing a 24-pixel target is expensive, so a confirmation
+//    is asked before cancelling.
+// 3. THE BLUE TAP FLASH. Android highlights a tapped target in translucent blue
+//    (-webkit-tap-highlight-color) and leaves a blue focus ring afterwards. The
+//    bridge suppressed that only for its own buttons (three rules in
+//    mobile-styles.js). Here it is done for the whole interface: the highlight is
+//    removed in favour of a short dimming (`:active`), while the focus ring stays
+//    for keyboard users (`:focus-visible`), which accessibility needs.
 //
-// Запись через unlink: файлы плагина — хардлинки в pnpm-store.
-// После этого bridge-rebuild-client.sh пересобирает client/client.js.
+// Written through unlink: plugin files are hardlinks into the pnpm store.
+// Afterwards bridge-rebuild-client.sh rebuilds client/client.js.
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -38,12 +38,12 @@ const MARK = 'dsh-bridge-en: mobile ux';
 
 const CSS = `
 
-/* ${MARK} — окно вопросов и подсветка нажатий на телефоне */
+/* ${MARK} - question card and tap highlight on the phone */
 @media (max-width: 768px) {
-  /* Рамка карточки вопроса растягивается на всё сиденье композера (на телефоне
-     это вся высота экрана) и перехватывает касания: переписка под ней не
-     прокручивается и не нажимается — даже когда карточка свёрнута в полоску.
-     Гасим события на рамке и на сиденье, возвращаем их самой карточке. */
+  /* The question card's frame stretches across the whole composer seat (the full
+     screen height on a phone) and intercepts touches: the conversation beneath
+     neither scrolls nor responds, even when the card is folded into a strip.
+     Drop the events on the frame and the seat, return them to the card. */
   [class*="composerSeat"]:has([data-question-key]),
   [data-question-key] {
     pointer-events: none !important;
@@ -54,12 +54,12 @@ const CSS = `
   }
   [data-question-key] > section {
     pointer-events: auto !important;
-    /* Размер по экрану: на высоком телефоне больше места под варианты, на
-       низком карточка не съедает переписку. */
+    /* Sized to the screen: a tall phone gets more room for the options, a short
+       one does not lose the conversation to the card. */
     max-height: clamp(260px, 58vh, 620px) !important;
   }
-  /* Свёрнутое состояние: тела нет — оставляем узкую полосу с одной строкой
-     заголовка, чтобы переписка была видна целиком. */
+  /* Folded state: with no body, leave a narrow strip with a single header line
+     so the conversation stays fully visible. */
   [data-question-key] > section:not(:has([data-question-scroll])) {
     max-height: none !important;
   }
@@ -69,13 +69,13 @@ const CSS = `
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
   }
-  /* Цели нажатия в шапке карточки: 24px мало для пальца. */
+  /* Touch targets in the card header: 24px is too small for a finger. */
   [data-question-key] > section > header button {
     min-width: 40px !important;
     min-height: 40px !important;
   }
-  /* Подсветка нажатий: убрать синюю вспышку и синий контур после тапа,
-     оставив контур для управления с клавиатуры. */
+  /* Tap feedback: remove the blue flash and the blue ring left after a tap,
+     keeping the ring for keyboard navigation. */
   *, *::before, *::after {
     -webkit-tap-highlight-color: transparent !important;
   }
@@ -94,10 +94,10 @@ const CSS = `
 `;
 
 const GUARD = `
-  // ${MARK}: крестик окна вопросов зовёт pending.cancel() — модель получает
-  // отмену и продолжает ход без ответа. На телефоне промах по маленькой цели
-  // стоит слишком дорого, поэтому спрашиваем подтверждение. Свернуть карточку
-  // (соседняя кнопка) подтверждения не требует: это чисто визуальное действие.
+  // ${MARK}: the question card's close button calls pending.cancel() - the model
+  // receives a cancellation and continues the turn without an answer. On a phone
+  // missing a small target costs too much, so a confirmation is asked. Folding the
+  // card (the neighbouring button) needs none: that is purely visual.
   (() => {
     if (window.__dshQuestionCancelGuard) return;
     window.__dshQuestionCancelGuard = true;
@@ -108,43 +108,45 @@ const GUARD = `
       const card = target.closest('[data-question-key]');
       if (card === null) return;
       const label = (target.getAttribute('aria-label') || '') + ' ' + (target.getAttribute('title') || '');
+      // The Russian variants are deliberate: the same patch also applies to an
+      // untranslated bridge, where the label is in the plugin's own language.
       if (!/dismiss|cancel|отмен|закр/i.test(label)) return;
       if (target.dataset.dshCancelConfirmed === '1') { delete target.dataset.dshCancelConfirmed; return; }
       event.preventDefault();
       event.stopPropagation();
-      const ok = window.confirm('Закрыть вопрос? Модель получит отмену и продолжит без вашего ответа.\\n\\nЧтобы просто убрать окно и почитать переписку, нажмите «Отмена», а затем стрелку рядом с крестиком — она сворачивает карточку.');
+      const ok = window.confirm('Close this question? The model receives a cancellation and continues without your answer.\\n\\nTo simply get the card out of the way and read the conversation, press Cancel and then the arrow next to the cross - it folds the card.');
       if (ok) { target.dataset.dshCancelConfirmed = '1'; target.click(); }
     }, true);
   })();
 `;
 
-// --- CSS в mobile-styles.js -------------------------------------------------
+// --- CSS in mobile-styles.js ------------------------------------------------
 const stylesPath = join(dir, 'client/mobile-styles.js');
-if (!existsSync(stylesPath)) { console.error(`нет ${stylesPath}`); process.exit(1); }
+if (!existsSync(stylesPath)) { console.error(`no ${stylesPath}`); process.exit(1); }
 let styles = readFileSync(stylesPath, 'utf8');
 if (styles.includes(MARK)) {
-  console.log('bridge: mobile ux — CSS уже на месте');
+  console.log('bridge: mobile ux - CSS already in place');
 } else {
   const at = styles.lastIndexOf('`');
-  if (at === -1) { console.error('не нашёл конец шаблонной строки MOBILE_STYLES_CSS'); process.exit(1); }
+  if (at === -1) { console.error('could not find the end of the MOBILE_STYLES_CSS template string'); process.exit(1); }
   styles = styles.slice(0, at) + CSS + styles.slice(at);
   rmSync(stylesPath, { force: true });
   writeFileSync(stylesPath, styles);
-  console.log('bridge: mobile ux — CSS добавлен');
+  console.log('bridge: mobile ux - CSS added');
 }
 
-// --- JS-страж в client/index.js --------------------------------------------
+// --- JS guard in client/index.js --------------------------------------------
 const indexPath = join(dir, 'client/index.js');
-if (!existsSync(indexPath)) { console.error(`нет ${indexPath}`); process.exit(1); }
+if (!existsSync(indexPath)) { console.error(`no ${indexPath}`); process.exit(1); }
 let index = readFileSync(indexPath, 'utf8');
 if (index.includes('__dshQuestionCancelGuard')) {
-  console.log('bridge: mobile ux — страж отмены уже на месте');
+  console.log('bridge: mobile ux - cancel guard already in place');
   process.exit(0);
 }
 const ANCHOR = 'function setupMobileExperience(rpcCall, ctx) {\n  if (typeof document === \'undefined\' || typeof window === \'undefined\') return;\n  injectMobileStyles();\n';
 const n = index.split(ANCHOR).length - 1;
-if (n !== 1) { console.error(`MATCH COUNT ${n} для якоря setupMobileExperience`); process.exit(1); }
+if (n !== 1) { console.error(`MATCH COUNT ${n} for the setupMobileExperience anchor`); process.exit(1); }
 index = index.replace(ANCHOR, ANCHOR + GUARD);
 rmSync(indexPath, { force: true });
 writeFileSync(indexPath, index);
-console.log('bridge: mobile ux — страж отмены добавлен');
+console.log('bridge: mobile ux - cancel guard added');

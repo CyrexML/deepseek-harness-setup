@@ -1,22 +1,23 @@
-// Масштабирование только в боковой панели (2026-09-23). Идемпотентен.
+// Zoom only inside the side panel. Idempotent.
 //   node patch-zoom-scope.mjs <plugin_dir>
 //
-// Зачем: на телефоне щипок в переписке мешает (случайно масштабируется чат),
-// а в правой панели он нужен — там открывают результат: HTML-страницу, PDF,
-// таблицу. Управлять этим через viewport нельзя: `user-scalable=no` выключает
-// зум на всей странице (и всё равно обходится системной настройкой Android
-// «Принудительное масштабирование»).
+// Why: on a phone a pinch inside the conversation gets in the way (the chat zooms
+// by accident), while in the right panel it is needed - that is where the result
+// is opened: an HTML page, a PDF, a spreadsheet. The viewport cannot express
+// this: `user-scalable=no` disables zoom for the whole page (and is overridden by
+// Android's "force enable zoom" setting anyway).
 //
-// Решение — по областям:
-//   • CSS `touch-action: pan-x pan-y` на переписке и композере: браузер не
-//     начинает жест масштабирования, если он начался внутри чата;
-//   • правой панели (`[data-sidebar-right-panel]`, хост 0.1.6) и превью внутри
-//     неё возвращаем `touch-action: auto` — щипок там работает штатно;
-//   • страховка на JS: touchmove с двумя и более касаниями внутри чата
-//     отменяется (не-пассивный слушатель), внутри панели — нет. Это перекрывает
-//     и «принудительное масштабирование» Android.
-// Якоря — data-атрибуты хоста (`data-conversation-scroll`, `data-chat-anchor-key`,
-// `data-sidebar-right-panel`), а не хеши CSS-модулей: переживают пересборку.
+// The solution is per area:
+//   * CSS `touch-action: pan-x pan-y` on the conversation and the composer: the
+//     browser never starts a zoom gesture that began inside the chat;
+//   * the right panel (`[data-sidebar-right-panel]` on host 0.1.6) and the
+//     preview inside it get `touch-action: auto` back, so pinch works there;
+//   * a JS backstop: a touchmove with two or more touches inside the chat is
+//     cancelled (non-passive listener), inside the panel it is not. This also
+//     covers Android's forced zoom.
+// The anchors are host data attributes (`data-conversation-scroll`,
+// `data-chat-anchor-key`, `data-sidebar-right-panel`) rather than CSS-module
+// hashes, so they survive a rebuild.
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
@@ -33,25 +34,25 @@ const MARK = '/* dsh-bridge-en: zoom scope */';
     const css = `
     ${MARK}
     @media (max-width: 768px) {
-      /* чат: щипок не начинается */
+      /* chat: no zoom gesture starts here */
       [data-conversation-scroll],
       [data-chat-anchor-key],
       [contenteditable="true"] { touch-action: pan-x pan-y !important; }
-      /* боковая панель: масштабирование штатное */
+      /* side panel: zoom behaves normally */
       [data-sidebar-right-panel],
       [data-sidebar-right-panel] * { touch-action: auto !important; }
     }
 `;
     const anchor = '\n`;\n';
     const idx = s.lastIndexOf(anchor);
-    if (idx < 0) { console.error('mobile-styles.js: конец MOBILE_STYLES_CSS не найден'); process.exit(1); }
+    if (idx < 0) { console.error('mobile-styles.js: end of MOBILE_STYLES_CSS not found'); process.exit(1); }
     s = s.slice(0, idx) + '\n' + css + s.slice(idx);
     unlinkWrite(path, s);
-    console.log('client/mobile-styles.js: zoom-scope применён');
+    console.log('client/mobile-styles.js: zoom-scope applied');
   }
 }
 
-// 2. JS-страховка — рядом с остальной мобильной логикой клиента
+// 2. JS backstop, next to the rest of the mobile client logic
 {
   const path = join(dir, 'client/index.js');
   let s = readFileSync(path, 'utf8');
@@ -59,7 +60,7 @@ const MARK = '/* dsh-bridge-en: zoom scope */';
   const anchor = 'function __dshBridgeClientMain';
   const at = s.indexOf(anchor);
   const inject = `${MARK}
-// Щипок внутри переписки отменяем, внутри правой панели — пропускаем.
+// Cancel a pinch inside the conversation; let it through inside the right panel.
 if (typeof window !== "undefined" && !window.__dshZoomScopeBound) {
   window.__dshZoomScopeBound = true;
   const inSidebar = (t) => !!(t && t.closest && t.closest('[data-sidebar-right-panel], [data-sidebar-right-float-host]'));
@@ -74,5 +75,5 @@ if (typeof window !== "undefined" && !window.__dshZoomScopeBound) {
   if (at < 0) s = inject + s;
   else s = s.slice(0, at) + inject + s.slice(at);
   unlinkWrite(path, s);
-  console.log('client/index.js: zoom-scope применён');
+  console.log('client/index.js: zoom-scope applied');
 }

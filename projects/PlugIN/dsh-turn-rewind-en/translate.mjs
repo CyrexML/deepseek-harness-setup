@@ -3,8 +3,8 @@
 // \uXXXX escapes in JSX text). Every fragment in strings.json is replaced in both forms, longest
 // first. Rerun after a plugin update; unmatched fragments are reported, not fatal.
 import { readFileSync, writeFileSync, copyFileSync, existsSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';

@@ -16,8 +16,8 @@
 // Fix: preview paths skip the HTML buffering/injection branch and go out with cache-control: no-store
 // (+ cdn-cache-control: no-store for the edge).
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';

@@ -121,7 +121,7 @@ function environment(cache) {
 export function apply(ctx, config = {}) {
   const minFreeMb = positiveInteger(config.minFreeMb, 'minFreeMb', 2048)
   const ttlMs = positiveInteger(config.cacheMs, 'cacheMs', 15000)
-  // Файл, который остаётся пользователю: по нему запуск повторяется без агента.
+  // The file left for the user: it lets them repeat the run without the agent.
   const handoffFile = typeof config.handoffFile === 'string' && config.handoffFile.length > 0
     ? config.handoffFile
     : 'RUN-TRAINING.md'

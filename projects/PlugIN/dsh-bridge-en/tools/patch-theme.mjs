@@ -11,8 +11,8 @@
 // ignored/re-applied until 1.5 s after it was applied. (2026-09-16: was a flat 10 s from load —
 // a theme picked within the first 10 s was never saved and reverted on the next open.)
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';

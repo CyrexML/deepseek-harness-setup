@@ -138,11 +138,11 @@ function Get-Asset {
 }
 
 Write-Step 'installing'
-Get-Asset -Asset $pick.engine -What 'движок'
+Get-Asset -Asset $pick.engine -What 'engine'
 if ($pick.runtime) {
     # The CUDA runtime comes as its own archive; without it the exe will not
     # start. The Toolkit is still not required.
-    Get-Asset -Asset $pick.runtime -What 'библиотеки CUDA'
+    Get-Asset -Asset $pick.runtime -What 'CUDA runtime'
 } elseif ($pick.kind -ne 'CPU') {
     Write-Warn 'the release has no cudart archive for {0} - if the server fails to start, install the CUDA Toolkit or pick another release with -Tag' $pick.kind
 }
@@ -162,7 +162,7 @@ if (-not (Test-Engine)) {
     Write-Warn 'llama-server.exe is installed but does not start.'
     Write-Info 'Usually that means missing CUDA libraries or a driver that is too old.'
     Write-Info 'Try: update the NVIDIA driver, or install the CPU build - this same step with -Cpu.'
-    throw 'движок не проходит проверку запуска'
+    throw (T 'the engine fails the startup check')
 }
 Write-Ok 'starts'
 Write-Done 'llama.cpp installed: {0}' $exe

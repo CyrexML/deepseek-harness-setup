@@ -11,8 +11,8 @@
 //    with viewport 412x915 → 915x412 → 412x915. Fix: on a layout switch across 768px drop the
 //    drawer class — a drawer must never survive a layout change.
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';

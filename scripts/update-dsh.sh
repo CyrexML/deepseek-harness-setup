@@ -22,7 +22,7 @@ DSH_ROOT="${DSH_ROOT:-$HOME/tools/deepseek-harness}"
 WORK="$HOME/Harness_AI/run/dsh-upgrade"
 mkdir -p "$WORK"
 step() { echo; echo "=== $*"; echo "$(date +%H:%M:%S) $*" >> "$WORK/state"; }
-die() { echo "ОШИБКА: $*" >&2; echo "$(date +%H:%M:%S) FAIL: $*" >> "$WORK/state"; exit 1; }
+die() { echo "ERROR: $*" >&2; echo "$(date +%H:%M:%S) FAIL: $*" >> "$WORK/state"; exit 1; }
 
 ROLLBACK=0; SKIP_BACKUP=0; TAG=""
 for a in "$@"; do

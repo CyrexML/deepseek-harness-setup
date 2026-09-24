@@ -1,5 +1,5 @@
-# Проверки, которые ловят то, что ломает установку у другого человека:
-# синтаксис скриптов обеих платформ, кодировку .ps1 и следы личных данных.
+# Checks that catch what breaks an install on someone else's machine: script
+# syntax on both platforms, .ps1 encoding and traces of personal data.
 name: checks
 
 on:
@@ -8,24 +8,24 @@ on:
 
 jobs:
   linux:
-    name: скрипты WSL и модули
+    name: WSL scripts and modules
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: синтаксис bash
+      - name: bash syntax
         run: |
           fail=0
           while IFS= read -r f; do
-            bash -n "$f" || { echo "СИНТАКСИС: $f"; fail=1; }
+            bash -n "$f" || { echo "SYNTAX: $f"; fail=1; }
           done < <(find . -name '*.sh' -not -path './.git/*')
           exit $fail
 
-      - name: в скриптах WSL нет CRLF
+      - name: no CRLF in WSL scripts
         run: |
           fail=0
           while IFS= read -r f; do
-            if grep -qU $'\r' "$f"; then echo "CRLF в $f — bash такой файл не выполнит"; fail=1; fi
+            if grep -qU $'\r' "$f"; then echo "CRLF in $f - bash will not run that file"; fail=1; fi
           done < <(find . -name '*.sh' -not -path './.git/*')
           exit $fail
 
@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: модули пресета и патчей разбираются
+      - name: preset and patch modules parse
         run: |
           fail=0
           while IFS= read -r f; do
@@ -41,7 +41,7 @@ jobs:
           done < <(find . -name '*.mjs' -not -path './.git/*')
           exit $fail
 
-      - name: JSON и YAML разбираются
+      - name: JSON and YAML parse
         run: |
           python3 - <<'PY'
           import json, sys, pathlib, yaml
@@ -57,47 +57,47 @@ jobs:
               if '.git' in p.parts: continue
               try: list(yaml.load_all(p.read_text(encoding='utf-8'), Loader=L))
               except Exception as e: bad.append(f'{p}: {e}')
-          print('\n'.join(bad) or 'все файлы разбираются')
+          print('\n'.join(bad) or 'every file parses')
           sys.exit(1 if bad else 0)
           PY
 
-      - name: нет следов личных данных
+      - name: no traces of personal data
         run: |
-          # Домашний путь ловим по имени пользователя, но обобщённые примеры
-          # (/home/user, /home/me) — это документация, а не утечка.
+          # A home path is caught by the user name, but generic examples
+          # (/home/user, /home/me) are documentation, not a leak.
           hits=$(grep -rInE 'BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|/home/[a-z][a-z0-9_-]+/' \
                    --exclude-dir=.git --exclude=checks.yml . \
                  | grep -vE '/home/(user|me|username|youruser|ubuntu|runner)/' || true)
           if [ -n "$hits" ]; then
             printf '%s\n' "$hits"
-            echo 'найдены ключи или домашние пути'; exit 1
+            echo 'keys or home paths found'; exit 1
           fi
-          echo 'чисто'
+          echo 'clean'
 
   windows:
-    name: скрипты Windows
+    name: Windows scripts
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: синтаксис PowerShell
+      - name: PowerShell syntax
         shell: pwsh
         run: |
           $bad = 0
           Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
             $errors = $null
             [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errors) | Out-Null
-            if ($errors.Count) { Write-Host "СИНТАКСИС: $($_.FullName): $($errors[0].Message)"; $bad = 1 }
+            if ($errors.Count) { Write-Host "SYNTAX: $($_.FullName): $($errors[0].Message)"; $bad = 1 }
           }
           exit $bad
 
-      - name: .ps1 с русским текстом сохранены с BOM
+      - name: .ps1 files with non-ASCII text carry a BOM
         shell: pwsh
         run: |
-          # Windows PowerShell 5.1 читает файл без BOM как ANSI: русские
-          # комментарии превращаются в мусор и ломают разбор. Файлу из одних
-          # ASCII-символов BOM не нужен — требовать его от всех подряд значит
-          # ловить то, что ничего не ломает.
+          # Windows PowerShell 5.1 reads a file without a BOM as ANSI, so
+          # non-ASCII text turns into garbage and breaks parsing. A pure ASCII
+          # file needs no BOM, and demanding one from every file would flag
+          # something that breaks nothing.
           $bad = 0
           Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
             $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
@@ -105,7 +105,7 @@ jobs:
             $nonAscii = $false
             foreach ($b in $bytes) { if ($b -gt 0x7F) { $nonAscii = $true; break } }
             if ($nonAscii -and -not $hasBom) {
-              Write-Host "не-ASCII без BOM: $($_.FullName)"; $bad = 1
+              Write-Host "non-ASCII without BOM: $($_.FullName)"; $bad = 1
             }
           }
           exit $bad

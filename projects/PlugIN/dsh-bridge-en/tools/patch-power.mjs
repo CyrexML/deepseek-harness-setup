@@ -7,18 +7,18 @@
 // (harness-start.ps1 -Hidden) polls that file and does the actual Stop-Everything / wsl --shutdown.
 // The bridge itself stays platform-neutral: without the env var the RPC fails with a clear message.
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';
 const dir = process.argv[2] || '.';
 const MARK = '/* dsh-bridge-en: power */';
 
-// Якорь может приехать с новой версией плагина: в 2.10.12 `async restartDsh()`
-// стал `async restartDsh(opts = {})`. Поэтому якорь задаётся списком вариантов —
-// берём первый, встречающийся ровно один раз; в тексте замены `{ANCHOR}`
-// подставляется найденный вариант.
+// The anchor can move with a new plugin version (`async restartDsh()` became
+// `async restartDsh(opts = {})` in 2.10.12), so it is a list of variants: the
+// first one occurring exactly once is used, and `{ANCHOR}` in the replacement
+// text is substituted with it.
 function patch(file, edits) {
   const path = join(dir, file);
   let s = readFileSync(path, 'utf8');

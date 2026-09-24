@@ -23,15 +23,15 @@ dsh-better-sidebar:
   defaultWidthPercent: 30
   browserInterceptHttps: true
   browserInterceptHttp: true
-  # Превью рендерит страницу в песочном iframe без allow-same-origin, то есть
-  # с opaque origin. Фенс доверия ядра отвергает Origin: null, поэтому КАЖДЫЙ
-  # подресурс (<script src>, <link>) получает 403, а сама страница грузится:
-  # навигация верхнего уровня заголовка Origin не несёт. Пока весь код был
-  # инлайновым, это не проявлялось; разрезка на js/*.js сделала превью
-  # нерабочим. Разовая кнопка в строке статуса живёт в состоянии компонента и
-  # сбрасывается при перезапуске хоста, поэтому флаг здесь.
-  # ЦЕНА: страница в превью исполняется с origin самого интерфейса и может
-  # читать и писать файлы сессии. Держать только для своих проектов.
+  # The preview renders the page in a sandboxed iframe without allow-same-origin,
+  # i.e. with an opaque origin. The core's trust fence rejects Origin: null, so
+  # EVERY sub-resource (<script src>, <link>) gets a 403 while the page itself
+  # loads, because a top-level navigation carries no Origin header. With all the
+  # code inline this never showed; splitting it into js/*.js made the preview
+  # useless. The one-off button in the status bar lives in component state and
+  # resets when the host restarts, hence the flag here.
+  # THE COST: a previewed page runs with the interface's own origin and can read
+  # and write session files. Keep it for your own projects only.
   htmlViewerNoSandbox: true
   workspaceFence: false
 agent-default-model:

@@ -58,10 +58,10 @@ $icon = Join-Path $runDir 'harness.ico'
 if (Test-Path $launch) {
   foreach ($dir in @($desktop, $startMenu)) {
     New-Shortcut -Path (Join-Path $dir 'Harness AI.lnk') -Target "$env:WINDIR\System32\wscript.exe" `
-      -Arguments "`"$launch`"" -Icon $icon -Description 'Запуск стенда Harness AI'
+      -Arguments "`"$launch`"" -Icon $icon -Description 'Start the Harness AI stand'
   }
-  New-Shortcut -Path (Join-Path $desktop 'Harness AI — стоп.lnk') -Target "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe" `
-    -Arguments "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$stop`"" -Icon $icon -Description 'Остановка стенда Harness AI'
+  New-Shortcut -Path (Join-Path $desktop 'Harness AI - stop.lnk') -Target "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe" `
+    -Arguments "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$stop`"" -Icon $icon -Description 'Stop the Harness AI stand'
   Write-Ok 'created on the desktop and in the Start menu'
 } else {
   Write-Warn 'no {0} - shortcuts skipped (WSL side not installed yet?)' $launch

@@ -35,11 +35,11 @@ for effort in low medium xhigh; do
     st=$(cat "$OUTDIR/$tag.log.start" 2>/dev/null || echo 0)
     en=$(cat "$OUTDIR/$tag.log.end" 2>/dev/null || echo 0)
     rc=$(grep -a "EXIT=" "$OUTDIR/$tag.log" 2>/dev/null | tail -1 | sed 's/EXIT=//')
-    if (cd "$REPO" && python3 -m pytest -q > "$OUTDIR/$tag.pytest" 2>&1); then solved=ДА; else solved=НЕТ; fi
+    if (cd "$REPO" && python3 -m pytest -q > "$OUTDIR/$tag.pytest" 2>&1); then solved=yes; else solved=no; fi
     steps=$(tr -d '\000\r' < "/mnt/f/Harness_AI/run/effort-$effort.log" | grep -ac "prompt eval time")
     printf '%-10s wall=%3ss rc=%s solved=%-3s steps_total=%s | %s\n' \
       "$tag" "$((en-st))" "$rc" "$solved" "$steps" "$(tail -1 "$OUTDIR/$tag.pytest" | tr -d '\r')" \
       | tee -a "$OUTDIR/summary.txt"
   done
 done
-echo; echo "=== ИТОГ ==="; cat "$OUTDIR/summary.txt"
+echo; echo "=== RESULT ==="; cat "$OUTDIR/summary.txt"

@@ -4,10 +4,11 @@
 // dark gradient; whale kept inside the central ~58% so a maskable (circle) crop never clips it.
 import { readFileSync, writeFileSync } from 'node:fs';
 const DSH_ROOT = process.env.DSH_ROOT ?? `${process.env.HOME}/tools/deepseek-harness`;
-// Playwright лежит в сторе pnpm под именем с версией, поэтому путь ИЩЕТСЯ: после
-// обновления харнеса версия меняется. Берём не самую новую, а ту, чьи браузеры
-// реально скачаны (~/.cache/ms-playwright): в сторе может лежать альфа, для
-// которой браузеров нет, и запуск падает «Executable doesn't exist».
+// Playwright sits in the pnpm store under a versioned name, so the path is
+// SEARCHED for: a harness update changes the version. Not the newest one is taken
+// but the one whose browsers are actually downloaded (~/.cache/ms-playwright) -
+// the store may hold an alpha with no browsers, and launching then fails with
+// "Executable doesn't exist".
 const { readdirSync: __rd, readFileSync: __rf, existsSync: __ex } = await import('node:fs');
 const __pnpm = `${DSH_ROOT}/node_modules/.pnpm`;
 const __candidates = __rd(__pnpm).filter((name) => /^playwright@\d/.test(name)).sort().reverse();
@@ -22,7 +23,7 @@ const __pw = __candidates.find((name) => {
   const revision = __chromiumRevision(name);
   return revision !== undefined && __installed.some((dir) => dir.endsWith(`-${revision}`));
 }) ?? __candidates[0];
-if (__pw === undefined) throw new Error(`playwright не найден в ${__pnpm}`);
+if (__pw === undefined) throw new Error(`playwright not found in ${__pnpm}`);
 const __pwEntry = `${__pnpm}/${__pw}/node_modules/playwright/index.mjs`;
 const { chromium } = await import(__pwEntry);
 const OUT = new URL('./assets/', import.meta.url).pathname;

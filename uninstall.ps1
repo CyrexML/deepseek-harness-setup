@@ -66,7 +66,7 @@ function Try-Do([string]$what, [scriptblock]$action) {
   try { & $action; Write-Ok 'done' } catch { Write-Warn 'failed: {0}' $_.Exception.Message }
 }
 
-Try-Do 'останавливаю стенд' {
+Try-Do 'stopping the stand' {
   $stop = Join-Path $root 'run\harness-stop.ps1'
   if (Test-Path $stop) { & powershell -NoProfile -ExecutionPolicy Bypass -File $stop | Out-Null }
   $stopServer = Join-Path $root 'run\stop-server.ps1'
@@ -75,35 +75,35 @@ Try-Do 'останавливаю стенд' {
   & wsl.exe -d $distro -- bash -lc 'pkill -f "bin.js web" 2>/dev/null; pkill -f cloudflared 2>/dev/null; true' 2>$null
 }
 
-Try-Do 'возвращаю таймауты сна' {
+Try-Do 'restoring the sleep timeouts' {
   $idle = Join-Path $root 'run\harness-idle-sleep.ps1'
   if (Test-Path $idle) { & powershell -NoProfile -ExecutionPolicy Bypass -File $idle -On | Out-Null }
   else { & powercfg.exe /change standby-timeout-ac 15 | Out-Null }
 }
 
-Try-Do 'удаляю задачу планировщика' {
+Try-Do 'removing the scheduled task' {
   Get-ScheduledTask -TaskName 'Harness AI power restore' -ErrorAction SilentlyContinue |
     Unregister-ScheduledTask -Confirm:$false -ErrorAction SilentlyContinue
 }
 
-Try-Do 'удаляю ярлыки' {
+Try-Do 'removing the shortcuts' {
   foreach ($dir in @([Environment]::GetFolderPath('Desktop'),
                      (Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'))) {
     Get-ChildItem -Path $dir -Filter 'Harness AI*.lnk' -ErrorAction SilentlyContinue | Remove-Item -Force
   }
 }
 
-Try-Do 'удаляю правило брандмауэра' {
+Try-Do 'removing the firewall rule' {
   Get-NetFirewallRule -DisplayName "Harness AI*" -ErrorAction SilentlyContinue |
     Remove-NetFirewallRule -ErrorAction SilentlyContinue
 }
 
-Try-Do 'удаляю содержимое стенда внутри WSL' {
+Try-Do 'removing the stand contents inside WSL' {
   $keep = if ($KeepData) { 'true' } else { 'rm -rf "$HOME/.dsh"' }
   & wsl.exe -d $distro -- bash -lc "rm -rf `"`$HOME/Harness_AI`" `"`$HOME/tools/deepseek-harness`" `"`$HOME/harness-stand`"; $keep" 2>$null
 }
 
-Try-Do 'удаляю движок и скрипты запуска' {
+Try-Do 'removing the engine and the launch scripts' {
   foreach ($sub in @('llama.cpp', 'run', 'exchange')) {
     $path = Join-Path $root $sub
     if (Test-Path $path) { Remove-Item -Recurse -Force $path -ErrorAction SilentlyContinue }
@@ -111,13 +111,13 @@ Try-Do 'удаляю движок и скрипты запуска' {
 }
 
 if (-not $KeepModel) {
-  Try-Do 'удаляю модели' {
+  Try-Do 'removing the models' {
     $models = Join-Path $root 'models'
     if (Test-Path $models) { Remove-Item -Recurse -Force $models -ErrorAction SilentlyContinue }
   }
 }
 
-Try-Do 'убираю пустой каталог стенда' {
+Try-Do 'removing the empty stand directory' {
   if ((Test-Path $root) -and -not (Get-ChildItem $root -Force -ErrorAction SilentlyContinue)) {
     Remove-Item -Force $root -ErrorAction SilentlyContinue
   }
@@ -134,7 +134,7 @@ if ($RemoveWsl -and -not $KeepWsl) {
 
 Write-Host ''
 Write-Done 'the stand is removed'
-Write-Host '  Остались нетронутыми: Windows, WSL, драйвер NVIDIA, Node.js внутри дистрибутива.'
-if ($KeepModel) { Write-Host "  Модели остались в $root\models — при новой установке мастер их подхватит." }
-if ($KeepData)  { Write-Host '  Данные DSH остались в ~/.dsh внутри WSL.' }
+Write-Host (T '  Left untouched: Windows, WSL, the NVIDIA driver, Node.js inside the distribution.')
+if ($KeepModel) { Write-Host (T '  The models stayed in {0}\models - a new install will pick them up.' @($root)) }
+if ($KeepData)  { Write-Host (T '  DSH data stayed in ~/.dsh inside WSL.') }
 Write-Host ''

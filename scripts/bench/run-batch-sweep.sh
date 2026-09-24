@@ -118,6 +118,6 @@ for entry in "${ARMS[@]}"; do
   printf '   prefill: %s\n   decode:  %s\n' "${PF[$name]:-}" "${DC[$name]:-}" >> "$SUM"
 done
 
-echo; echo "=== ИТОГ ==="; cat "$SUM"
+echo; echo "=== RESULT ==="; cat "$SUM"
 echo "raw bodies of failed requests: $RAW"
 echo "(the working arm is restored separately: start-server.ps1 with no parameters)"

@@ -50,9 +50,9 @@ function Read-StandConfig {
   $path = Get-StandConfigPath
   if (-not (Test-Path $path)) {
     $example = Join-Path $script:StandRoot 'config.example.json'
-    if (-not (Test-Path $example)) { throw "нет ни config.json, ни config.example.json в $script:StandRoot" }
+    if (-not (Test-Path $example)) { throw (T 'neither config.json nor config.example.json in {0}' @($script:StandRoot)) }
     Copy-Item $example $path
-    Write-Info "создан config.json из примера — при желании поправьте пути и порты"
+    Write-Info 'config.json created from the example - adjust the paths and ports if you like'
   }
   $cfg = Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json
 
@@ -64,10 +64,10 @@ function Read-StandConfig {
     $best = Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue |
       Where-Object { $_.Free -ne $null -and $_.Name.Length -eq 1 } |
       Sort-Object Free -Descending | Select-Object -First 1
-    if ($null -eq $best) { throw "диск $drive`: не найден, и подобрать замену не удалось — укажите windowsRoot в config.json" }
+    if ($null -eq $best) { throw (T 'drive {0}: not found and no replacement could be chosen - set windowsRoot in config.json' @($drive)) }
     $tail = ($cfg.windowsRoot -replace '^[A-Za-z]:', '')
     $replacement = "$($best.Name):$tail"
-    Write-Warn "диска $drive`: нет — беру $($best.Name): ($([math]::Round($best.Free/1GB)) ГБ свободно)"
+    Write-Warn 'no drive {0}: - taking {1}: ({2} GB free)' $drive $best.Name ([math]::Round($best.Free/1GB))
     $cfg.windowsRoot = $replacement
     ($cfg | ConvertTo-Json -Depth 12) | Set-Content -Path $path -Encoding UTF8
   }
@@ -101,7 +101,7 @@ function Set-StandConfig {
 function Invoke-Wsl {
   param([string]$Distro, [string]$Command)
   & wsl.exe -d $Distro -- bash -lc $Command
-  if ($LASTEXITCODE -ne 0) { throw "шаг в WSL вернул код $LASTEXITCODE" }
+  if ($LASTEXITCODE -ne 0) { throw (T 'the WSL step returned code {0}' @($LASTEXITCODE)) }
 }
 
 # Windows path -> WSL path: F:\Harness_AI -> /mnt/f/Harness_AI

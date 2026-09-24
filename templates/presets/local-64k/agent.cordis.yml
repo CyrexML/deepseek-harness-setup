@@ -17,55 +17,50 @@
 # pool instances — `provide()` throws on the second registration under the
 # same realm symbol; labels join REALMS, and are not what this file needs.)
 
-# ── anchored: отложенная выдача схем инструментов ───────────────────────────
+# -- anchored: deferred delivery of tool schemas -----------------------------
 #
-# Перенесено из xiaobright/dsh-anchored-standard (MIT), три модуля из семи.
-# Не взяты: custom-bash (решает проблему Windows/PTY, которой в WSL нет),
-# instruction-hint (гасит инъекцию AGENTS.md — нам она нужна),
-# context-gate (маргинально), skill-search (не взят — см. RESIDENT_DISCOVERY_TOOLS).
+# Taken from xiaobright/dsh-anchored-standard (MIT), three modules out of seven.
+# Left out: custom-bash (solves a Windows/PTY problem that does not exist in
+# WSL), instruction-hint (suppresses the AGENTS.md injection, which this stand
+# wants), context-gate (marginal) and skill-search.
 #
-# Эта строка обязана идти ПЕРВОЙ: after-next трансформы waterfall применяются
-# в обратном порядке регистрации, поэтому фильтр каталога должен зарегистри-
-# роваться раньше всех, кто трогает ту же сборку.
+# This row must come FIRST: after-next waterfall transforms apply in reverse
+# registration order, so the catalog filter has to register before anything else
+# that touches the same assembly.
 #
-# bootstrapTools — резидентный набор, замеренный по логам сессий 2026-09-09.
-# За 3 440 вызовов инструментов во всех пресетах (этот, standard-th065,
-# встроенный standard, cordis) модель звала только: bash, read, edit, write,
-# grep, glob (20), todo_write (15), ask_user_question (2). Всё остальное —
-# web_search, web_fetch, subagent, subagent_fork, workflow, ralph, skill,
-# exit_plan_mode, *_goal, send_message, interrupt_agent, list_agents,
-# job_kill, cordis_* — ноль вызовов. Поэтому набор совпадает с замеренным
-# спросом, а не с полным каталогом.
+# bootstrapTools is the resident set, measured from session logs.
+# Across 3440 tool calls in every preset the model only called bash, read, edit,
+# write, grep, glob, todo_write and ask_user_question. Everything else -
+# subagent, workflow, ralph, skill, exit_plan_mode, *_goal, send_message,
+# interrupt_agent, list_agents, job_kill, cordis_* - was called zero times. So
+# the set matches measured demand rather than the full catalog.
 #
-# glob/todo_write/ask_user_question добавлены 2026-09-09. glob до этого стоял
-# только в compactionTools, то есть был доступен ровно один запрос после
-# сжатия и практически отсутствовал. ask_user_question — не удобство, а
-# способность: без него агент не может задать вопрос вообще.
+# ask_user_question is not a convenience but a capability: without it the agent
+# cannot ask a question at all.
 #
-# Цена: 2 056 -> 2 957 токенов схем на запрос (замер по длине JSON схем из
-# request/header). Полный каталог standard — 6 512, из них 4 037 приходится
-# на инструменты, не вызванные ни разу.
+# The cost: schemas grew from 2056 to 2957 tokens per request. The full standard
+# catalog is 6512, of which 4037 belong to tools never called once.
 #
-# dev_tool_search оставлен, но на него больше не рассчитываем: за 9 сессий
-# и 456 вызовов в anchored-пресете он не был вызван НИ РАЗУ, каталог во всех
-# request/header оставался исходным. Разблокировка «в один вызов» —
-# теоретическая; всё, чего нет здесь, для модели отсутствует.
+# dev_tool_search is kept but no longer relied on: across 9 sessions and 456
+# calls it was never invoked, and the catalog in every request stayed as it was.
+# Unlocking "in one call" is theoretical - anything not listed here does not
+# exist for the model.
 #
-# compactionTools: после `compaction/end` каталог откатывается к
-# bootstrapTools + это, ровно на один запрос. glob отсюда убран — он теперь
-# резидентный. dev_tool_search оставлен сознательно (в оригинале его тут
-# нет): иначе после каждого сжатия модель до следующего своего сообщения
-# лишена возможности вернуть разблокированное.
+# compactionTools: after `compaction/end` the catalog falls back to
+# bootstrapTools plus this, for exactly one request. dev_tool_search is kept here
+# deliberately (the original does not have it): otherwise, after every
+# compaction, the model has no way to bring back what it unlocked until its next
+# message.
 - id: tool-bootstrap
   name: ./tool-bootstrap.mjs
   config:
-    # web_fetch добавлен 2026-09-23: без него агент не может прочитать ни одной
-    # ссылки — «всё, чего нет здесь, для модели отсутствует» (см. выше), а
-    # dev_tool_search на практике не вызывается. Схема у него крошечная (один
-    # параметр url). web_search добавляется только когда задан ключ поиска:
-    # провайдер в сборке — deepseek-official с apiKeyEnv DEEPSEEK_API_KEY
-    # (packages/bundle/base/cordis.patch.yml:461), и без ключа инструмент
-    # только тратил бы ход на ошибку.
+    # web_fetch is here because without it the agent cannot read a single link -
+    # "anything not listed here does not exist for the model" (see above) - and
+    # dev_tool_search is not called in practice. Its schema is tiny (one url
+    # parameter). web_search is added only when a search key is present: the
+    # bundled provider is deepseek-official with apiKeyEnv DEEPSEEK_API_KEY
+    # (packages/bundle/base/cordis.patch.yml:461), and without a key the tool
+    # would only spend a step on an error.
     bootstrapTools: !!js "['read', 'write', 'edit', 'bash', 'grep', 'glob', 'todo_write', 'ask_user_question', 'dev_tool_search', 'web_fetch'].concat((process.env.DEEPSEEK_API_KEY || process.env.EXA_API_KEY || process.env.PERPLEXITY_API_KEY) ? ['web_search'] : [])"
     promoteOn: either
     includeSubagents: false
@@ -74,39 +69,39 @@
 - id: dev-tool-search
   name: ./dev-tool-search.mjs
 
-# ── advisory: цена файла в токенах ──────────────────────────────────────────
+# -- advisory: what a file costs in tokens -----------------------------------
 #
-# Правило «keep files small» в ~/.dsh/AGENTS.md не работает по трём причинам:
-# читается один раз в начале и не всплывает на 90-м шаге; написано про
-# СОЗДАНИЕ файлов, а про уже существующий index.html на 1039 строк не говорит
-# ничего; и называет число строк, которое модель не может соотнести с
-# бюджетом. Этот плагин закрывает все три: срабатывает в момент записи,
-# смотрит на текущий размер независимо от того, кто его создал, и сообщает
-# токены и долю рабочего цикла.
+# A "keep files small" rule in ~/.dsh/AGENTS.md fails for three reasons: it is
+# read once at the start and does not resurface at step 90; it is written about
+# CREATING files and says nothing about an existing 1039-line one; and it states
+# a line count, which the model cannot weigh against its budget. This plugin
+# covers all three: it fires at the moment of the write, looks at the current
+# size regardless of who created it, and reports tokens and the share of a
+# working cycle.
 #
-# НИКОГДА НЕ БЛОКИРУЕТ. tools/post-execute идёт ПОСЛЕ записи — блокирующее
-# решение здесь не предотвращает файл, а отвергает результат уже случившейся
-# записи, после чего модель начинает переписывать то, что уже лежит на диске.
-# Плагин всегда делегирует next() и только прикладывает заметку.
+# IT NEVER BLOCKS. tools/post-execute runs AFTER the write, so a blocking
+# decision here does not prevent the file - it rejects the result of a write that
+# already happened, and the model starts rewriting what is already on disk. The
+# plugin always delegates to next() and only attaches a note.
 #
-# 450/800 — не «приличная длина файла», а точка, где полное чтение перестаёт
-# быть по карману. Замер по проекту: 450 строк JS ≈ 5 990 токенов (33% цикла
-# 18 368) — нормальный файл; 800 ≈ 10 649 (58%) — уже больше половины цикла;
-# Cooking_APP/index.html на 1 039 строк ≈ 18 423 (100%) — весь цикл целиком,
-# и это та патология, ради которой плагин написан.
+# 450/800 is not "a decent file length" but the point where reading it whole
+# stops being affordable: 450 lines of JS are about 5990 tokens (33% of an 18368
+# cycle), 800 about 10649 (58%), and a 1039-line file about 18423 - the entire
+# cycle, which is the pathology this plugin was written for.
 #
-# Заметка выдаётся ОДИН раз на переход уровня для каждого файла в сессии:
-# повторяться на каждой записи она стоила бы больше контекста, чем сам файл.
+# The note is issued ONCE per level transition per file per session: repeating it
+# on every write would cost more context than the file itself.
 #
-# bytesPerToken и cycleTokens — калибровка от 2026-09-10, см. шапку .mjs.
-# Менялись thresholdRatio, retainRatio, потолок пересказа, резидентный
-# каталог или размер AGENTS.md — перемерить и поправить cycleTokens.
-# ── видеопамять: запуск обучения на занятой карте ────────────────────────────
-# Модель не видит загрузку видеокарты, а сервер модели держит её почти целиком
-# (30-tune оставляет свободными 150–500 МиБ). Без этой подсказки запрос «обучи
-# сеть» превращается в `python train.py`, несколько минут загрузки данных и
-# OOM-трассировку. Плагин меряет свободную память в момент запуска и на первый
-# такой вызов отвечает отказом с числами и тремя выходами — дальше не мешает.
+# bytesPerToken and cycleTokens are a calibration; if thresholdRatio, retainRatio,
+# the summary ceiling, the resident catalog or the size of AGENTS.md change,
+# re-measure and correct cycleTokens.
+# -- VRAM: launching training on an occupied card ----------------------------
+# The model cannot see GPU load, and the model server holds almost the whole card
+# (30-tune leaves 150-500 MiB free). Without this notice a "train a network"
+# request turns into `python train.py`, minutes of data loading and an OOM
+# traceback. The plugin measures free memory at launch time and answers the first
+# such call with a refusal carrying the numbers and three ways out; after that it
+# stays out of the way.
 - id: gpu-budget-notice
   name: ./gpu-budget-notice.mjs
   config:
@@ -120,44 +115,45 @@
     tools: [write, edit]
     bytesPerToken: 3.08
     cycleTokens: 18141
-    # Глобальные исключения: файлы, о которых не сообщать вовсе (данные,
-    # сгенерированное). Шаблоны с `*`, сверяются с путём инструмента.
+    # Global exclusions: files to say nothing about at all (data, generated
+    # output). Patterns with `*`, matched against the tool's path.
     exclude: []
-    # Пометка «файл единый» — ПРОЕКТНАЯ, лежит в самом проекте.
+    # The "this file is one unit" marker belongs to the PROJECT and lives in it.
     #
-    # «Раздели» — неверный совет для длинного, но неделимого кода: цикла
-    # обучения, сгенерированного файла, одного алгоритма. Три файла по 300
-    # строк стоят при чтении ровно столько же, сколько один на 900, если нужен
-    # весь. Настоящая мера там — чтение диапазонами, а не разрезка.
+    # "Split it" is wrong advice for code that is long but not separable - a
+    # training loop, a generated file, a single algorithm. Three files of 300
+    # lines cost exactly as much to read as one of 900 when you need all of it;
+    # the real mitigation there is reading by ranges.
     #
-    # Проект перечисляет такие файлы в `.dsh-size-exempt` в своём корне (ищется
-    # вверх по дереву): по одному шаблону на строку, `#` — комментарий,
-    # сверяется и с полным путём, и с одним именем файла. Помеченный файл не
-    # получает совета «раздели» и вовсе молчит на уровне warn; на уровне urgent
-    # приходит одна заметка с ценой и советом «открывай grep -n и диапазонами».
+    # A project lists such files in `.dsh-size-exempt` at its root (searched
+    # upward): one pattern per line, `#` for comments, matched against the full
+    # path and the bare file name. A marked file gets no "split it" advice and
+    # stays silent at warn level; at urgent level it gets one note with the cost
+    # and the advice to open it with grep -n and ranges.
     exemptFileName: .dsh-size-exempt
     exemptMaxDepth: 12
 
-# ── advisory: цена чтения ───────────────────────────────────────────────────
+# -- advisory: what reading costs --------------------------------------------
 #
-# Разрезка index.html на девять модулей не дала ничего: агент прочитал их всё
-# равно. Замер по сессии c47f7d3f (2026-09-10): 9 шагов, 7 чтений, ВСЕ целиком,
-# один grep за прогон; 17 762 токена = 97% цикла против 18 423 у прежнего
-# единого файла. Экономия от всей разрезки — 661 токен, 3,6%.
+# Splitting a 1000-line index.html into nine modules changed nothing: the agent
+# read them all anyway. Measured over one session: 9 steps, 7 reads, ALL whole,
+# one grep in the entire run; 17762 tokens = 97% of a cycle against 18423 for the
+# single file before. The whole split saved 661 tokens, 3.6%.
 #
-# Разрезка дала ВОЗМОЖНОСТЬ читать узко, но не создала ПОВЕДЕНИЯ. Правила
-# «read narrowly» и «do not re-read» в AGENTS.md действовали весь тот прогон.
-# Поэтому здесь то же решение, что и с размером файлов: называть цену в той
-# валюте, которую агент тратит, в момент траты.
+# Splitting gave the ABILITY to read narrowly but created no BEHAVIOUR: the
+# "read narrowly" and "do not re-read" rules in AGENTS.md were in force
+# throughout that run. So the same decision as with file size: state the cost in
+# the currency the agent spends, at the moment it spends it.
 #
-# Две заметки: накопленный бюджет чтения за цикл (пороги 45% и 75%, по одному
-# разу на уровень) и повторное чтение того же файла целиком. Счётчик
-# обнуляется на compaction/end — после сжатия бюджет начинается заново.
+# Two notes: the accumulated read budget per cycle (thresholds 45% and 75%, once
+# per level) and re-reading the same file whole. The counter resets on
+# compaction/end - after a compaction the budget starts again.
 #
-# Проверено переигрыванием того самого прогона: предупреждение срабатывает на
-# четвёртом чтении при 67%, когда впереди ещё три чтения на 4 847 токенов.
+# Verified by replaying that run: the warning fires on the fourth read at 67%,
+# with three more reads worth 4847 tokens still ahead.
 #
-# bytesPerToken и cycleTokens — общие с file-size-notice, перемерять вместе.
+# bytesPerToken and cycleTokens are shared with file-size-notice; re-measure
+# them together.
 - id: read-budget-notice
   name: ./read-budget-notice.mjs
   config:
@@ -167,28 +163,27 @@
     bytesPerToken: 3.08
     cycleTokens: 18141
 
-# ── advisory: нужен ли проекту DECISIONS.md ─────────────────────────────────
+# -- advisory: does this project need a DECISIONS.md --------------------------
 #
-# Карта в DECISIONS.md — самое дешёвое, что есть в этой конфигурации: девять
-# строк за ~150 токенов вместо 17 762 разведочного чтения (замер 2026-09-10).
-# Но новый проект начинается без неё, и создать её некому.
+# A map in DECISIONS.md is the cheapest thing in this configuration: nine lines
+# for about 150 tokens instead of 17762 spent on exploratory reading. But a new
+# project starts without one and nobody creates it.
 #
-# Правилом это не решается: правило читается на первом шаге, когда проект — один
-# пустой файл и журнал бессмыслен, а к тридцатому шагу, когда он окупился бы,
-# правило уже далеко вверху контекста. Та же болезнь, что у правил про размер
-# файлов и про узкое чтение.
+# A rule does not solve this: it is read at step one, when the project is a
+# single empty file and a journal is meaningless, and by step thirty, when it
+# would pay off, the rule is far up the context. The same disease as the rules
+# about file size and narrow reading.
 #
-# Плагин НЕ создаёт файл и не решает за агента. Он задаёт вопрос один раз за
-# сессию, когда работа перестала быть разовой, и прямо говорит: если задача
-# одноразовая — игнорируй, журнал для выброшенной работы это мусор.
+# The plugin does NOT create the file and does not decide for the agent. It asks
+# once per session, when the work has stopped being a one-off, and says plainly:
+# if the task is throwaway, ignore it - a journal for discarded work is litter.
 #
-# Порог: 3 разных файла, затронутых в проекте за сессию (один файл — скрипт,
-# два — скрипт и тест, три — структура, по которой придётся ориентироваться).
-# После сжатия порог падает до 2: сжатие означает, что сессия уже переросла
-# одно окно, и следующая начнётся вслепую.
+# Threshold: 3 different files touched in the project during the session (one
+# file is a script, two a script and a test, three a structure someone will have
+# to navigate). After a compaction the threshold drops to 2: a compaction means
+# the session has already outgrown one window and the next one starts blind.
 #
-# Молчит навсегда, как только файл появился — в том числе если его только что
-# создал сам агент.
+# Silent forever once the file exists - including when the agent just created it.
 - id: decisions-file-notice
   name: ./decisions-file-notice.mjs
   config:
@@ -210,26 +205,22 @@
 - id: agent-instructions
   name: '@deepseek-ai/dsh-agent-instructions'
   config:
-    # Умолчание базового бандла — 65536 байт, это до ~21 000 токенов при
-    # замеренных 3.08 байта на токен, треть окна, и платится на КАЖДОМ запросе.
+    # The base bundle default is 65536 bytes - up to ~21000 tokens at the
+    # measured 3.08 bytes per token, a third of the window, paid on EVERY request.
     #
-    # Это ПОТОЛОК бандла, а не фиксированная цена: платится ровно за то, что
-    # реально лежит на диске. Поднять его без проектных файлов не стоит ничего.
+    # This is the bundle's CEILING, not a fixed price: you pay for what is
+    # actually on disk, so raising it costs nothing when there are no project
+    # files.
     #
-    # При нехватке бюджета первым вытесняется самый широкий файл, то есть
-    # глобальный ~/.dsh/AGENTS.md — а он и есть носитель всех рабочих правил,
-    # поэтому запас держим сверх его размера, а не впритык.
+    # When the budget is short, the widest file is evicted first - which is the
+    # global ~/.dsh/AGENTS.md, the carrier of all the working rules. So the
+    # headroom is kept above its size rather than just at it.
     #
-    # 8192: глобальный AGENTS.md после переписывания секции DECISIONS.md
-    # занимает 5138 байт, остаётся ~3 000 на проектный AGENTS.md — достаточно
-    # для файла правил уровня проекта. Полностью занятый бандл стоит ~2 660
-    # токенов на запрос.
-    #
-    # История: 4096 -> 6144 (2026-09-09, anchored освободил ~4 400 токенов
-    # каталога) -> 8192 -> 12288 (2026-09-13: глобальный AGENTS.md вырос до
-    # ~7 100 байт, и в Cooking_APP с проектным 1 527 сумма превысила 8192 —
-    # глобальный молча вытеснялся целиком, «omitted ~/.dsh/AGENTS.md» в каждом
-    # запросе; 12288 оставляет ~5 000 на проектный файл).
+    # 12288 leaves about 5000 bytes for a project-level AGENTS.md. A fully used
+    # bundle costs about 2660 tokens per request. (It went 4096 -> 6144 -> 8192 ->
+    # 12288: at 8192 a grown global AGENTS.md plus a project one exceeded the
+    # budget and the global file was silently dropped whole, with "omitted
+    # ~/.dsh/AGENTS.md" in every request.)
     maxBytes: 12288
 
 # ── shell ───────────────────────────────────────────────────────────────────
@@ -255,11 +246,11 @@
 # they need no realm. The `fs` service and its policy stay in the host.
 - id: tool-fs
   name: '@deepseek-ai/dsh-tool-fs'
-  # Потолок одного `read`. Умолчание пакета 50 KiB (read-render.ts:14) ≈ 14k
-  # токенов — один вызов съедает весь цикл между сжатиями. Замер 317a9aa7:
-  # read ALL-CONTEXT.tsv 34 410 симв. одним вызовом. 16 KiB ≈ 4,5k токенов;
-  # инструмент сам печатает «Output capped ... Use offset=N to continue»,
-  # то есть пагинация остаётся, дорогим становится только «всё сразу».
+  # Cap on a single `read`. The package default of 50 KiB (read-render.ts:14) is
+  # about 14k tokens - one call eats a whole cycle between compactions; one
+  # measured call read 34410 characters at once. 16 KiB is about 4.5k tokens, and
+  # the tool itself prints "Output capped ... Use offset=N to continue", so
+  # pagination remains and only "everything at once" becomes expensive.
   config:
     readMaxBytes: 16384
 
@@ -290,13 +281,13 @@
 - id: skill-filesystem
   name: '@deepseek-ai/dsh-skill-filesystem'
 
-# 2026-09-15: каталог skills выключен в рабочем пресете. После снятия engramory
-# единственные skills — восемь univer (dsh-univer-office): ~800 токенов в
-# каждом префиксе и после каждого сжатия при нуле вызовов за 144 сессии.
-# Инструменты univer_* остаются доступны через dev_tool_search. Для работы с
-# документами (.xlsx/.docx/.pptx/.univer) — пресет «Local 64k + Office»,
-# который генерирует scripts/make-office-preset.sh из этого файла и в котором
-# эта строка включена. Проверка: в новой сессии нет user-role skill-catalog.
+# The skills catalog is off in the working preset: the only skills left are the
+# eight univer ones, about 800 tokens in every prefix and after every compaction,
+# with zero calls across 144 sessions. The univer_* tools stay reachable through
+# dev_tool_search. For documents (.xlsx/.docx/.pptx/.univer) use the
+# "Local 64k + Office" preset, which scripts/make-office-preset.sh generates from
+# this file with the row enabled. Check: a new session has no user-role
+# skill-catalog message.
 - id: tool-skill
   name: '@deepseek-ai/dsh-tool-skill'
   disabled: true
@@ -356,94 +347,83 @@
     compaction: true
     toolResultPruner: true
   config:
-    # 2026-09-12: штатный класс заменён подклассом (шапка compaction-notools.mjs):
-    # пересказ без каталога инструментов (23 из 36 сжатий сессии 317a9aa7
-    # вернули tool-call вместо текста) и порог по usage сервера, а не по
-    # оценке метра (после qwen3.8-agent.jinja оценка завышает контекст ~вдвое).
+    # The stock class is replaced by a subclass (see the header of
+    # compaction-notools.mjs): summaries without the tool catalog (23 of 36
+    # compactions in one session returned a tool call instead of text) and a
+    # threshold based on server usage rather than the meter's estimate, which
+    # overstates the context roughly twofold with this chat template.
     - id: compaction-basic
       name: ./compaction-notools.mjs
       config:
-        # Окно 65 536 (profiles/web/cordis.patch.yml, с 2026-09-08). Порог
-        # считается как floor(contextWindow x ratio), то есть доля окна, а не
-        # абсолют: переход с 32k на 64k сам удвоил и порог, и запас.
+        # The threshold is floor(contextWindow x ratio), a share of the window
+        # rather than an absolute, so moving from 32k to 64k doubled both the
+        # threshold and the headroom.
         #
-        # 0.65 выбиралось под окно 32 768 (порог 21 299, запас 11 469) и при
-        # 64k давало порог 42 598 с запасом 22 938 — вдвое больше, чем тогда
-        # признавалось достаточным, то есть окно простаивало.
-        #
-        # 0.75 -> порог 49 152, запас до стены 16 384. Не хватает: перемер по
-        # сессиям 2026-09-09/10 (Cooking_APP x3, PlugIN) дал худший прирост за
-        # один шаг 17 910 токенов (топ: 17 910 / 17 632 / 11 881 / 11 759 /
-        # 10 226) — больше, чем считалось на 2026-09-09 (14 357). Прирост и
-        # есть перелёт: проверка на agent/pre-step видит ПРЕДЫДУЩИЙ замер,
-        # поэтому реальный пик = порог + прирост одного шага, то есть
-        # 49 152 + 17 910 = 67 062 при стене 65 536.
-        #
-        # 0.7 -> порог 45 875, запас 19 661 > 17 910. Замеренные пики за те же
-        # прогоны: 59 818 / 54 708 / 53 646 / 49 970 — все выше 45 875, то есть
-        # сжатие будет срабатывать на шаг раньше, а не реже.
-        #
-        # 0.8 (умолчание пакета) — 52 428 + 17 910 = 70 338, за стеной.
-        # Окно 65536 = -c сервера (эпизод с 131072 закрыт 2026-09-13, см.
-        # cordis.patch.yml профиля): 0.70 × 65536 = 45 875.
+        # Why 0.7 and not more: the check on agent/pre-step sees the PREVIOUS
+        # measurement, so the real peak is threshold + the growth of one step.
+        # Measured across four sessions the worst single-step growth was 17910
+        # tokens. At 0.75 that gives 49152 + 17910 = 67062 against a 65536 wall;
+        # the package default of 0.8 gives 70338. At 0.7 the threshold is 45875
+        # with 19661 of headroom - more than the worst step - and the measured
+        # peaks of those runs (59818 / 54708 / 53646 / 49970) all sit above it,
+        # so compaction fires a step earlier rather than less often.
         thresholdRatio: 0.70
 
-        # Умолчание 0.16 = 10 485 токенов от окна (retainRatio считается от
-        # ОКНА, не от порога). Замер: сжатие роняло контекст с 44 308 до
-        # 19 043, теряя 25k, после чего модель 5-6 шагов набирала контекст
-        # заново. 0.25 = 16 384 -> падение до ~26k.
+        # The package default 0.16 is 10485 tokens of the window (retainRatio
+        # counts from the WINDOW, not from the threshold). Measured: a compaction
+        # dropped the context from 44308 to 19043, losing 25k, after which the
+        # model spent 5-6 steps rebuilding it.
         #
-        # 0.25 выбиралось, когда пересказ стоил 3 072. После подъёма maxTokens
-        # до 6 144 хвост и пересказ вместе съели цикл между сжатиями:
-        #   префикс 8 050 + хвост 16 384 + пересказ 6 144 = 30 578,
-        #   порог 45 875 -> на работу остаётся 15 297.
-        # Это МЕНЬШЕ худшего замеренного прироста за один шаг (17 910), то есть
-        # один тяжёлый шаг сразу после сжатия снова переводит порог.
+        # 0.25 was chosen when a summary cost 3072 tokens. After raising maxTokens
+        # to 6144 the tail and the summary together ate the cycle between
+        # compactions: prefix 8050 + tail 16384 + summary 6144 = 30578 against a
+        # 45875 threshold, leaving 15297 for work - LESS than the worst measured
+        # single-step growth (17910), so one heavy step right after a compaction
+        # crosses the threshold again.
         #
-        # 0.20 = 13 107: 8 050 + 13 107 + 6 144 = 27 301, цикл 18 574 > 17 910.
-        # Цена — хвост короче на 3 277 токенов, примерно три шага истории.
+        # 0.20 = 13107: 8050 + 13107 + 6144 = 27301, a cycle of 18574 > 17910.
+        # The price is a tail shorter by 3277 tokens, about three steps of history.
         #
-        # Префикс 8 050 замерен 2026-09-10 при 3.08 байта на токен: системный
-        # промпт 2 420 + схемы девяти инструментов 3 861 + AGENTS.md 1 773.
-        # Появится проектный AGENTS.md на все 8 192 байта — префикс дойдёт до
-        # ~9 050, цикл упадёт до ~17 570, то есть снова ниже 17 910. Запас
-        # держится ровно на том, что проектных AGENTS.md сейчас нет; заведёшь
-        # такой файл — перемерить и снимать хвост дальше (0.18 = 11 796).
+        # The 8050 prefix was measured at 3.08 bytes per token: system prompt 2420
+        # + nine tool schemas 3861 + AGENTS.md 1773. A project AGENTS.md filling
+        # the whole bundle would push the prefix to ~9050 and the cycle down to
+        # ~17570, below the worst step again - so if you add one, re-measure and
+        # trim the tail further (0.18 = 11796).
         retainRatio: 0.20
 
-        # Потолок самого пересказа. Умолчание пакета 8 192.
+        # Cap on the summary itself. The package default is 8192.
         #
-        # Было 3 072 — выбрано по сессии 9d305367 из соображения «чекпойнт не
-        # должен съедать бюджет, который сжатие только что освободило».
-        # Не хватило: перемер логов 2026-09-09/10 показал, что при 3 072
-        # обрывается БОЛЬШИНСТВО сжатий — 12 из 19, 21 из 23, 25 из 27 и 2 из
-        # 10 закончились "summarization truncated at the token cap (incomplete
-        # checkpoint)". Оборванный чекпойнт означает, что сжатие не состоялось:
-        # порог остаётся перейдённым, сжатие запускается на следующем же шаге,
-        # контекст тем временем продолжает расти. Это, а не сам порог, —
-        # главная причина переполнений.
+        # It used to be 3072, on the reasoning that a checkpoint should not eat
+        # the budget a compaction had just freed. That was not enough: at 3072
+        # MOST compactions were truncated - 12 of 19, 21 of 23, 25 of 27 - with
+        # "summarization truncated at the token cap (incomplete checkpoint)". A
+        # truncated checkpoint means the compaction did not happen: the threshold
+        # stays crossed, compaction restarts on the next step, and the context
+        # keeps growing meanwhile. That, rather than the threshold itself, is the
+        # main cause of overflows.
         #
-        # Переход на nothink-маршрут (ниже) проблему не снял: дело не в том,
-        # что бюджет уходит на размышление, а в том, что восемь секций
-        # инструкции компактора в 3 072 токена не укладываются.
+        # Moving to the nothink route (below) did not fix it: the problem is not
+        # the budget going into thinking but the compactor's eight instruction
+        # sections not fitting into 3072 tokens.
         #
-        # 6 144: пост-сжатие = ~3 500 префикс + 16 384 хвост + до 6 144
-        # пересказ ≈ 26 000, при пороге 45 875 остаётся ~20 000 рабочего
-        # запаса. Если обрывы останутся — поднимать до умолчания 8 192.
+        # At 6144 the post-compaction state is about 3500 prefix + 16384 tail +
+        # up to 6144 summary = ~26000, leaving ~20000 of working headroom under
+        # the 45875 threshold. If truncation returns, raise it to the 8192
+        # default.
         maxTokens: 6144
 
-        # Маршрут пересказа — та же модель, но записью без мышления
+        # The summary goes to the same model through an entry with thinking off
         # (profiles/web/cordis.patch.yml, id qwen38-27b-nothink).
         #
-        # Причина: 2026-09-09 из 50 сжатий за день 46 закончились
-        # "summarization truncated at the token cap (incomplete checkpoint)".
-        # Рассуждение и пересказ делят один выходной бюджет: 3 072 уходили на
-        # размышление, чекпойнт не дописывался, порог оставался перейдённым — и
-        # сжатие запускалось снова на следующем же шаге, по ~95 с за попытку.
-        # Пересказ — работа вспомогательная, думать над ней не нужно.
+        # Why: on one day 46 of 50 compactions ended with "summarization truncated
+        # at the token cap (incomplete checkpoint)". Reasoning and the summary
+        # share one output budget - the budget went into thinking, the checkpoint
+        # was never finished, the threshold stayed crossed and compaction started
+        # again on the very next step, about 95 s per attempt. A summary is
+        # auxiliary work that needs no thinking.
         #
-        # Если чекпойнт всё равно обрывается, поднимать здесь maxTokens
-        # (штатное умолчание пакета — 8192).
+        # If checkpoints still get truncated, raise maxTokens here (the package
+        # default is 8192).
         summarizationProvider: qwen-local
         summarizationModel: qwen38-27b-nothink
 
@@ -487,14 +467,14 @@
         toolName: subagent
         modelSelectionSettings: true
         backgroundMode: continuable
-        # Worker-режим. Замер 317a9aa7: два из 13 worker'ов кончились
-        # max-tokens, пытаясь выдать словарь переводов текстом; их обрезанные
-        # ответы (36 066 и 33 060 символов) ушли родителю целиком как
-        # subagent-settled — ~20k токенов мусора в контексте родителя.
-        # maxTokens 4096 ограничивает цену такого провала четырьмя тысячами.
-        # Маршрут наследуется от родителя (modelSelectionSettings), поэтому
-        # provider/model здесь не задаются. Persona — правила worker'а,
-        # которые родитель в промпте задать забывает.
+        # Worker mode. Measured: two of 13 workers ran into max-tokens while
+        # trying to emit a translation dictionary as text, and their truncated
+        # answers (36066 and 33060 characters) went to the parent whole as
+        # subagent-settled - about 20k tokens of litter in the parent's context.
+        # maxTokens 4096 caps the price of such a failure at four thousand.
+        # The route is inherited from the parent (modelSelectionSettings), so no
+        # provider/model here. The persona carries the worker rules the parent
+        # tends to forget to state in the prompt.
         agentOptions:
           maxTokens: 4096
         persona: >-
@@ -570,17 +550,15 @@
   config:
     fetch: true
     searchTimeoutMs: 60000
-    # Пределы под окно 64k (комментарий ниже писался под 32k; сами лимиты
-    # оставлены — 12 000 символов на страницу разумны и при 64k).
-    # Умолчания пакета рассчитаны на большие окна и здесь
-    # смертельны: fetchMaxOutputChars 200000 символов — это ~57 000 токенов,
-    # почти вдвое больше всего окна, то есть один web_fetch крупной страницы
-    # гарантированно даёт CONTEXT_WINDOW_EXCEEDED.
-    # 12000 символов ≈ 3 400 токенов — примерно четверть рабочего бюджета.
+    # Limits for a 64k window. The package defaults assume large windows and are
+    # fatal here: fetchMaxOutputChars of 200000 characters is about 57000 tokens,
+    # nearly twice the whole window, so one web_fetch of a large page guarantees
+    # CONTEXT_WINDOW_EXCEEDED. 12000 characters is about 3400 tokens, roughly a
+    # quarter of the working budget.
     fetchMaxOutputChars: 12000
-    # 8 источников со сниппетами — тоже несколько тысяч токенов. Трёх хватает,
-    # а нужную страницу модель дочитает через web_fetch.
+    # Eight sources with snippets are also several thousand tokens. Three are
+    # enough, and the model reads the page it needs through web_fetch.
     searchMaxResults: 3
-    # Каждый запрос у родного провайдера DeepSeek — полный ход модели по
-    # латентности и токенам, отдельного поискового эндпоинта у него нет.
+    # With the native DeepSeek provider every query is a full model turn in both
+    # latency and tokens: it has no separate search endpoint.
     searchMaxQueries: 2

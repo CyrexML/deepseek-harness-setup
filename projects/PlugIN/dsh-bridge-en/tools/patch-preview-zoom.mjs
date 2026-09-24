@@ -1,36 +1,35 @@
-// Щипок масштабирует СОДЕРЖИМОЕ превью, а не интерфейс панели (2026-09-23).
-// Идемпотентен.  node patch-preview-zoom.mjs <plugin_dir>
+// Pinch zooms the CONTENT of the preview, not the panel interface. Idempotent.
+//   node patch-preview-zoom.mjs <plugin_dir>
 //
-// Зачем. patch-zoom-scope.mjs отдал правой панели штатный зум браузера: щипок
-// там масштабировал ВСЮ страницу, то есть вместе с панелью уезжали её вкладки,
-// адресная строка и сам чат — рассмотреть мелкий текст в открытом файле это
-// помогало плохо. Нужно другое: рамка панели стоит на месте, а приближается
-// только то, что показано внутри — страница во встроенном браузере, PDF,
-// таблица, картинка.
+// Why. patch-zoom-scope.mjs gave the right panel the browser's normal zoom, so a
+// pinch there scaled the WHOLE page: the panel's tabs, the address bar and the
+// chat moved along with it, which helps little when you want to read small text
+// in an open file. What is needed is the opposite: the panel frame stays put and
+// only what is shown inside comes closer - a page in the embedded browser, a PDF,
+// a spreadsheet, an image.
 //
-// Как сделано. Щипок перехватывается сами́м мостом (не-пассивный touchmove,
-// preventDefault — браузер свой зум не начинает) в ДВУХ местах: в родительском
-// документе для панели и ВНУТРИ документа превью — потому что касание, начатое
-// в iframe, до родителя не доходит вообще (события получает документ кадра).
-// Масштаб применяется к содержимому:
-//   * если это <iframe> и документ внутри доступен (у нас так: превью HTML
-//     работает без sandbox, см. htmlViewerNoSandbox в настройках стенда) —
-//     ставим `zoom` на его <html>. Это НАСТОЯЩЕЕ масштабирование: текст
-//     переверстывается, ничего не режется;
-//   * иначе (<canvas> pdf.js, <img>) — НАСТОЯЩИЙ размер в разметке (width/height
-//     в пикселях, снятый max-width), а не «transform» и не «zoom»: только так у
-//     контейнера появляется прокрутка и увеличенную страницу можно возить
-//     пальцем. Заодно по пути наверх открывается горизонтальная прокрутка —
-//     просмотрщик режет её (overflow-x: hidden);
-//   * приближается то место, куда поставили пальцы: у документа внутри кадра
-//     прокрутка после каждого шага возвращается так, чтобы точка под пальцами
-//     осталась на месте (иначе `zoom` тянет содержимое в левый верхний угол —
-//     жалоба 2026-09-23);
-//   * двойное касание двумя пальцами возвращает 100%.
-// Масштаб держится в пределах 1…5 и запоминается на вкладку (пока она открыта).
+// How. The bridge intercepts the pinch itself (non-passive touchmove with
+// preventDefault, so the browser never starts its own zoom) in TWO places: in the
+// parent document for the panel, and INSIDE the preview document - because a
+// touch that begins in an iframe never reaches the parent at all (the frame's
+// document gets the events). The scale is applied to the content:
+//   * for an <iframe> whose document is reachable (which is the case here: the
+//     HTML preview runs without sandbox, see htmlViewerNoSandbox in the stand
+//     settings) - `zoom` is set on its <html>. That is REAL zooming: the text
+//     reflows and nothing is cut off;
+//   * otherwise (<canvas> from pdf.js, <img>) - a REAL size in the markup
+//     (width/height in pixels, max-width removed) rather than `transform` or
+//     `zoom`: only then does the container get scrollbars and the enlarged page
+//     can be dragged with a finger. On the way up horizontal scrolling is opened
+//     as well, because the viewer clips it (overflow-x: hidden);
+//   * the zoom focuses where the fingers are: inside the frame the scroll is
+//     corrected after each step so the point under the fingers stays put
+//     (otherwise `zoom` drags the content into the top-left corner);
+//   * a double tap with two fingers returns to 100%.
+// The scale is kept between 1 and 5 and remembered per tab while it is open.
 //
-// Якорь — `[data-sidebar-right-panel]`, атрибут родной панели DSH 0.1.6,
-// а не хеш CSS-модуля: переживает пересборку интерфейса.
+// The anchor is `[data-sidebar-right-panel]`, an attribute of the native DSH
+// 0.1.6 panel rather than a CSS-module hash, so it survives an interface rebuild.
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -39,12 +38,12 @@ const MARK = 'dsh-bridge-en: preview zoom';
 
 const CSS = `
 
-/* ${MARK} — щипок масштабирует содержимое превью, а не панель */
+/* ${MARK} - pinch zooms the preview content, not the panel */
 @media (max-width: 768px) {
-  /* Браузер не должен начинать свой зум внутри панели: масштабом управляем сами. */
+  /* The browser must not start its own zoom inside the panel: we drive it. */
   [data-sidebar-right-panel],
   [data-sidebar-right-panel] * { touch-action: pan-x pan-y !important; }
-  /* Масштабируемое содержимое растёт от левого верхнего угла, контейнер прокручивается. */
+  /* Scaled content grows from the top-left corner and the container scrolls. */
   [data-dsh-preview-zoom] {
     transform-origin: 0 0 !important;
     will-change: transform;
@@ -53,13 +52,13 @@ const CSS = `
 `;
 
 const GUARD = `
-  // ${MARK}: щипок внутри правой панели масштабирует только содержимое превью.
+  // ${MARK}: a pinch inside the right panel scales only the preview content.
   (() => {
     if (window.__dshPreviewZoom) return;
     window.__dshPreviewZoom = true;
     var MIN = 1, MAX = 5;
     var state = null;          // { target, kind, startScale, startDist }
-    var scales = new WeakMap(); // элемент -> текущий масштаб
+    var scales = new WeakMap(); // element -> current scale
     var lastTwoFingerTap = 0;
 
     var distance = function (touches) {
@@ -68,9 +67,9 @@ const GUARD = `
       return Math.hypot(dx, dy);
     };
 
-    // Что именно масштабировать под пальцами: iframe превью, холст pdf.js,
-    // картинка — в таком порядке, потому что iframe может лежать внутри
-    // контейнера с холстом-заглушкой.
+    // What to scale under the fingers: the preview iframe, a pdf.js canvas, an
+    // image - in that order, because the iframe may sit inside a container that
+    // also holds a placeholder canvas.
     var pickTarget = function (node) {
       if (!(node instanceof Element)) return null;
       var panel = node.closest('[data-sidebar-right-panel]');
@@ -81,16 +80,17 @@ const GUARD = `
       return inside;
     };
 
-    // Документ внутри iframe доступен только для своего происхождения; у превью
-    // без песочницы он свой, у чужого сайта во встроенном браузере — нет.
+    // The document inside an iframe is reachable only for the same origin: the
+    // sandbox-free preview is same-origin, an external site in the embedded
+    // browser is not.
     var innerDoc = function (element) {
       if (element.tagName !== 'IFRAME') return null;
       try { return element.contentDocument && element.contentDocument.documentElement ? element.contentDocument : null; }
       catch (e) { return null; }
     };
 
-    // Ближайшие предки с прокруткой — по каждой оси своя: страницу PDF по
-    // вертикали возит контейнер страниц, по горизонтали — рамка самой страницы.
+    // The nearest scrolling ancestor differs per axis: a PDF page scrolls
+    // vertically in the page container and horizontally in the page frame.
     var scrollerFor = function (node, axis) {
       var el = node.parentElement;
       while (el !== null && el !== document.body) {
@@ -100,10 +100,10 @@ const GUARD = `
       return null;
     };
 
-    // Контейнеры просмотрщика режут содержимое по горизонтали
-    // (overflow-x: hidden). Пока страница была в размер панели, это не мешало;
-    // увеличенную подвинуть вбок уже нужно, поэтому по пути наверх открываем
-    // горизонтальную прокрутку. Только внутри панели и не глубже шести шагов.
+    // The viewer's containers clip content horizontally (overflow-x: hidden).
+    // That was fine while the page fitted the panel; an enlarged one has to move
+    // sideways, so horizontal scrolling is opened on the way up - inside the
+    // panel only, and no deeper than six levels.
     var openHorizontalScroll = function (node) {
       var el = node.parentElement;
       for (var i = 0; el !== null && i < 6 && el.closest('[data-sidebar-right-panel]') !== null; i++) {
@@ -113,13 +113,13 @@ const GUARD = `
       }
     };
 
-    var baseSizes = new WeakMap();   // элемент -> размер при масштабе 1
+    var baseSizes = new WeakMap();   // element -> size at scale 1
 
-    // ВАЖНО: страница PDF (<canvas>) и картинки увеличиваются НАСТОЯЩИМ
-    // размером в разметке, а не «transform: scale» и не «zoom». Преобразование
-    // не меняет занимаемое место, поэтому прокручивать нечего — увеличенную
-    // страницу нельзя подвинуть пальцем (жалоба 2026-09-23). У самой страницы
-    // при этом стоит max-width: 100%, который гасил и «zoom», — снимаем.
+    // IMPORTANT: a PDF page (<canvas>) and images are enlarged by a REAL size in
+    // the markup rather than by "transform: scale" or "zoom". A transform does not
+    // change the space taken, so there is nothing to scroll and the enlarged page
+    // cannot be dragged with a finger. The page itself carries max-width: 100%,
+    // which also suppressed "zoom", so that is removed.
     var apply = function (element, scale) {
       scales.set(element, scale);
       var doc = innerDoc(element);
@@ -168,8 +168,8 @@ const GUARD = `
       var midX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
       var midY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
       var current = scales.get(target) || 1;
-      // Точка содержимого под пальцами — в координатах самого содержимого при
-      // масштабе 1: после каждого шага прокрутка возвращает её под пальцы.
+      // The content point under the fingers, in the content's own coordinates at
+      // scale 1: after each step the scroll brings it back under the fingers.
       var box = target.getBoundingClientRect();
       state = {
         target: target, startScale: current, startDist: distance(event.touches),
@@ -186,8 +186,8 @@ const GUARD = `
       var scale = state.startScale * (dist / state.startDist);
       scale = Math.min(MAX, Math.max(MIN, scale));
       apply(state.target, scale);
-      // Содержимое выросло — доводим прокрутку так, чтобы точка, которая была
-      // под пальцами, там и осталась (иначе всё уезжает в левый верхний угол).
+      // The content grew, so the scroll is adjusted to keep the point that was
+      // under the fingers in place (otherwise everything drifts to the top-left).
       var midX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
       var midY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
       var box = state.target.getBoundingClientRect();
@@ -202,11 +202,11 @@ const GUARD = `
     document.addEventListener('touchend', stop, true);
     document.addEventListener('touchcancel', stop, true);
 
-    // ВАЖНО: касание, начатое ВНУТРИ iframe, до родительского документа не
-    // доходит вовсе — события получает документ самого кадра. Поэтому для
-    // превью (оно своего происхождения, песочница отключена) тот же обработчик
-    // ставится внутрь его документа. Без этого щипок над открытой страницей
-    // масштабировал весь интерфейс: браузер обрабатывал жест сам.
+    // IMPORTANT: a touch that starts INSIDE an iframe never reaches the parent
+    // document - the frame's own document gets the events. So for the preview
+    // (same origin, sandbox off) the same handler is installed inside its
+    // document. Without that, a pinch over an open page scaled the whole
+    // interface, because the browser handled the gesture itself.
     var attachInside = function (doc) {
       if (doc.__dshPreviewZoomBound) return;
       doc.__dshPreviewZoomBound = true;
@@ -234,11 +234,11 @@ const GUARD = `
         var scale = innerScale();
         var mid = center(event.touches);
         var box = scroller();
-        // Точка документа под пальцами: при «zoom» координаты содержимого
-        // умножаются на масштаб, поэтому храним её В МАСШТАБЕ 1 и после
-        // каждого шага возвращаем прокрутку так, чтобы та же точка осталась
-        // под пальцами. Без этого приближение всегда уезжало в левый верхний
-        // угол — там начало координат.
+        // The document point under the fingers: with "zoom" the content
+        // coordinates are multiplied by the scale, so it is stored AT SCALE 1 and
+        // after each step the scroll is restored to keep that point under the
+        // fingers. Without this the zoom always drifted to the top-left corner,
+        // where the origin is.
         inner = {
           startScale: scale,
           startDist: distance(event.touches),
@@ -262,16 +262,16 @@ const GUARD = `
       doc.addEventListener('touchcancel', innerStop, true);
     };
 
-    // Кадры появляются и переоткрываются вместе с вкладками панели, поэтому
-    // просто периодически осматриваем панель. Чужой origin (внешний сайт во
-    // встроенном браузере) недоступен — там остаётся штатное поведение.
+    // Frames appear and reopen together with the panel's tabs, so the panel is
+    // simply inspected periodically. A foreign origin (an external site in the
+    // embedded browser) is unreachable and keeps the default behaviour.
     var scanFrames = function () {
       var frames = document.querySelectorAll('[data-sidebar-right-panel] iframe');
       for (var i = 0; i < frames.length; i++) {
         try {
           var doc = frames[i].contentDocument;
           if (doc && doc.documentElement) attachInside(doc);
-        } catch (e) { /* другой origin — пропускаем */ }
+        } catch (e) { /* different origin - skip */ }
       }
     };
     setInterval(scanFrames, 1200);
@@ -281,31 +281,31 @@ const GUARD = `
 
 // --- CSS --------------------------------------------------------------------
 const stylesPath = join(dir, 'client/mobile-styles.js');
-if (!existsSync(stylesPath)) { console.error(`нет ${stylesPath}`); process.exit(1); }
+if (!existsSync(stylesPath)) { console.error(`no ${stylesPath}`); process.exit(1); }
 let styles = readFileSync(stylesPath, 'utf8');
 if (styles.includes(MARK)) {
-  console.log('bridge: preview zoom — CSS уже на месте');
+  console.log('bridge: preview zoom - CSS already in place');
 } else {
   const at = styles.lastIndexOf('`');
-  if (at === -1) { console.error('не нашёл конец шаблонной строки MOBILE_STYLES_CSS'); process.exit(1); }
+  if (at === -1) { console.error('could not find the end of the MOBILE_STYLES_CSS template string'); process.exit(1); }
   styles = styles.slice(0, at) + CSS + styles.slice(at);
   rmSync(stylesPath, { force: true });
   writeFileSync(stylesPath, styles);
-  console.log('bridge: preview zoom — CSS добавлен');
+  console.log('bridge: preview zoom - CSS added');
 }
 
 // --- JS ---------------------------------------------------------------------
 const indexPath = join(dir, 'client/index.js');
-if (!existsSync(indexPath)) { console.error(`нет ${indexPath}`); process.exit(1); }
+if (!existsSync(indexPath)) { console.error(`no ${indexPath}`); process.exit(1); }
 let index = readFileSync(indexPath, 'utf8');
 if (index.includes('__dshPreviewZoom')) {
-  console.log('bridge: preview zoom — обработчик уже на месте');
+  console.log('bridge: preview zoom - handler already in place');
   process.exit(0);
 }
 const ANCHOR = 'function setupMobileExperience(rpcCall, ctx) {\n  if (typeof document === \'undefined\' || typeof window === \'undefined\') return;\n  injectMobileStyles();\n';
 const n = index.split(ANCHOR).length - 1;
-if (n !== 1) { console.error(`MATCH COUNT ${n} для якоря setupMobileExperience`); process.exit(1); }
+if (n !== 1) { console.error(`MATCH COUNT ${n} for the setupMobileExperience anchor`); process.exit(1); }
 index = index.replace(ANCHOR, ANCHOR + GUARD);
 rmSync(indexPath, { force: true });
 writeFileSync(indexPath, index);
-console.log('bridge: preview zoom — обработчик добавлен');
+console.log('bridge: preview zoom - handler added');

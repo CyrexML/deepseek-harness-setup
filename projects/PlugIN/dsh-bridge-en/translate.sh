@@ -31,14 +31,14 @@ node "$HERE/tools/patch-hashes.mjs" .     # remap stale css-module hashes of the
 node "$HERE/tools/patch-icon.mjs" .       # DSH whale as PWA/home-screen/apple-touch icon (assets from tools/gen-icon.mjs)
 node "$HERE/tools/patch-power.mjs" .      # Power card in Remote access: stop DSH / DSH+WSL via launcher signal file
 node "$HERE/tools/patch-settings-mobile.mjs" . # settings nav/plugin-hub overflow on phones; dark power popover
-node "$HERE/tools/patch-zoom-scope.mjs" . # щипок: выключен в чате, включён в боковой панели
-node "$HERE/tools/patch-header-sidebar-btn.mjs" . # убрать нашу кнопку сайдбара: в 0.1.6 есть родная
-node "$HERE/tools/patch-mobile-ux.mjs" . # окно вопросов и подсветка нажатий на телефоне
-node "$HERE/tools/patch-preview-zoom.mjs" . # щипок масштабирует содержимое превью, а не панель
-node "$HERE/tools/patch-html-no-store.mjs" . # страница не кешируется: иначе телефон держит старый бандл
+node "$HERE/tools/patch-zoom-scope.mjs" . # pinch: off in the chat, on in the side panel
+node "$HERE/tools/patch-header-sidebar-btn.mjs" . # drop the added sidebar button: 0.1.6 has a native one
+node "$HERE/tools/patch-mobile-ux.mjs" . # question card and tap highlight on the phone
+node "$HERE/tools/patch-preview-zoom.mjs" . # pinch zooms the preview content, not the panel
+node "$HERE/tools/patch-html-no-store.mjs" . # the page is never cached, or the phone keeps an old bundle
 # rebuild client bundle with esbuild from tools/node_modules
 ln -sfn "$HERE/tools/node_modules" node_modules
-rm -f client/client.js   # store-хардлинк: esbuild пишет по месту, файл пересоздаём
+rm -f client/client.js   # store hardlink: esbuild writes in place, so recreate the file
 node client/build.mjs
 rm node_modules
 for f in $FILES client/client.js; do node --check "$f"; done

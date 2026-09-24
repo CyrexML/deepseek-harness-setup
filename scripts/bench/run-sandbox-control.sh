@@ -31,10 +31,10 @@ for task in 01 02; do
     st=$(cat "$OUT/$tag.log.start" 2>/dev/null || echo 0)
     en=$(cat "$OUT/$tag.log.end" 2>/dev/null || echo 0)
     rc=$(grep -a "EXIT=" "$OUT/$tag.log" 2>/dev/null | tail -1 | sed 's/EXIT=//')
-    if (cd "$repo" && python3 -m pytest -q > "$OUT/$tag.pytest" 2>&1); then solved=ДА; else solved=НЕТ; fi
+    if (cd "$repo" && python3 -m pytest -q > "$OUT/$tag.pytest" 2>&1); then solved=yes; else solved=no; fi
     printf '%-8s wall=%4ss steps=%-3s context=%-6s rc=%s solved=%-3s | %s\n' \
       "$tag" "$((en-st))" "$steps" "$ctx" "$rc" "$solved" \
       "$(tail -1 "$OUT/$tag.pytest" | tr -d '\r')" | tee -a "$OUT/summary.txt"
   done
 done
-echo; echo "=== ИТОГ ==="; cat "$OUT/summary.txt"
+echo; echo "=== RESULT ==="; cat "$OUT/summary.txt"

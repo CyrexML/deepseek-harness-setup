@@ -9,8 +9,8 @@
 //  3. Power popover (dsh-bridge-en): on ≤768px it pins to the viewport edges (12px) instead of the
 //     anchor, so it can never leave the screen; dark DeepSeek palette in both themes.
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-// Плагины лежат в pnpm-store хардлинками: запись «по месту» испортила бы копию в store,
-// поэтому файл сначала удаляется (новый inode), потом пишется.
+// Plugin files are hardlinks into the pnpm store: writing in place would corrupt
+// the store copy, so the file is unlinked first (new inode) and then written.
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';

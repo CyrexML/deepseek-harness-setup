@@ -22,7 +22,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 PROFILE="$HOME/.dsh/profiles/web"
 KEEP="$HOME/Harness_AI/run/backups/keep"
 step() { echo; echo "=== $*"; }
-die() { echo "ОШИБКА: $*" >&2; exit 1; }
+die() { echo "ERROR: $*" >&2; exit 1; }
 
 if [ "${1:-}" = "--rollback" ]; then
   src="${2:?give the backup directory}"

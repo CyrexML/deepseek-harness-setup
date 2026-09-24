@@ -1,37 +1,35 @@
 /**
- * compaction-basic для стенда: (1) пересказ без каталога инструментов,
- * (2) порог сжатия по usage llama-server, а не по оценке метра,
- * (3) пересказ без reasoning-блоков в реплее (см. summarize()).
+ * compaction-basic for this stand: (1) summarize without the tool catalog,
+ * (2) threshold by llama-server usage rather than by the meter's estimate,
+ * (3) summaries without reasoning blocks in the replay (see summarize()).
  *
- * (1) Замер по логам 2026-09-11/12: из 36 сжатий сессии 317a9aa7 23 закончились
- * "summarization produced no text summary content" за 3-20 с каждое; в
- * c47f7d3f — 33 из 73. summarizer.ts §summarizeWithLlm реплеит разговор ВМЕСТЕ
- * со схемами инструментов (ради префикс-кэша) и просит модель «не звать
- * инструменты» текстом. Модель посреди tool-цикла отвечает tool-call, текста
- * нет, компактор бросает ошибку, порог остаётся перейдённым, и попытка
- * повторяется на каждом следующем шаге, пока контекст растёт. Ручки в схеме
- * компактора нет (config.ts §27), но `summarize()` объявлен единственным хуком
- * подкласса (index.ts:231). Здесь он вызывается без `tools`: без каталога
- * tool-call невозможен физически. Цена: системное сообщение шаблона Qwen
- * начинается с блока tools, префикс-кэш для запроса пересказа не совпадает —
- * полный префилл ~40k токенов, ~25-30 с при 1 500 т/с.
+ * (1) Measured over session logs: 23 of 36 compactions in one session and 33 of
+ * 73 in another ended with "summarization produced no text summary content".
+ * summarizer.ts replays the conversation TOGETHER with the tool schemas (for the
+ * prefix cache) and asks the model in prose not to call tools. In the middle of a
+ * tool loop the model answers with a tool call, there is no text, the compactor
+ * throws, the threshold stays crossed and the attempt repeats on every following
+ * step while the context keeps growing. The compactor schema has no knob for
+ * this, but `summarize()` is declared the subclass's only hook, so it is called
+ * here without `tools`: with no catalog a tool call is physically impossible.
+ * The cost: the Qwen template's system message starts with the tools block, so
+ * the prefix cache does not match for the summary request - a full prefill of
+ * about 40k tokens.
  *
- * (2) С 2026-09-12 сервер работает на qwen3.8-agent.jinja: reasoning прошлых
- * шагов в промпт не реплеится, и usage сервера стал заметно МЕНЬШЕ оценки
- * метра (token-meter/src/estimate.ts считает reasoning-блоки по chars/4).
- * Метр берёт usage только когда usage >= оценки (token-meter/src/index.ts:166),
- * иначе — оценку. Итог замера 13d5fe23 (первая сессия на новом шаблоне):
- * сжатия при реальных 26 237 и 23 901 токенах при пороге 45 875. Здесь перед
- * штатной проверкой считается реальный контекст: usage последнего вызова
- * (input + cacheRead + output) плюс оценка того, что легло в surface после него
- * (результаты инструментов, вставки). Ниже порога — сжатие не запускается.
- * После сжатия, пока нового ответа модели нет, usage устарел — решает штатная
- * логика. Триггер context-overflow не перехватывается никогда.
+ * (2) With the stand's chat template the reasoning of past steps is not replayed,
+ * and server usage became noticeably SMALLER than the meter's estimate
+ * (token-meter counts reasoning blocks as chars/4). The meter only takes usage
+ * when usage >= estimate, otherwise the estimate - which produced compactions at
+ * a real 26237 and 23901 tokens against a 45875 threshold. So before the normal
+ * check the real context is computed here: the usage of the last call
+ * (input + cacheRead + output) plus an estimate of what landed in the surface
+ * after it (tool results, insertions). Below the threshold no compaction starts.
+ * Right after a compaction, while there is no new model answer, usage is stale
+ * and the normal logic decides. The context-overflow trigger is never intercepted.
  *
- * Импорт по абсолютному пути: пресет лежит под ~/.dsh, и восходящий поиск
- * node_modules до пакетов харнесса не доходит (agent-presets/src/mount.ts §import
- * решает это только для спецификатора строки, не для импортов внутри файла).
- * Путь совпадает с тем, что грузит сам хост, поэтому экземпляр модуля один.
+ * Imported by absolute path: the preset lives under ~/.dsh and an upward
+ * node_modules search never reaches the harness packages. The path matches what
+ * the host itself loads, so there is a single module instance.
  */
 import Base from '@HARNESS_DIR@/packages/compaction/compaction-basic/lib/index.js'
 
@@ -50,8 +48,8 @@ function blocksChars(content) {
 }
 
 /**
- * Реальный контекст по usage последнего ответа модели, или undefined, если
- * после него было сжатие (usage устарел) или usage вовсе нет.
+ * The real context from the usage of the last model answer, or undefined when a
+ * compaction happened after it (usage is stale) or there is no usage at all.
  */
 export function usageAnchoredTokens(session) {
   let delta = 0
@@ -71,9 +69,9 @@ export function usageAnchoredTokens(session) {
       case 'assistant/message': {
         const u = e.data.usage
         if (u === undefined) return undefined
-        // Шаблон qwen3.8-agent.jinja не реплеит reasoning и последнего ответа,
-        // поэтому из outputTokens вычитаются его reasoning-токены (по чанкам
-        // потока; без потока — по символам).
+        // The stand's chat template does not replay the reasoning of the last
+        // answer either, so its reasoning tokens are subtracted from
+        // outputTokens (from stream chunks, or from characters without them).
         let reasoning = 0
         const stream = e.data.stream
         if (Array.isArray(stream)) {
@@ -91,11 +89,11 @@ export function usageAnchoredTokens(session) {
 }
 
 /**
- * Действующий список todo_write текущего хода (tool-todo/src/index.ts:131 —
- * проекция очищается на turn/start), или undefined. Пересказ сжатия список не
- * упоминает (compaction-basic/src/summarizer.ts), и после сжатия модель его не
- * видит: эталон 14, прогон 3 — последний todo_write на шаге 136 из 183, ход
- * закрыт с пунктами in_progress/pending в панели.
+ * The current turn's todo_write list (tool-todo/src/index.ts:131 - the projection
+ * is cleared on turn/start), or undefined. The compaction summary never mentions
+ * the list (compaction-basic/src/summarizer.ts), so after a compaction the model
+ * stops seeing it: in one measured run the last todo_write came at step 136 of
+ * 183 and the turn ended with items still in_progress/pending in the panel.
  */
 export function openTodos(session) {
   for (let seq = session.seq - 1; seq >= 0; seq -= 1) {
@@ -114,15 +112,15 @@ export default class CompactionNoTools extends Base {
 
   async summarize(input, agent, signal) {
     const { tools: _tools, ...rest } = input
-    // (3) Reasoning-блоки из реплея пересказа вырезаются здесь, а не шаблоном:
-    // пересказ идёт на ДРУГУЮ запись модели (qwen38-27b-nothink), и pi-ai
-    // (utils/transform-messages.js:68-90) для чужой модели превращает thinking
-    // в обычный текст assistant-сообщения — шаблон такой текст не отличает.
-    // Эталон 14, ход 5: 294k символов reasoning с последнего сжатия → запрос
-    // пересказа 70 982…118 387 токенов → 400 от сервера, 16 провалов подряд,
-    // контекст рос, пока клэмп pi-ai не дожал вывод до 2 181 токена.
-    // Assistant-сообщение, в котором кроме reasoning ничего не было, выбрасывается
-    // целиком: на него никто не ссылается (tool-call в нём нет).
+    // (3) Reasoning blocks are stripped from the summary replay here rather than
+    // by the template: the summary goes to a DIFFERENT model entry, and pi-ai
+    // (utils/transform-messages.js:68-90) turns thinking into ordinary assistant
+    // text for a foreign model, which the template cannot tell apart. In one
+    // measured turn 294k characters of reasoning since the last compaction made
+    // the summary request 70982-118387 tokens, the server answered 400 sixteen
+    // times in a row and the context kept growing until pi-ai's clamp cut the
+    // output down. An assistant message that carried nothing but reasoning is
+    // dropped whole: nothing refers to it (it holds no tool call).
     const messages = []
     for (const m of rest.messages) {
       if (m.role !== 'assistant' || !Array.isArray(m.content)) { messages.push(m); continue }
@@ -131,8 +129,9 @@ export default class CompactionNoTools extends Base {
       messages.push({ ...m, content })
     }
     const result = await super.summarize({ ...rest, messages }, agent, signal)
-    // (4) Список todo_write дописывается к пересказу, чтобы после сжатия модель
-    // продолжала его вести и закрыла перед финальным ответом.
+    // (4) The todo_write list is appended to the summary so that after a
+    // compaction the model keeps maintaining it and closes it before the final
+    // answer.
     const todos = openTodos(agent.session)
     if (Array.isArray(todos) && todos.length > 0) {
       const lines = todos.map((t) => `- [${t.status}] ${t.content}`).join('\n')

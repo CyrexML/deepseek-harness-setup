@@ -37,7 +37,7 @@ layer() {
   local name="$1" file="$2" mark="$3"; shift 3
   if [ ! -f "$file" ]; then echo "patches: $name - file missing ($file), skipped"; return; fi
   if grep -qF -- "$mark" "$file"; then echo "patches: $name - ok"; return; fi
-  if [ "$CHECK" = 1 ]; then echo "patches: $name — НЕТ ПАТЧА"; missing=1; return; fi
+  if [ "$CHECK" = 1 ]; then echo "patches: $name - MISSING"; missing=1; return; fi
   echo "patches: $name - marker absent, applying: $*"
   if "$@" >"/tmp/ensure-$name.log" 2>&1 && grep -qF -- "$mark" "$file"; then
     echo "patches: $name - applied"

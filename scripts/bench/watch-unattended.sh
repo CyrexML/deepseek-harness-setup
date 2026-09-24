@@ -17,7 +17,7 @@ show() {
 
   H="http://$(ip route show default | awk '{print $3}'):8080/v1"
   if curl -sf --max-time 5 "$H/models" >/dev/null; then echo "llama-server: alive"
-  else echo "llama-server: НЕ ОТВЕЧАЕТ"; fi
+  else echo "llama-server: NOT RESPONDING"; fi
 
   if [ -s "$RUNDIR/status.tsv" ]; then
     echo
@@ -64,7 +64,7 @@ show() {
     grep -E "^# (tests|pass|fail)|^not ok|PASS|FAIL" "$LASTG" | tail -8 || tail -4 "$LASTG"
   fi
 
-  if [ -f "$RUNDIR/result" ]; then echo; echo "ИТОГ: $(cat "$RUNDIR/result")"; fi
+  if [ -f "$RUNDIR/result" ]; then echo; echo "RESULT: $(cat "$RUNDIR/result")"; fi
 }
 
 if [ "$FOLLOW" = "-f" ]; then

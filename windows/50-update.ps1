@@ -71,5 +71,5 @@ Invoke-Wsl $distro "cd $wslRepo && bash wsl/50-verify.sh"
 
 Write-Done 'update finished'
 Write-Host (T '  If something broke: the profile backup is in ~/Harness_AI/run/backups/keep/before-update-*')
-Write-Host '  Вернуть прежние версии: bash ~/Harness_AI/scripts/update-plugin.sh --rollback <папка бэкапа>'
+Write-Host (T '  To restore the previous versions: bash ~/Harness_AI/scripts/update-plugin.sh --rollback <backup folder>')
 Write-Host ''

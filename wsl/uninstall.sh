@@ -46,7 +46,7 @@ step 'restoring sleep timeouts'
 
 for t in "${targets[@]}"; do
   step 'removing %s' "$t"
-  rm -rf "$t" && ok "удалено"
+  rm -rf "$t" && ok 'removed'
 done
 
 step 'PATH line in ~/.bashrc'
@@ -58,4 +58,4 @@ else
 fi
 
 done_step 'stand removed from WSL'
-echo "Windows-часть (модели, движок, ярлыки) удаляется отдельно: uninstall.ps1"
+t 'The Windows side (models, engine, shortcuts) is removed separately: uninstall.ps1\n'
