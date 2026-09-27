@@ -7,7 +7,7 @@ stand on a Windows PC: a local model on your own GPU, a coding agent that reads 
 your project files, a side panel that renders the result (HTML pages, PDFs, spreadsheets),
 and a mobile interface you can actually use from a phone.
 
-It is not a bare harness install. It also sets up the plugins worth having, applies 22
+It is not a bare harness install. It also sets up the plugins worth having, applies 23
 patch layers that fix what does not work out of the box (most of them on the mobile side),
 tunes the model server for your GPU, and installs shortcuts, an update button and a full
 uninstall.
@@ -36,7 +36,7 @@ What you get:
 Why this is not the same as "installing the harness yourself": the harness is the core.
 Around it you still have to choose and wire up plugins, fix what does not work on a phone,
 pick a model for your card, compute the context window, set up startup, the tunnel and
-power behaviour. Here that is already done and pinned: **22 patch layers** where things
+power behaviour. Here that is already done and pinned: **23 patch layers** where things
 break, every component version recorded in `stand.lock.json`, and model server settings
 computed for your GPU instead of copied from someone else's example.
 
@@ -98,7 +98,7 @@ The installer explains every step as it goes:
 | `00-prereqs` | checks GPU and free space, installs WSL2 and a distribution, opens the model port |
 | `10-llama` | installs llama.cpp with the CUDA build matching your driver |
 | `20-model` | picks a model for your GPU and downloads it |
-| `wsl/*` | builds the harness, installs plugins, applies 22 patch layers, writes the config |
+| `wsl/*` | builds the harness, installs plugins, applies 23 patch layers, writes the config |
 | `30-tune` | computes the context window that fits your VRAM and measures the result |
 | `40-shortcuts` | shortcuts, autostart, power-maintenance task |
 | `50-verify` | verifies everything came up |
@@ -203,7 +203,7 @@ component and the GPU driver are never touched.
 - **DeepSeek Harness** at the tag from `stand.lock.json`, built from source inside WSL2.
 - **Plugins** at pinned versions: mobile bridge, side panel with a file explorer and
   viewers, office documents, context meter, graph memory, turn rewind.
-- **22 patch layers** — my own fixes on top of the harness and the plugins (below).
+- **23 patch layers** — my own fixes on top of the harness and the plugins (below).
 - **llama.cpp** plus the GGUF model you chose, on the Windows side.
 
 <p align="center">
@@ -238,6 +238,8 @@ whatever is missing on every start.
 | mobile-back | the system back gesture closes the drawer, the panel or a dialog instead of leaving the app |
 | load-monitor | GPU load, temperature, power draw and the energy used since start, in the header |
 | fs-edit-tolerant | an edit whose `old_string` differs only in whitespace still applies; when it truly does not match, the error quotes the file |
+| mobile-input | on a touch screen Enter breaks the line instead of sending; a clipboard carrying only HTML still pastes; a long question leaves room for its answers |
+| write-streak-notice (preset) | says so when a turn has run long with nothing written, before the answer hits its cap |
 
 ## Housekeeping
 

@@ -73,6 +73,10 @@
       "marker": "dsh-bridge-en: load monitor"
     },
     {
+      "name": "mobile-input",
+      "marker": "dsh-bridge-en: mobile input"
+    },
+    {
       "name": "mobile-attach",
       "marker": "dsh-bridge-en: mobile attach"
     },

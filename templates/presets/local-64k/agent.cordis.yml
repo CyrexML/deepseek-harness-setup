@@ -158,6 +158,21 @@
 #
 # bytesPerToken and cycleTokens are shared with file-size-notice; re-measure
 # them together.
+# -- advisory: a long stretch with nothing written ----------------------------
+#
+# The counterpart to read-budget-notice: that one watches what comes in, this
+# one watches whether anything goes out. 12 calls is a normal diagnosis; 24 with
+# nothing written is the shape of a turn that will try to emit its result as
+# text. See the header of the module for the run this was measured on.
+- id: write-streak-notice
+  name: ./write-streak-notice.mjs
+  config:
+    warnCalls: 12
+    urgentCalls: 24
+    writeTools: [write, edit]
+    # Quoted in the message; keep in step with the model's maxTokens above.
+    maxTokens: 12288
+
 - id: read-budget-notice
   name: ./read-budget-notice.mjs
   config:
@@ -220,12 +235,18 @@
     # global ~/.dsh/AGENTS.md, the carrier of all the working rules. So the
     # headroom is kept above its size rather than just at it.
     #
-    # 12288 leaves about 5000 bytes for a project-level AGENTS.md. A fully used
-    # bundle costs about 2660 tokens per request. (It went 4096 -> 6144 -> 8192 ->
-    # 12288: at 8192 a grown global AGENTS.md plus a project one exceeded the
-    # budget and the global file was silently dropped whole, with "omitted
-    # ~/.dsh/AGENTS.md" in every request.)
-    maxBytes: 12288
+    # It went 4096 -> 6144 -> 8192 -> 12288 -> 16384, and every raise came after
+    # the same failure: the global file grows past the headroom and is dropped
+    # whole, with "omitted ~/.dsh/AGENTS.md" in every request and none of the
+    # working rules in context. Last occurrence, session bbfafd8c (2026-09-27):
+    # global 11381 + Cooking_APP 1742 = 13123 over the 12288 budget, and that
+    # turn then did what the dropped rules forbid - 32 steps, no write, the
+    # finished file composed in the answer, turn ended on max-tokens.
+    #
+    # 16384 leaves about 5400 bytes for a project-level AGENTS.md above a global
+    # file of ~10900. The number is a CEILING, not a price: the cost is what is
+    # actually on disk, so headroom is free until it is used.
+    maxBytes: 16384
 
 # ── shell ───────────────────────────────────────────────────────────────────
 

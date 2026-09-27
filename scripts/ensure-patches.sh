@@ -80,6 +80,8 @@ layer touch-ui-gate "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bri
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-touch-ui-gate.mjs" "$NM/@wenbin_wb/dsh-bridge"
 layer load-monitor "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: load monitor" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-load-monitor.mjs" "$NM/@wenbin_wb/dsh-bridge"
+layer mobile-input "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: mobile input" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-mobile-input.mjs" "$NM/@wenbin_wb/dsh-bridge"
 layer mobile-attach "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: mobile attach" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-mobile-attach.mjs" "$NM/@wenbin_wb/dsh-bridge"
 layer mobile-back "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: mobile back" \
