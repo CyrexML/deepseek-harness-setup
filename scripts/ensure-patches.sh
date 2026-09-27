@@ -18,6 +18,7 @@
 #   sidebar-slot-id  lib/client.js   "dsh-local: turnTail slot id"  scripts/patch-better-sidebar-slot-id.mjs (DSH 0.1.6+ compatibility)
 #   univer-slot-id   lib/client.js   "dsh-local: turnTail slot id"  scripts/patch-univer-slot-id.mjs (same)
 #   sidebar-session-sync lib/client.js "dsh-local: session sync" scripts/patch-better-sidebar-session-sync.mjs (file click on 0.1.6)
+#   fs-edit-tolerant fs-local/lib/index.js "dsh-local: tolerant edit match"  scripts/patch-fs-edit-tolerant.mjs (harness, not the profile)
 #   sidebar-binary-handoff lib/client.js "dsh-local: binary handoff" scripts/patch-better-sidebar-binary-handoff.mjs (pdf/office to the native viewers)
 #
 # The bridge's translate.sh calls the local model for strings it does not know
@@ -63,6 +64,8 @@ layer graph-memory "$NM/graph-memory/dist/dsh.js" "dsh-local: workspace-scoped r
   node "$HERE/patch-graph-memory-scope.mjs"
 layer ui-conversation "$DSH_ROOT/packages/client/ui-conversation/lib/client.js" "dsh-local: eager image read" \
   node "$HERE/patch-ui-conversation-eager-read.mjs"
+layer fs-edit-tolerant "$DSH_ROOT/packages/fs/fs-local/lib/index.js" "dsh-local: tolerant edit match" \
+  node "$HERE/patch-fs-edit-tolerant.mjs" "$DSH_ROOT"
 layer pdfjs-map-polyfill "$DSH_ROOT/packages/client/ui-sidebar-documentpreview/lib/client.pdf.js" "dsh-local: Map.getOrInsert polyfill" \
   node "$HERE/patch-pdfjs-map-polyfill.mjs"
 layer zoom-scope "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bridge-en: zoom scope" \
@@ -73,6 +76,14 @@ layer mobile-ux "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bridge-
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-mobile-ux.mjs" "$NM/@wenbin_wb/dsh-bridge"
 layer preview-zoom "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bridge-en: preview zoom" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-preview-zoom.mjs" "$NM/@wenbin_wb/dsh-bridge"
+layer touch-ui-gate "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bridge-en: touch ui gate" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-touch-ui-gate.mjs" "$NM/@wenbin_wb/dsh-bridge"
+layer load-monitor "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: load monitor" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-load-monitor.mjs" "$NM/@wenbin_wb/dsh-bridge"
+layer mobile-attach "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: mobile attach" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-mobile-attach.mjs" "$NM/@wenbin_wb/dsh-bridge"
+layer mobile-back "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: mobile back" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-mobile-back.mjs" "$NM/@wenbin_wb/dsh-bridge"
 layer html-no-store "$NM/@wenbin_wb/dsh-bridge/lib/index.js" "dsh-bridge-en: html no-store" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-html-no-store.mjs" "$NM/@wenbin_wb/dsh-bridge"
 

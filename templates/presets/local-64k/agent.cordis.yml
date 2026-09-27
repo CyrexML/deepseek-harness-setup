@@ -29,6 +29,10 @@
 # that touches the same assembly.
 #
 # bootstrapTools is the resident set, measured from session logs.
+# read_image joined it for the visual loop: a screenshot is worthless until it is
+# looked at, and reaching read_image through dev_tool_search costs a whole model
+# step every time (369 read_image calls against 92 dev_tool_search calls in the
+# logs - it was being unlocked over and over).
 # Across 3440 tool calls in every preset the model only called bash, read, edit,
 # write, grep, glob, todo_write and ask_user_question. Everything else -
 # subagent, workflow, ralph, skill, exit_plan_mode, *_goal, send_message,
@@ -61,7 +65,7 @@
     # bundled provider is deepseek-official with apiKeyEnv DEEPSEEK_API_KEY
     # (packages/bundle/base/cordis.patch.yml:461), and without a key the tool
     # would only spend a step on an error.
-    bootstrapTools: !!js "['read', 'write', 'edit', 'bash', 'grep', 'glob', 'todo_write', 'ask_user_question', 'dev_tool_search', 'web_fetch'].concat((process.env.DEEPSEEK_API_KEY || process.env.EXA_API_KEY || process.env.PERPLEXITY_API_KEY) ? ['web_search'] : [])"
+    bootstrapTools: !!js "['read', 'write', 'edit', 'bash', 'grep', 'glob', 'todo_write', 'ask_user_question', 'dev_tool_search', 'web_fetch', 'read_image'].concat((process.env.DEEPSEEK_API_KEY || process.env.EXA_API_KEY || process.env.PERPLEXITY_API_KEY) ? ['web_search'] : [])"
     promoteOn: either
     includeSubagents: false
     compactionTools: [dev_tool_search]

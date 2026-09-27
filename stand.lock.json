@@ -1,6 +1,6 @@
 {
   "_": "Snapshot of the verified combination. Changed deliberately: edit the numbers and publish a new lock.",
-  "createdAt": "2026-09-24",
+  "createdAt": "2026-09-27",
   "harness": {
     "tag": "dsh-v0.1.6-alpha.2",
     "commit": "ddefc45fbc7f8e46dd73185e68295696d1297887"
@@ -41,6 +41,10 @@
       "marker": "dsh-local: eager image read"
     },
     {
+      "name": "fs-edit-tolerant",
+      "marker": "dsh-local: tolerant edit match"
+    },
+    {
       "name": "pdfjs-map-polyfill",
       "marker": "dsh-local: Map.getOrInsert polyfill"
     },
@@ -59,6 +63,22 @@
     {
       "name": "preview-zoom",
       "marker": "dsh-bridge-en: preview zoom"
+    },
+    {
+      "name": "touch-ui-gate",
+      "marker": "dsh-bridge-en: touch ui gate"
+    },
+    {
+      "name": "load-monitor",
+      "marker": "dsh-bridge-en: load monitor"
+    },
+    {
+      "name": "mobile-attach",
+      "marker": "dsh-bridge-en: mobile attach"
+    },
+    {
+      "name": "mobile-back",
+      "marker": "dsh-bridge-en: mobile back"
     },
     {
       "name": "html-no-store",
