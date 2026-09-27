@@ -14,7 +14,17 @@
 // What this changes. On a touch screen two buttons are placed in the composer's
 // tool row, next to the "+": one opens the file dialog, the other the same
 // dialog with accept="image/*", which on Android and iOS offers the camera and
-// the gallery directly. Both click the host's own input, so the file travels the
+// the gallery directly.
+//
+// The two buttons declare different accepts on purpose. A file input with no
+// accept at all makes Android offer every content source it has, camera and
+// gallery included - which is noise next to a photo button that already does
+// exactly that. The paperclip therefore asks for documents only
+// (application/* covers pdf, archives, office files and anything unknown, which
+// Android maps to application/octet-stream; text/* covers txt, csv, md, source
+// files), and that is what takes the camera out of its list. Images and video
+// belong to the other button. To have the paperclip offer everything again,
+// set ATTACH_FILE_ACCEPT below to an empty string. Both click the host's own input, so the file travels the
 // host's normal intake path - nothing is uploaded by the bridge. The buttons
 // cancel pointerdown instead of taking focus, so neither of them raises the
 // keyboard.
@@ -45,15 +55,19 @@ if (typeof window !== "undefined" && !window.__dshAttachButtons) {
     file: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>',
     photo: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'
   };
+  // Documents only, so Android does not put the camera in the paperclip's list.
+  // Empty string = no filter at all (every source, as before).
+  var ATTACH_FILE_ACCEPT = "application/*,text/*";
   var __dshAttachOpen = function (input, photo) {
     if (!input || input.disabled) return;
     var had = input.getAttribute("accept");
+    var want = photo ? "image/*" : ATTACH_FILE_ACCEPT;
     var restore = function () {
-      if (!photo) return;
+      if (!want) return;
       if (had === null) input.removeAttribute("accept");
       else input.setAttribute("accept", had);
     };
-    if (photo) input.setAttribute("accept", "image/*");
+    if (want) input.setAttribute("accept", want);
     input.addEventListener("change", restore, { once: true });
     window.addEventListener("focus", restore, { once: true });
     setTimeout(restore, 60000);
