@@ -176,8 +176,13 @@ function setupLoadMonitor(rpcCall) {
   style.dataset.plugin = '@wenbin_wb/dsh-bridge';
   style.dataset.pluginCss = '@wenbin_wb/dsh-bridge/load-monitor';
   style.textContent = [
-    '.dsh-load-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px;margin-left:4px;margin-right:4px;order:98;border:1px solid var(--dsw-alias-border-l2,#e5e7eb);border-radius:999px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);font:500 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0}',
+    '.dsh-load-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px;margin-left:4px;margin-right:4px;order:98;border:1px solid var(--dsw-alias-border-l2,#e5e7eb);border-radius:999px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);font:500 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;pointer-events:auto !important}',
     '.dsh-load-chip:hover{background:var(--dsw-alias-bg-layer-2,rgba(0,0,0,.06))}',
+    // The mobile top bar is transparent to touches on purpose
+    // (.dsh-mobile-app-header carries pointer-events: none so the conversation
+    // under it still scrolls), and every control in it re-enables them for
+    // itself - which is why the chip above declares pointer-events: auto. Without
+    // it a tap goes straight through the chip into the page beneath.
     '.dsh-load-chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}',
     // The sidebar header has room for the wordmark or for the chip, not both:
     // at 256px the brand is squeezed to an unreadable stub. The mark stays, the
