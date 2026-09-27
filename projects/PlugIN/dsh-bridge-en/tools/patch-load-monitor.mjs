@@ -176,9 +176,16 @@ function setupLoadMonitor(rpcCall) {
   style.dataset.plugin = '@wenbin_wb/dsh-bridge';
   style.dataset.pluginCss = '@wenbin_wb/dsh-bridge/load-monitor';
   style.textContent = [
-    '.dsh-load-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px;margin-left:4px;order:98;border:1px solid var(--dsw-alias-border-l2,#e5e7eb);border-radius:999px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);font:500 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0}',
+    '.dsh-load-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px;margin-left:4px;margin-right:4px;order:98;border:1px solid var(--dsw-alias-border-l2,#e5e7eb);border-radius:999px;background:transparent;color:var(--dsw-alias-label-secondary,#6b7280);font:500 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0}',
     '.dsh-load-chip:hover{background:var(--dsw-alias-bg-layer-2,rgba(0,0,0,.06))}',
     '.dsh-load-chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}',
+    // The sidebar header has room for the wordmark or for the chip, not both:
+    // at 256px the brand is squeezed to an unreadable stub. The mark stays, the
+    // name moves to the button's tooltip. Scoped with :has, so a header without
+    // a chip (the phone, where the chip goes elsewhere) keeps its name.
+    'div[class*="_logoRow"]:has(.dsh-load-chip) [class*="_brandName"]{display:none !important}',
+    // On a narrow header the draw drops out and load plus temperature remain.
+    '@media (max-width: 768px){.dsh-load-chip .w{display:none}}',
     '.dsh-load-pop{position:fixed;z-index:2147483000;box-sizing:border-box;width:min(300px,calc(100vw - 24px));padding:14px;border-radius:12px;background:var(--dsw-alias-bg-layer-1,#fff);color:var(--dsw-alias-label-primary,#111827);box-shadow:0 12px 40px rgba(0,0,0,.28);border:1px solid var(--dsw-alias-border-l2,#e5e7eb);font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}',
     '.dsh-load-pop h4{margin:0 0 2px;font-size:13px}',
     '.dsh-load-pop .sub{margin:0 0 10px;font-size:11px;color:var(--dsw-alias-label-tertiary,#9ca3af)}',
@@ -209,7 +216,7 @@ function setupLoadMonitor(rpcCall) {
     const g = data && data.gpu;
     for (const chip of document.querySelectorAll('.dsh-load-chip')) {
       const text = g
-        ? pct(g.utilPct) + ' \\u00b7 ' + heat(g.tempC) + ' \\u00b7 ' + watt(g.powerW)
+        ? pct(g.utilPct) + ' \\u00b7 ' + heat(g.tempC) + '<span class="w"> \\u00b7 ' + watt(g.powerW) + '</span>'
         : 'no GPU data';
       chip.innerHTML = '<i class="dot"></i>' + text;
       chip.title = g ? g.name + ' \\u2014 load, temperature, power draw' : (lastError || 'nvidia-smi did not answer');
@@ -305,12 +312,23 @@ function setupLoadMonitor(rpcCall) {
     // One chip, in the header that is actually on screen: the sidebar keeps a
     // second logo row for its collapsed state, and mounting in both puts two
     // chips in the interface at once.
-    const host = [...document.querySelectorAll('.dsh-mobile-app-header, div[class*="_logoRow"]')]
-      .find((el) => el.getBoundingClientRect().width > 0);
+    // querySelectorAll returns document order, not selector order, and the
+    // drawer's sidebar header comes before the mobile top bar - mounting there
+    // hides the chip behind a closed drawer. Ask for the top bar first.
+    const visible = (el) => el && el.getBoundingClientRect().width > 0;
+    const host = [...document.querySelectorAll('.dsh-mobile-app-header')].find(visible)
+      || [...document.querySelectorAll('div[class*="_logoRow"]')].find(visible);
     for (const chip of document.querySelectorAll('.dsh-load-chip')) {
       if (!host || !host.contains(chip)) chip.remove();
     }
     if (host && !host.querySelector('.dsh-load-chip')) host.appendChild(makeChip());
+    // The hidden wordmark keeps its text as the button's tooltip, so the build
+    // and version stay one hover away rather than disappearing with it.
+    const brand = host && host.querySelector('[class*="_brand"]');
+    if (brand && !brand.getAttribute('title')) {
+      const name = (brand.textContent || '').trim();
+      if (name) brand.setAttribute('title', name);
+    }
     if (data) paint();
   };
   // Coalesced to one pass per frame: the interface mutates the DOM constantly
