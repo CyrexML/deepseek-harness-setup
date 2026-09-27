@@ -275,6 +275,17 @@ Either set a DeepSeek, Exa or Perplexity key (Settings → search), or just hand
 the agent links yourself — it will read them. As soon as a key is present in the
 environment, the preset adds `web_search` to the model's set by itself.
 
+**Exa as the search provider.** The bundled `web_search` goes to DeepSeek, which
+needs a funded balance. Exa is the free alternative: a $10 credit that comes back
+on the first of every month, no card. Its provider ships with the harness but is
+not in the base bundle's dependencies, so three things are needed — the key in
+Settings -> Plugins -> Web search (it is stored in `~/.dsh/.credentials.yaml`,
+never in a file that is published), a `web-search-exa` row inserted in the
+profile patch with `searchProvider: exa` on the `web` row, and the symlinks that
+`scripts/ensure-patches.sh` keeps in place (`link_pkg`). `start-web.sh` lifts the
+stored key into the environment, because the agent preset decides whether to make
+`web_search` resident by looking there.
+
 **The agent does not run code silently.** The default is `workspace-write` with
 confirmation: the command is shown to you before it runs, and file writes are
 confined to the workspace (`packages/bundle/base/cordis.patch.yml:231`). The

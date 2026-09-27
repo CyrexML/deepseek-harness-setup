@@ -47,6 +47,23 @@ layer() {
   fi
 }
 
+# The Exa search provider is built in the harness but absent from the base
+# bundle's dependencies (only web-search-deepseek is declared there), so the
+# loader cannot resolve it. Two symlinks put it where both resolution anchors
+# look: next to the bundle's own copy, and in the profile, because a row
+# declared in the PROFILE patch resolves against the profile. A `pnpm install`
+# in the harness removes them, which is why this runs on every start.
+# Harmless when the row is not used: an unresolvable link is simply not loaded.
+link_pkg() {
+  local name="$1" target="$2" dir
+  for dir in "$DSH_ROOT/packages/bundle/base/node_modules/@deepseek-ai" "$NM/@deepseek-ai"; do
+    [ -d "$dir" ] || continue
+    if [ -e "$dir/$name" ] && [ "$(readlink -f "$dir/$name")" = "$(readlink -f "$target")" ]; then continue; fi
+    ln -sfn "$target" "$dir/$name" && echo "patches: link $name -> $(basename "$dir") - relinked"
+  done
+}
+link_pkg dsh-web-search-exa "$DSH_ROOT/packages/web/web-search-exa"
+
 layer bridge "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en:" \
   bash "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/translate.sh"
 # client.js is built by the last step of translate.sh: if a patch landed after
