@@ -55,6 +55,29 @@ export DSH_LLAMA_BASE_URL="${DSH_LLAMA_BASE_URL:-http://$WINHOST:8080/v1}"
 # MISSING_CREDENTIAL.
 export DSH_LLAMA_KEY="local-no-auth"
 
+# A search key entered in the interface is written to the harness's own
+# credential store ($DSH_HOME/.credentials.yaml, section `refs:`), NOT to this
+# process's environment. The agent preset, however, decides whether to make
+# `web_search` resident by looking at the environment - so a key added through
+# the UI would enable search for the provider and still leave the tool invisible
+# to the model. Lift the three search references into the environment here, so
+# both halves see the same key. An already-exported value wins and is left
+# alone: the inherited environment is the harness's own top layer too.
+CRED="$HOME/.dsh/.credentials.yaml"
+if [ -r "$CRED" ]; then
+  for var in DEEPSEEK_API_KEY EXA_API_KEY PERPLEXITY_API_KEY; do
+    [ -n "$(eval "echo \${$var:-}")" ] && continue
+    # `refs:` is a flat map of NAME: value; take the first match, strip quotes.
+    val="$(awk -v k="$var" '
+      /^refs:/ { inrefs = 1; next }
+      /^[^[:space:]]/ { inrefs = 0 }
+      inrefs && $1 == k":" { sub(/^[[:space:]]*[^:]*:[[:space:]]*/, ""); gsub(/^["\x27]|["\x27]$/, ""); print; exit }
+    ' "$CRED" 2>/dev/null)"
+    [ -n "$val" ] && export "$var=$val"
+  done
+  unset val var
+fi
+
 # The bridge's Power buttons (Settings -> Remote access) write {mode: dsh|wsl}
 # here, and harness-start.ps1 -Hidden polls the file and stops the system. Set
 # unconditionally: with no launcher nobody reads it, and the RPC only returns a
