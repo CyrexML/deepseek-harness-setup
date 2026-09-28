@@ -50,6 +50,20 @@ if [ -f "$TPL/agents-gpu.md" ]; then
   fi
 fi
 
+# The same channel carries the read-before-edit rule. DSH refuses an edit of a
+# file it has not seen the `read` tool open, and the shell does not count: the
+# model that explores with `grep` and `sed -n` loses one call per file to that
+# refusal, and one more whenever a `sed -i` invalidates a read it already had.
+if [ -f "$TPL/agents-edit-ledger.md" ]; then
+  agents="$DSHDIR/AGENTS.md"
+  if ! grep -q 'dsh-local: edit-ledger-rule' "$agents" 2>/dev/null; then
+    { [ -s "$agents" ] && printf '\n'; cat "$TPL/agents-edit-ledger.md"; } >> "$agents"
+    ok 'edit/read rule added to AGENTS.md'
+  else
+    ok 'edit/read rule already in AGENTS.md'
+  fi
+fi
+
 mkdir -p "$DSHDIR/.agent-presets"
 if [ -d "$TPL/presets/local-64k" ]; then
   rm -rf "$DSHDIR/.agent-presets/$PRESET"

@@ -238,6 +238,7 @@ whatever is missing on every start.
 | mobile-back | the system back gesture closes the drawer, the panel or a dialog instead of leaving the app |
 | load-monitor | GPU load, temperature, power draw and the energy used since start, in the header |
 | fs-edit-tolerant | an edit whose `old_string` differs only in whitespace still applies; when it truly does not match, the error quotes the file |
+| fs-missing-path | a write or edit aimed at a path that does not exist says so, instead of telling the model to read a file that cannot be read |
 | mobile-input | on a touch screen Enter breaks the line instead of sending; a clipboard carrying only HTML still pastes; a long question leaves room for its answers |
 | write-streak-notice (preset) | says so when a turn has run long with nothing written, before the answer hits its cap |
 

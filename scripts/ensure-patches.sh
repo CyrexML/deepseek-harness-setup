@@ -19,6 +19,7 @@
 #   univer-slot-id   lib/client.js   "dsh-local: turnTail slot id"  scripts/patch-univer-slot-id.mjs (same)
 #   sidebar-session-sync lib/client.js "dsh-local: session sync" scripts/patch-better-sidebar-session-sync.mjs (file click on 0.1.6)
 #   fs-edit-tolerant fs-local/lib/index.js "dsh-local: tolerant edit match"  scripts/patch-fs-edit-tolerant.mjs (harness, not the profile)
+#   fs-missing-path tool-fs/lib/index.js "dsh-local: missing path before unread"  scripts/patch-fs-missing-path.mjs (harness, not the profile)
 #   sidebar-binary-handoff lib/client.js "dsh-local: binary handoff" scripts/patch-better-sidebar-binary-handoff.mjs (pdf/office to the native viewers)
 #
 # The bridge's translate.sh calls the local model for strings it does not know
@@ -83,6 +84,8 @@ layer ui-conversation "$DSH_ROOT/packages/client/ui-conversation/lib/client.js" 
   node "$HERE/patch-ui-conversation-eager-read.mjs"
 layer fs-edit-tolerant "$DSH_ROOT/packages/fs/fs-local/lib/index.js" "dsh-local: tolerant edit match" \
   node "$HERE/patch-fs-edit-tolerant.mjs" "$DSH_ROOT"
+layer fs-missing-path "$DSH_ROOT/packages/fs/tool-fs/lib/index.js" "dsh-local: missing path before unread" \
+  node "$HERE/patch-fs-missing-path.mjs" "$DSH_ROOT"
 layer pdfjs-map-polyfill "$DSH_ROOT/packages/client/ui-sidebar-documentpreview/lib/client.pdf.js" "dsh-local: Map.getOrInsert polyfill" \
   node "$HERE/patch-pdfjs-map-polyfill.mjs"
 layer zoom-scope "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bridge-en: zoom scope" \

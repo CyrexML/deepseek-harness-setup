@@ -1,6 +1,6 @@
 {
   "_": "Snapshot of the verified combination. Changed deliberately: edit the numbers and publish a new lock.",
-  "createdAt": "2026-09-27",
+  "createdAt": "2026-09-28",
   "harness": {
     "tag": "dsh-v0.1.6-alpha.2",
     "commit": "ddefc45fbc7f8e46dd73185e68295696d1297887"
@@ -43,6 +43,10 @@
     {
       "name": "fs-edit-tolerant",
       "marker": "dsh-local: tolerant edit match"
+    },
+    {
+      "name": "fs-missing-path",
+      "marker": "dsh-local: missing path before unread"
     },
     {
       "name": "pdfjs-map-polyfill",
