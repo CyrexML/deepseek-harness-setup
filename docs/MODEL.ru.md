@@ -42,12 +42,17 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 
 | Видеопамять | Модель | Файл | Окно контекста |
 |---|---|---|---|
-| 10 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-MTP-UD-Q4_K_XL.gguf` (6.1 ГБ) | 32k |
-| 12 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-MTP-UD-Q5_K_XL.gguf` (6.9 ГБ) | 48k |
-| 14 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-MTP-UD-Q6_K_XL.gguf` (9.0 ГБ) | 64k |
-| 16 ГБ | Qwen3.8 27B | `Qwen3.8-27B-UD-Q3_K_XL.gguf` (13 ГБ) | 64k ← под это настроено |
-| 24 ГБ | Qwen3.8 27B | `Qwen3.8-27B-UD-Q4_K_XL.gguf` (17 ГБ) | 64k |
-| 32 ГБ+ | Qwen3.8 27B | `Qwen3.8-27B-Q5_K_M.gguf` (21 ГБ) | 128k |
+| 6 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q2_K_XL.gguf` (4.1 ГБ) | 16k |
+| 8 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q3_K_XL.gguf` (4.9 ГБ) | 24k |
+| 10 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q4_K_XL.gguf` (5.7 ГБ) | 32k |
+| 12 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q5_K_XL.gguf` (6.4 ГБ) | 48k |
+| 14 ГБ | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q6_K_XL.gguf` (8.4 ГБ) | 64k |
+| 16 ГБ | Qwen3.8 27B | `Qwen3.8-27B-UD-Q3_K_XL.gguf` (12.2 ГБ) | 64k ← под это настроено |
+| 24 ГБ | Qwen3.8 27B | `Qwen3.8-27B-UD-Q4_K_XL.gguf` (16.4 ГБ) | 64k |
+| 32 ГБ+ | Qwen3.8 27B | `Qwen3.8-27B-UD-Q5_K_M.gguf` (18.4 ГБ) | 128k |
+
+В именах файлов 9B нет `MTP`: MTP-шный — сам репозиторий, файлы внутри не переименованы.
+Размеры настоящие, как на Hugging Face, в гибибайтах.
 
 Обе линейки умеют предсказывать несколько токенов вперёд (MTP) — на этом держится
 скорость генерации стенда, поэтому в каталоге только такие сборки.

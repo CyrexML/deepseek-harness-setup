@@ -42,12 +42,17 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 
 | VRAM | Model | File | Context window |
 |---|---|---|---|
-| 10 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-MTP-UD-Q4_K_XL.gguf` (6.1 GB) | 32k |
-| 12 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-MTP-UD-Q5_K_XL.gguf` (6.9 GB) | 48k |
-| 14 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-MTP-UD-Q6_K_XL.gguf` (9.0 GB) | 64k |
-| 16 GB | Qwen3.8 27B | `Qwen3.8-27B-UD-Q3_K_XL.gguf` (13 GB) | 64k ← what this repo is tuned for |
-| 24 GB | Qwen3.8 27B | `Qwen3.8-27B-UD-Q4_K_XL.gguf` (17 GB) | 64k |
-| 32 GB+ | Qwen3.8 27B | `Qwen3.8-27B-Q5_K_M.gguf` (21 GB) | 128k |
+| 6 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q2_K_XL.gguf` (4.1 GB) | 16k |
+| 8 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q3_K_XL.gguf` (4.9 GB) | 24k |
+| 10 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q4_K_XL.gguf` (5.7 GB) | 32k |
+| 12 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q5_K_XL.gguf` (6.4 GB) | 48k |
+| 14 GB | Qwen3.5 9B (MTP) | `Qwen3.5-9B-UD-Q6_K_XL.gguf` (8.4 GB) | 64k |
+| 16 GB | Qwen3.8 27B | `Qwen3.8-27B-UD-Q3_K_XL.gguf` (12.2 GB) | 64k ← what this repo is tuned for |
+| 24 GB | Qwen3.8 27B | `Qwen3.8-27B-UD-Q4_K_XL.gguf` (16.4 GB) | 64k |
+| 32 GB+ | Qwen3.8 27B | `Qwen3.8-27B-UD-Q5_K_M.gguf` (18.4 GB) | 128k |
+
+The 9B file names carry no `MTP`: the repository is the MTP one, the files inside are not
+renamed. Sizes are the real ones on Hugging Face, in GiB.
 
 Both lines support multi-token prediction (MTP), which is what the stand's generation
 speed relies on — that is why the catalog only lists those builds.

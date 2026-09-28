@@ -26,12 +26,14 @@ $modelsDir = Join-Path $cfg.windowsRoot 'models'
 # mtp marks models that can predict several tokens ahead (--spec-type
 # draft-mtp): +50-100% generation speed, which is why they come first.
 $catalog = @(
-  @{ name='Qwen3.5-9B-MTP-UD-Q4_K_XL.gguf';  repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=10; sizeGb=6.1;  ctx=32768; mtp=$true;  family='Qwen3.5 9B'; note='smallest option: 10 GB of VRAM' }
-  @{ name='Qwen3.5-9B-MTP-UD-Q5_K_XL.gguf';  repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=12; sizeGb=6.9;  ctx=49152; mtp=$true;  family='Qwen3.5 9B'; note='minimum recommended configuration' }
-  @{ name='Qwen3.5-9B-MTP-UD-Q6_K_XL.gguf';  repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=14; sizeGb=9.0;  ctx=65536; mtp=$true;  family='Qwen3.5 9B'; note='same family, higher precision' }
-  @{ name='Qwen3.8-27B-UD-Q3_K_XL.gguf';     repo='unsloth/Qwen3.8-27B-GGUF';     vramGb=16; sizeGb=13;   ctx=65536; mtp=$true;  family='Qwen3.8 27B'; note="the author's configuration (RTX 5080, 16 GB)" }
-  @{ name='Qwen3.8-27B-UD-Q4_K_XL.gguf';     repo='unsloth/Qwen3.8-27B-GGUF';     vramGb=24; sizeGb=17;   ctx=65536; mtp=$true;  family='Qwen3.8 27B'; note='same model, more precise' }
-  @{ name='Qwen3.8-27B-Q5_K_M.gguf';         repo='unsloth/Qwen3.8-27B-GGUF';     vramGb=32; sizeGb=21;   ctx=131072; mtp=$true; family='Qwen3.8 27B'; note='for cards of 32 GB and up' }
+  @{ name='Qwen3.5-9B-UD-Q2_K_XL.gguf';      repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=6;  sizeGb=4.1;  ctx=16384; mtp=$true;  family='Qwen3.5 9B'; note='the last option for a 6 GB card' }
+  @{ name='Qwen3.5-9B-UD-Q3_K_XL.gguf';      repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=8;  sizeGb=4.9;  ctx=24576; mtp=$true;  family='Qwen3.5 9B'; note='for 8 GB cards' }
+  @{ name='Qwen3.5-9B-UD-Q4_K_XL.gguf';      repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=10; sizeGb=5.7;  ctx=32768; mtp=$true;  family='Qwen3.5 9B'; note='10 GB of VRAM' }
+  @{ name='Qwen3.5-9B-UD-Q5_K_XL.gguf';      repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=12; sizeGb=6.4;  ctx=49152; mtp=$true;  family='Qwen3.5 9B'; note='minimum recommended configuration' }
+  @{ name='Qwen3.5-9B-UD-Q6_K_XL.gguf';      repo='unsloth/Qwen3.5-9B-MTP-GGUF';  vramGb=14; sizeGb=8.4;  ctx=65536; mtp=$true;  family='Qwen3.5 9B'; note='same family, higher precision' }
+  @{ name='Qwen3.8-27B-UD-Q3_K_XL.gguf';     repo='unsloth/Qwen3.8-27B-GGUF';     vramGb=16; sizeGb=12.2; ctx=65536; mtp=$true;  family='Qwen3.8 27B'; note="the author's configuration (RTX 5080, 16 GB)" }
+  @{ name='Qwen3.8-27B-UD-Q4_K_XL.gguf';     repo='unsloth/Qwen3.8-27B-GGUF';     vramGb=24; sizeGb=16.4; ctx=65536; mtp=$true;  family='Qwen3.8 27B'; note='same model, more precise' }
+  @{ name='Qwen3.8-27B-UD-Q5_K_M.gguf';      repo='unsloth/Qwen3.8-27B-GGUF';     vramGb=32; sizeGb=18.4; ctx=131072; mtp=$true; family='Qwen3.8 27B'; note='for cards of 32 GB and up' }
 )
 
 function Get-VramGb {
@@ -93,9 +95,19 @@ if (Test-Path $target) {
   # curl.exe ships with Windows 10+ and can resume (-C -), unlike Invoke-WebRequest
   & curl.exe -L --fail --retry 5 --retry-delay 5 -C - -o "$target" "$url"
   if ($LASTEXITCODE -ne 0) {
-    Write-Warn 'the automatic download failed (network/mirror). Download the file by hand:'
-    Write-Info '  https://huggingface.co/{0}' $choice.repo
-    Write-Info '  and place it into {0}' $modelsDir
+    # curl exit 22 is an HTTP 4xx: the file name is wrong, not the network.
+    # Saying so saves an hour of retrying a download that can never work.
+    if ($LASTEXITCODE -eq 22) {
+      Write-Warn 'Hugging Face answered "not found" - this is the file name, not your connection.'
+      Write-Info 'asked for: {0}' $url
+      Write-Info 'open https://huggingface.co/{0}/tree/main and take the exact name from there,' $choice.repo
+      Write-Info 'then run:  install.cmd -Step model -Model <the exact file name>'
+    } else {
+      Write-Warn 'the automatic download failed (network/mirror). Download the file by hand:'
+      Write-Info '  https://huggingface.co/{0}/tree/main' $choice.repo
+      Write-Info '  and place it into {0}' $modelsDir
+      Write-Info 'a partial file is kept and the next run resumes from where it stopped.'
+    }
     throw (T 'the model was not downloaded')
   }
   Write-Ok 'downloaded: {0}' $target

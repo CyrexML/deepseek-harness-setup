@@ -38,6 +38,7 @@ function Write-Step { param([string]$Text, [Parameter(ValueFromRemainingArgument
 function Write-Ok   { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("    v " + (T $Text $Values)) -ForegroundColor Green }
 function Write-Info { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("    . " + (T $Text $Values)) }
 function Write-Warn { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("    ! " + (T $Text $Values)) -ForegroundColor Yellow }
+function Write-Err  { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ("    x " + (T $Text $Values)) -ForegroundColor Red }
 function Write-Done { param([string]$Text, [Parameter(ValueFromRemainingArguments)][object[]]$Values) Write-Host ((T $Text $Values) + "`n") -ForegroundColor Green }
 
 function Get-StandConfigPath {
@@ -54,7 +55,26 @@ function Read-StandConfig {
     Copy-Item $example $path
     Write-Info 'config.json created from the example - adjust the paths and ports if you like'
   }
-  $cfg = Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json
+  # A hand-edited config.json is the first thing that breaks, and ConvertFrom-Json
+  # answers with a parser message that means nothing to whoever edited it. The
+  # two mistakes that actually happen: a single backslash in a Windows path
+  # (JSON reads \H as an escape) and curly quotes pasted from a chat or a doc.
+  $raw = Get-Content $path -Raw -Encoding UTF8
+  try {
+    $cfg = $raw | ConvertFrom-Json
+  } catch {
+    Write-Err 'config.json cannot be read: {0}' $path
+    if ($raw -match '[\u201c\u201d\u00ab\u00bb]') {
+      Write-Warn 'it contains curly quotes - JSON only accepts the straight " character.'
+    }
+    if ($raw -match '(?<!\\)\\(?![\\/"bfnrtu])') {
+      Write-Warn 'a path has a single backslash. In JSON write it twice: "D:\\Harness_AI".'
+      Write-Info 'a forward slash works just as well: "D:/Harness_AI".'
+    }
+    Write-Info 'the parser said: {0}' $_.Exception.Message
+    Write-Info 'to start over, delete config.json - the next run copies config.example.json again.'
+    throw (T 'config.json is not valid JSON')
+  }
 
   # The configured drive may not exist: the example says F:, the machine may only
   # have C:. Fall back to the drive with the most free space and write the choice

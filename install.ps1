@@ -24,11 +24,35 @@ $cfg = Read-StandConfig
 $distro = $cfg.wslDistro
 $wslRepo = "`$HOME/harness-stand"
 
-function Step-Prereqs   { & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\00-prereqs.ps1" }
-function Step-Llama     { if (-not $SkipLlama) { & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\10-llama.ps1" } }
-function Step-Model     { if (-not $SkipModel) { & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\20-model.ps1" } }
-function Step-Tune      { if (-not $SkipModel) { & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\30-tune.ps1" } }
-function Step-Shortcuts { & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\40-shortcuts.ps1" }
+# Each Windows step runs in its own PowerShell, so a `throw` inside it reaches
+# this script only as an exit code - nothing here sees the exception. Without
+# this check the install marched on over a failed step and the first real error
+# was buried under four screens of later output. Code 2 is the one non-error
+# stop: the machine needs a reboot (or a WSL user) before the run can continue.
+function Invoke-WinStep {
+  param([string]$Name, [string]$Script)
+  & powershell -NoProfile -ExecutionPolicy Bypass -File "$here\windows\$Script"
+  $code = $LASTEXITCODE
+  if ($code -eq 2) {
+    Write-Host ''
+    Write-Warn 'the install stops here: finish what the step above asks, then run install.cmd again'
+    exit 2
+  }
+  if ($code -ne 0) {
+    Write-Host ''
+    Write-Err 'step "{0}" failed (code {1}) - the message above says why' $Name $code
+    Write-Info 'nothing later was run. Fix that one thing and start install.cmd again:'
+    Write-Info 'the install is idempotent, finished steps are skipped.'
+    Write-Info 'to retry this step alone:  install.cmd -Step {0}' $Name
+    exit $code
+  }
+}
+
+function Step-Prereqs   { Invoke-WinStep 'prereqs'   '00-prereqs.ps1' }
+function Step-Llama     { if (-not $SkipLlama) { Invoke-WinStep 'llama' '10-llama.ps1' } }
+function Step-Model     { if (-not $SkipModel) { Invoke-WinStep 'model' '20-model.ps1' } }
+function Step-Tune      { if (-not $SkipModel) { Invoke-WinStep 'tune'  '30-tune.ps1' } }
+function Step-Shortcuts { Invoke-WinStep 'shortcuts' '40-shortcuts.ps1' }
 
 # The installer tree is copied into WSL: the Linux steps run from there, and the
 # maintenance scripts stay there afterwards.

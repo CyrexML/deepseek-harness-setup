@@ -36,11 +36,11 @@ What you get:
 Why this is not the same as "installing the harness yourself": the harness is the core.
 Around it you still have to choose and wire up plugins, fix what does not work on a phone,
 pick a model for your card, compute the context window, set up startup, the tunnel and
-power behaviour. Here that is already done and pinned: **23 patch layers** where things
+power behaviour. Here that is already done and pinned: **24 patch layers** where things
 break, every component version recorded in `stand.lock.json`, and model server settings
 computed for your GPU instead of copied from someone else's example.
 
-The honest limits: you need an NVIDIA GPU from 12 GB and Windows with WSL2; answer quality
+The honest limits: you need an NVIDIA GPU (the stand starts from 6 GB, comfortable from 12) and Windows with WSL2; answer quality
 is the quality of the model you choose, not of the installer; and there is only one card,
 so your own GPU work (training a network) and the model take turns — there is
 [a section about that](#web-access-and-your-own-gpu-work).
@@ -57,7 +57,7 @@ so your own GPU work (training a network) and the model take turns — there is
 | | Minimum | Tuned for |
 |---|---|---|
 | OS | Windows 10 / 11 | Windows 11 |
-| GPU | NVIDIA, 12 GB VRAM | RTX 5080, 16 GB |
+| GPU | NVIDIA, 8 GB VRAM (comfortable from 12) | RTX 5080, 16 GB |
 | Disk | 40 GB free | |
 | RAM | 16 GB | 32 GB |
 
@@ -86,10 +86,64 @@ engine — but the model then runs tens of times slower.
 
 ## Install
 
-1. Download this repository (**Code → Download ZIP**) and unpack it.
-2. Copy `config.example.json` to `config.json`. You only need to look at one line —
-   `windowsRoot`, the folder for the model and the engine.
-3. Right-click **install.cmd** → **Run as administrator**.
+### 1. Download and unpack
+
+**Code → Download ZIP**, unpack into an ordinary folder such as `C:\harness-setup`.
+Do not run it from inside the archive: the scripts look for files next to themselves.
+
+> **Windows will complain, and that is expected.** SmartScreen shows "Windows protected
+> your PC", and an antivirus may flag the installer. The reason is plain: these are
+> unsigned PowerShell scripts that download executables from the internet — exactly the
+> behaviour heuristics look for. The repository has no code-signing certificate.
+> In the SmartScreen dialog: **More info → Run anyway**. If the antivirus already removed
+> files, add the folder to its exclusions and unpack again. What gets downloaded is listed
+> in [`stand.lock.json`](stand.lock.json) and visible in the scripts themselves.
+
+### 2. Create config.json
+
+Copy `config.example.json` to `config.json` in the same folder. If you forget, the
+installer does it on the first run and says so.
+
+You only need to look at one line — `windowsRoot`, the folder for the model and the
+engine. It needs **40 GB of free space**.
+
+```json
+"windowsRoot": "D:\\Harness_AI",
+```
+
+**The one real trap is backslashes.** This is JSON, and a backslash has to be written
+twice. `"D:\Harness_AI"` is a broken file and the installer never gets past it:
+
+| Works | Does not |
+|---|---|
+| `"D:\\Harness_AI"` | `"D:\Harness_AI"` |
+| `"D:/Harness_AI"` | `"D:\Harness AI"` (avoid spaces) |
+
+A forward slash works just as well and is harder to get wrong — use it if in doubt.
+
+Edit the file in **Notepad or VS Code**. Word and phone note apps replace the straight `"`
+with curly quotes, which JSON does not accept. If the file does break, the installer now
+says so plainly and names the cause; you can also just delete `config.json` and run again.
+
+Lines starting with `_` are comments — leave them alone. If the drive in `windowsRoot`
+does not exist on this machine, the installer picks the one with the most free space and
+writes that choice back into `config.json`.
+
+### 3. Run it
+
+Right-click **install.cmd** → **Run as administrator**.
+
+**If WSL was not installed before**, the install takes three passes. That is by design:
+
+| Pass | What happens | What you do |
+|---|---|---|
+| 1st | WSL2 is installed, the installer prints "reboot the computer and run this script again" | **reboot**, then run `install.cmd` again |
+| 2nd | Ubuntu is installed; a black window opens and asks for a user name and password | type any latin name and a password (**the password does not echo — that is not a hang**), then close that window and run `install.cmd` again |
+| 3rd | the full install runs | wait |
+
+That password belongs to the user inside Ubuntu and is rarely needed — write it down.
+After the second pass the window is left at a prompt like `you@PC:/mnt/c/...$`. That is
+not an error and not a question: just close the window.
 
 The installer explains every step as it goes:
 
@@ -98,7 +152,7 @@ The installer explains every step as it goes:
 | `00-prereqs` | checks GPU and free space, installs WSL2 and a distribution, opens the model port |
 | `10-llama` | installs llama.cpp with the CUDA build matching your driver |
 | `20-model` | picks a model for your GPU and downloads it |
-| `wsl/*` | builds the harness, installs plugins, applies 23 patch layers, writes the config |
+| `wsl/*` | builds the harness, installs plugins, applies 24 patch layers, writes the config |
 | `30-tune` | computes the context window that fits your VRAM and measures the result |
 | `40-shortcuts` | shortcuts, autostart, power-maintenance task |
 | `50-verify` | verifies everything came up |
@@ -114,12 +168,40 @@ Translations live in `i18n/ru.json` as a plain "English string -> translation" t
 string missing from the table is printed in English, so a partial translation breaks
 nothing — and a new language is one more file, not a second copy of every script.
 
-Every step is idempotent — an interrupted install can simply be started again. A single
-step can be run on its own:
+**The installer stops at the first failed step** and names the step and how to retry just
+that one. Nothing after it runs: continuing on top of a broken step is pointless, and its
+message would be buried under the following screens anyway.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File install.ps1 -Step model
+Every step is idempotent — an interrupted install can simply be started again, and
+finished work is skipped.
+
+### Passing a flag
+
+`install.cmd` forwards its arguments, but neither a double click nor "Run as
+administrator" gives you anywhere to type them. So: **Start → cmd → right-click → Run as
+administrator**, and from there:
+
 ```
+cd /d C:\harness-setup
+install.cmd -Step model
+```
+
+The same goes for `uninstall.cmd -All` and `update.cmd`.
+
+| `install.cmd` flag | What it does |
+|---|---|
+| `-Step <name>` | run one step: `prereqs`, `llama`, `wsl`, `model`, `tune`, `shortcuts`, `verify` |
+| `-SkipModel` | leave the model alone (already downloaded and tuned) |
+| `-SkipLlama` | skip the llama.cpp engine |
+
+The steps have their own flags, which matter when something did not come up:
+
+| Command | When you need it |
+|---|---|
+| `powershell -File windows\10-llama.ps1 -Cpu` | the GPU or driver will not do: a CPU build, slow but it works anywhere |
+| `powershell -File windows\20-model.ps1 -ListOnly` | see what fits your VRAM without downloading anything |
+| `powershell -File windows\20-model.ps1 -Model <file name>` | take a specific quant instead of the matched one |
+| `powershell -File windows\20-model.ps1 -NoDownload` | record the choice, place the file yourself |
 
 Which versions get installed is fixed in [`stand.lock.json`](stand.lock.json): the harness
 tag, every plugin version and the list of patch layers. That is the combination this
@@ -203,7 +285,7 @@ component and the GPU driver are never touched.
 - **DeepSeek Harness** at the tag from `stand.lock.json`, built from source inside WSL2.
 - **Plugins** at pinned versions: mobile bridge, side panel with a file explorer and
   viewers, office documents, context meter, graph memory, turn rewind.
-- **23 patch layers** — my own fixes on top of the harness and the plugins (below).
+- **24 patch layers** — my own fixes on top of the harness and the plugins (below).
 - **llama.cpp** plus the GGUF model you chose, on the Windows side.
 
 <p align="center">
@@ -380,6 +462,41 @@ HTTPS keeps working, which makes this easy to misdiagnose — see [docs/MOBILE.m
 **Generation is slower than ~20 tokens/s.** The model did not fit into VRAM. Re-run
 `windows\30-tune.ps1` (it recomputes the window) or pick a smaller quantization — see
 [docs/MODEL.md](docs/MODEL.md).
+
+**The installer fails and you cannot see why.** That was true until September 2026: the
+steps ran in separate processes and a failed step stopped nothing, so a log ended with
+four different errors in a row and the first, real one was already off screen. The install
+now stops at the first. If your log looks like that, you have an old copy — download the
+repository again.
+
+**`the engine fails the startup check`.** `llama-server.exe` downloaded but will not run.
+The installer now prints what the binary itself said and the exit code it returned. Three
+usual causes:
+
+- **no Microsoft Visual C++ Runtime** — often missing on a clean machine, and llama.cpp
+  builds need it. Exit code `-1073741515` (0xC0000135) means exactly this:
+  `winget install Microsoft.VCRedist.2015+.x64`, then `install.cmd -Step llama`;
+- **the CUDA libraries did not unpack** — no `cudart64_*.dll` next to the binary. Usually
+  a truncated download: delete the `llama.cpp` folder under `windowsRoot` and retry the step;
+- **the driver is too old** — update the NVIDIA driver, or install the CPU build:
+  `powershell -File windows\10-llama.ps1 -Cpu`.
+
+**`the model was not downloaded` with `error: 404` in the log.** A 404 is the file name,
+not your network. Open `https://huggingface.co/<repo>/tree/main`, take the exact name, and
+run `install.cmd -Step model -Model <file name>`. A truncated download (anything but 404)
+resumes by itself when you run the step again.
+
+**Less VRAM than the smallest model asks for.** The installer installs it anyway and says
+so: part of the model runs on the CPU, which works but is slow. At 4–6 GB this is
+marginal; the honest minimum for comfortable work is 12 GB.
+
+**The WSL step fails with `the WSL step returned code 1`.** The full build log now lives
+inside WSL at `~/.harness-stand-logs/build.log` (and `install.log`), with the last 25 lines
+shown on screen. To read it all:
+
+```
+wsl -d Ubuntu -- tail -100 ~/.harness-stand-logs/build.log
+```
 
 **The first request after start is slow.** Expected: the first large prompt runs on a cold
 file cache and unbuilt CUDA graphs. The launcher sends a warm-up request, so this only

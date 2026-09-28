@@ -25,12 +25,51 @@ $exe = Join-Path $binDir 'llama-server.exe'
 
 # Health is checked by running the binary, not by its presence: with CUDA
 # libraries missing the exe exists but dies immediately.
+$script:EngineSays = ''
+$script:EngineCode = $null
 function Test-Engine {
-    if (-not (Test-Path $exe)) { return $false }
+    $script:EngineSays = ''
+    $script:EngineCode = $null
+    if (-not (Test-Path $exe)) { $script:EngineSays = (T 'the file is not there: {0}' @($exe)); return $false }
     try {
         $out = & $exe --version 2>&1 | Out-String
+        # Out-String gives $null when the process printed nothing, which is
+        # exactly the missing-DLL case: .Trim() on it would throw and the catch
+        # below would replace the useful exit code with a null-reference message.
+        $script:EngineCode = $LASTEXITCODE
+        $script:EngineSays = if ($null -eq $out) { '' } else { $out.Trim() }
         return ($LASTEXITCODE -eq 0) -or ($out -match 'version|llama')
-    } catch { return $false }
+    } catch {
+        $script:EngineSays = $_.Exception.Message
+        return $false
+    }
+}
+
+# Windows reports a missing DLL only as an exit status, with nothing on stdout.
+# These are the two that actually go missing on a fresh machine, so name them
+# instead of leaving the user with a bare "does not start".
+function Show-EngineFailure {
+    if ($script:EngineSays) {
+        Write-Info 'llama-server.exe said:'
+        foreach ($line in ($script:EngineSays -split "`r?`n")) { if ($line.Trim()) { Write-Host "        $line" } }
+    } else {
+        Write-Info 'llama-server.exe printed nothing at all.'
+    }
+    if ($null -ne $script:EngineCode) { Write-Info 'exit code: {0}' $script:EngineCode }
+    if ($script:EngineCode -eq -1073741515) {
+        Write-Warn 'code -1073741515 (0xC0000135) means a DLL is missing, not a broken GPU.'
+    }
+    $vcr = Join-Path $env:SystemRoot 'System32\vcruntime140.dll'
+    if (-not (Test-Path $vcr)) {
+        Write-Warn 'the Microsoft Visual C++ runtime is not installed - llama-server.exe cannot start without it.'
+        Write-Info 'install it and run this step again:  winget install Microsoft.VCRedist.2015+.x64'
+    }
+    $cudart = Get-ChildItem $binDir -Filter 'cudart64_*.dll' -ErrorAction SilentlyContinue
+    if (-not $cudart) {
+        Write-Warn 'no cudart64_*.dll next to the binary - the CUDA runtime archive did not unpack.'
+        Write-Info 'delete the llama.cpp folder and run this step again; on a flaky connection the archive arrives truncated.'
+    }
+    Write-Info 'full folder: {0}' $binDir
 }
 
 if (Test-Engine) {
@@ -47,7 +86,10 @@ function Get-GpuInfo {
     try {
         $header = (& nvidia-smi 2>$null | Out-String)
         if (-not $header) { return $null }
-        $cuda = if ($header -match 'CUDA Version:\s*([0-9]+)\.([0-9]+)') { [double]"$($Matches[1]).$($Matches[2])" } else { 0 }
+        # $null means "nvidia-smi did not say" - a very different thing from
+        # "the driver supports nothing". Reported as 0, it silently pushed every
+        # machine onto the OLDEST CUDA build available.
+        $cuda = if ($header -match 'CUDA Version:\s*([0-9]+)\.([0-9]+)') { [double]"$($Matches[1]).$($Matches[2])" } else { $null }
         $name = (& nvidia-smi --query-gpu=name --format=csv,noheader 2>$null | Select-Object -First 1)
         $driver = (& nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>$null | Select-Object -First 1)
         return @{ name = $name; driver = $driver; cuda = $cuda }
@@ -62,6 +104,10 @@ if ($null -eq $gpu) {
         Write-Info 'The model will run on the CPU: tens of times slower.'
         Write-Info 'If you do have a card, install a current driver from nvidia.com and run this step again.'
     }
+} elseif ($null -eq $gpu.cuda) {
+    Write-Ok '{0}, driver {1}' $gpu.name $gpu.driver
+    Write-Warn 'nvidia-smi did not report a CUDA version - taking the newest CUDA build and letting it prove itself.'
+    Write-Info 'if the startup check below fails, run this step with -Cpu, or update the driver.'
 } else {
     Write-Ok '{0}, driver {1}, supports CUDA up to {2}' $gpu.name $gpu.driver $gpu.cuda
 }
@@ -108,7 +154,15 @@ foreach ($rel in $releases) {
             [void]($_.name -match 'cuda-([0-9]+\.[0-9]+)-x64\.zip$')
             [pscustomobject]@{ asset = $_; version = [double]$Matches[1] }
         } | Sort-Object version -Descending
-        $fit = $cudaAssets | Where-Object { $_.version -le $gpu.cuda } | Select-Object -First 1
+        # Unknown ceiling: the newest build is the right guess on any current
+        # driver, and the startup check right after will say if it is wrong.
+        # `$x = if (...) {}` with `else` on the NEXT line does not parse: the
+        # newline ends the assignment and orphans the else. Plain statements.
+        if ($null -eq $gpu.cuda) {
+            $fit = $cudaAssets | Select-Object -First 1
+        } else {
+            $fit = $cudaAssets | Where-Object { $_.version -le $gpu.cuda } | Select-Object -First 1
+        }
         if (-not $fit -and $cudaAssets) {
             $fit = $cudaAssets | Select-Object -Last 1
             Write-Warn 'the driver supports CUDA up to {0}; taking the lowest available CUDA {1} build - update the driver if it fails' $gpu.cuda $fit.version
@@ -160,8 +214,9 @@ if (-not (Test-Path $exe)) { throw (T 'the archive has no llama-server.exe - unp
 Write-Step 'startup check'
 if (-not (Test-Engine)) {
     Write-Warn 'llama-server.exe is installed but does not start.'
-    Write-Info 'Usually that means missing CUDA libraries or a driver that is too old.'
-    Write-Info 'Try: update the NVIDIA driver, or install the CPU build - this same step with -Cpu.'
+    Show-EngineFailure
+    Write-Info 'If none of the above applies: update the NVIDIA driver, or install the CPU build -'
+    Write-Info 'this same step with -Cpu (slow, but it works on any machine).'
     throw (T 'the engine fails the startup check')
 }
 Write-Ok 'starts'

@@ -43,11 +43,27 @@ else
 fi
 
 step 'dependencies'
-( cd "$DST" && pnpm install --prefer-offline 2>&1 | tail -3 )
+# The full output goes to a file and only the tail to the screen: a failure here
+# used to show five lines of a stack trace and nothing that said what broke.
+LOG_DIR="$HOME/.harness-stand-logs"
+mkdir -p "$LOG_DIR"
+run_logged() {
+  local what="$1"; shift
+  local log="$LOG_DIR/$what.log"
+  if ( cd "$DST" && "$@" ) >"$log" 2>&1; then
+    tail -3 "$log" | sed 's/^/    /'
+    return 0
+  fi
+  warn '%s failed - last 25 lines:' "$what"
+  tail -25 "$log" | sed 's/^/    /'
+  die 'full log: %s' "$log"
+}
+
+run_logged install pnpm install --prefer-offline
 ok 'installed'
 
 step 'build (long: 5-15 minutes)'
-( cd "$DST" && pnpm build 2>&1 | tail -5 )
+run_logged build pnpm build
 [ -f "$DST/apps/cli/lib/bin.js" ] || die 'the build produced no apps/cli/lib/bin.js'
 ok 'built'
 

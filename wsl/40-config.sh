@@ -64,6 +64,19 @@ if [ -f "$TPL/agents-edit-ledger.md" ]; then
   fi
 fi
 
+# And the same channel carries the path rule. A path the model retypes from its
+# own failed call is the single most expensive loop on this stand: every retry
+# fails identically, and the fs layer can only say the path is not there.
+if [ -f "$TPL/agents-paths.md" ]; then
+  agents="$DSHDIR/AGENTS.md"
+  if ! grep -q 'dsh-local: path-copy-rule' "$agents" 2>/dev/null; then
+    { [ -s "$agents" ] && printf '\n'; cat "$TPL/agents-paths.md"; } >> "$agents"
+    ok 'path rule added to AGENTS.md'
+  else
+    ok 'path rule already in AGENTS.md'
+  fi
+fi
+
 mkdir -p "$DSHDIR/.agent-presets"
 if [ -d "$TPL/presets/local-64k" ]; then
   rm -rf "$DSHDIR/.agent-presets/$PRESET"
