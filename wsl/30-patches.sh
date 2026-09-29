@@ -22,6 +22,18 @@ for dir in scripts projects/PlugIN presets templates i18n; do
 done
 chmod +x "$STAND"/scripts/*.sh 2>/dev/null || true
 
+# The bridge patch toolchain has dependencies of its own - esbuild rebuilds the
+# client bundle the phone receives, acorn parses the sources - and nothing ever
+# installed them. On a machine where they happened to be there already this was
+# invisible; on a fresh one the client rebuild failed and the phone kept getting
+# the unpatched bundle.
+BRIDGE_TOOLS="$STAND/projects/PlugIN/dsh-bridge-en/tools"
+if [ -f "$BRIDGE_TOOLS/package.json" ] && [ ! -d "$BRIDGE_TOOLS/node_modules" ]; then
+  step 'bridge patch toolchain'
+  run_logged bridge-tools "$BRIDGE_TOOLS" npm install --no-audit --no-fund
+  ok 'installed'
+fi
+
 step 'applying patch layers'
 # Translating new bridge strings needs a live model; without one translate.sh
 # says so and leaves them untranslated.
