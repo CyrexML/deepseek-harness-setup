@@ -353,5 +353,11 @@
   "  The Windows features \"Virtual Machine Platform\" and \"Windows Subsystem for Linux\" stay enabled;": "  Компоненты Windows «Платформа виртуальной машины» и «Подсистема Windows для Linux» остаются включёнными;",
   "  they are inert on their own. Turn them off by hand if you want, in \"Turn Windows features on or off\".": "  сами по себе они ничего не делают. Выключить вручную: «Включение или отключение компонентов Windows».",
   "a separate file (~0.9 GB) that lets the agent look at images you send it": "отдельный файл (~0,9 ГБ), с ним агент сможет смотреть картинки, которые вы присылаете",
-  "optional: if it is not there, the install carries on without it": "необязательный: если его нет, установка идёт дальше без него"
+  "optional: if it is not there, the install carries on without it": "необязательный: если его нет, установка идёт дальше без него",
+  "measuring (short probe: the model does not fit in VRAM)": "замер (короткий: модель не помещается в видеопамять)",
+  "most of the model runs on the CPU here, so this is slow - allow several minutes": "большая часть модели считается на процессоре, поэтому медленно — это несколько минут",
+  "the speed probe did not finish: {0}": "замер скорости не завершился: {0}",
+  "the stand is configured and ready to start - only this measurement is missing.": "стенд настроен и готов к запуску — не хватает только этого замера.",
+  "to try again later:  install.cmd -Step tune": "повторить позже:  install.cmd -Step tune",
+  "speed was not measured - see above.": "скорость не измерена — см. выше."
 }

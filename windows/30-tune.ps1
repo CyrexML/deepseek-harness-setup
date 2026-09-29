@@ -91,17 +91,42 @@ do {
 if ($health -ne 'ok') { throw (T 'the server did not come up in 8 minutes - see {0}\run\server.log' @($root)) }
 Write-Ok 'up'
 
-Write-Step 'measuring (the first request is always slower - warm-up)'
-$body = @{ prompt = ('The quick brown fox jumps over the lazy dog near the river bank. ' * 500).Substring(0, 32000)
-           n_predict = 1; temperature = 0; cache_prompt = $false; stream = $false } | ConvertTo-Json
-Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 600 | Out-Null
-$r1 = Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 600
-$body2 = @{ prompt = 'Explain what a neural network is, in two sentences.'
-            n_predict = 256; temperature = 0; cache_prompt = $false; stream = $false } | ConvertTo-Json
-$r2 = Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body2 -ContentType 'application/json' -TimeoutSec 600
+# A card the model does not fit into runs most of it on the CPU, and the full
+# probe then takes tens of minutes of silence - long enough to look hung. The
+# numbers are indicative either way, so the probe shrinks instead of the wait.
+$vramNow  = Get-FreeVramMb
+$modelNow = [int]((Get-Item $modelPath).Length / 1MB)
+$onCpu    = ($vramNow -gt 0) -and ($modelNow + 1200 -gt $vramNow)
+if ($onCpu) {
+  Write-Step 'measuring (short probe: the model does not fit in VRAM)'
+  Write-Warn 'most of the model runs on the CPU here, so this is slow - allow several minutes'
+  $promptChars = 4000
+  $genTokens = 32
+} else {
+  Write-Step 'measuring (the first request is always slower - warm-up)'
+  $promptChars = 32000
+  $genTokens = 256
+}
 
-$prefill = [math]::Round($r1.timings.prompt_per_second)
-$decode  = [math]::Round($r2.timings.predicted_per_second)
+$prefill = 0
+$decode  = 0
+# The stand is already configured and its launch script written: this step only
+# reports speed. A probe that times out must not fail the install behind it.
+try {
+  $body = @{ prompt = ('The quick brown fox jumps over the lazy dog near the river bank. ' * 500).Substring(0, $promptChars)
+             n_predict = 1; temperature = 0; cache_prompt = $false; stream = $false } | ConvertTo-Json
+  Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 900 | Out-Null
+  $r1 = Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 900
+  $body2 = @{ prompt = 'Explain what a neural network is, in two sentences.'
+              n_predict = $genTokens; temperature = 0; cache_prompt = $false; stream = $false } | ConvertTo-Json
+  $r2 = Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body2 -ContentType 'application/json' -TimeoutSec 900
+  $prefill = [math]::Round($r1.timings.prompt_per_second)
+  $decode  = [math]::Round($r2.timings.predicted_per_second)
+} catch {
+  Write-Warn 'the speed probe did not finish: {0}' $_.Exception.Message
+  Write-Info 'the stand is configured and ready to start - only this measurement is missing.'
+  Write-Info 'to try again later:  install.cmd -Step tune'
+}
 $freeMb  = try { [int]((Invoke-Native { & nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits 2>$null } | Select-Object -First 1)) } catch { 0 }
 
 Write-Host ''
@@ -111,7 +136,9 @@ Write-Host (T '  prefill:       {0} tok/s   (on an RTX 5080, 16 GB: about 1970)'
 Write-Host (T '  generation:    {0} tok/s   (on an RTX 5080, 16 GB: about 95)' @($decode))
 Write-Host (T '  VRAM free:     {0} MiB' @($freeMb))
 Write-Host ''
-if ($decode -lt 20) {
+if ($decode -eq 0) {
+  Write-Warn 'speed was not measured - see above.'
+} elseif ($decode -lt 20) {
   Write-Warn 'generation below 20 tok/s - the model almost certainly did not fit into VRAM.'
   Write-Info 'Take a smaller quant (docs/MODEL.md section 2), or run this script again to recompute the window.'
 } else {
