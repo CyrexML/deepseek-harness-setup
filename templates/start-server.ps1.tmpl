@@ -165,7 +165,19 @@ if ($Dry) {
 
 Write-Host ("EXEC: " + $exe + " " + ($a -join " "))
 if ($PrintOnly) { exit 0 }
-if (Test-Path $Log) { Remove-Item -Force $Log }
+# A llama-server that is already running holds this file open, and Remove-Item
+# then threw - which the launcher reported as "could not start", naming a log
+# file rather than the process that owns it. Refuse for the real reason instead.
+$running = @(Get-Process llama-server -ErrorAction SilentlyContinue)
+if ($running.Count -gt 0) {
+  Write-Host ("llama-server is already running (PID " + ($running.Id -join ', ') + ")") -ForegroundColor Yellow
+  Write-Host "Stop it first. If it will not stop, it was started with administrator rights:" -ForegroundColor Yellow
+  Write-Host "  open PowerShell as administrator and run:  Stop-Process -Name llama-server -Force" -ForegroundColor Yellow
+  exit 1
+}
+# Still guarded: another process may hold the log for reasons of its own, and a
+# stale log is not worth refusing to start over.
+if (Test-Path $Log) { Remove-Item -Force $Log -ErrorAction SilentlyContinue }
 Write-Host ("LOG:  " + $Log)
 
 # llama-server writes its log to stderr
