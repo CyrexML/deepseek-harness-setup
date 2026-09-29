@@ -48,11 +48,6 @@ step 'profile package.json'
   printf '{\n  "name": "dsh-profile-web",\n  "private": true,\n  "dependencies": {\n    '
   (IFS=$',\n    '; printf '%s' "${deps[*]}")
   printf '\n  },\n'
-  # pnpm 10+ refuses to run a dependency's build script unless it is named here.
-  # node-pty is a native module the terminal needs, and leaving it unapproved is
-  # a warning on pnpm 11 but a failed install on 12 - so say it explicitly
-  # instead of depending on which pnpm happens to be present.
-  printf '  "pnpm": {\n    "onlyBuiltDependencies": ["node-pty"]\n  },\n'
   printf '  "dsh": {\n    "profile": {\n      "bundles": [\n        '
   (IFS=$',\n        '; printf '%s' "${bundles[*]}")
   printf '\n      ],\n      "patchReload": "live"\n    }\n  }\n}\n'
@@ -60,6 +55,21 @@ step 'profile package.json'
 node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"))' "$PROFILE/package.json" ||
   die 'the generated package.json is invalid'
 ok 'written: %s/package.json' "$PROFILE"
+
+# pnpm refuses to run a dependency's build script unless it is approved, and
+# stops the install over it. node-pty is a native module the terminal needs.
+#
+# The setting lives HERE, in pnpm-workspace.yaml, and the key is `allowBuilds` -
+# not the `pnpm.onlyBuiltDependencies` field in package.json, which pnpm 11 reads
+# no more and warns about, and not .npmrc, which it ignores silently. Verified by
+# running pnpm 11.7.0 against a cold store: with this file the install exits 0
+# and pty.node is built; without it, ERR_PNPM_IGNORED_BUILDS.
+step 'build approvals'
+cat > "$PROFILE/pnpm-workspace.yaml" <<'YAML'
+allowBuilds:
+  node-pty: true
+YAML
+ok 'written: %s/pnpm-workspace.yaml' "$PROFILE"
 
 step 'installing plugins'
 run_logged plugins "$PROFILE" pnpm install
