@@ -306,7 +306,12 @@ try {
   # nine days old because it was the one file that copied itself nowhere).
   # harness-start.ps1 is included: PowerShell has already read it into memory, so
   # replacing the file mid-run is safe and the NEXT click gets the fresh code.
-  Wsl "cp $Repo/scripts/start-server.ps1 $Repo/scripts/stop-server.ps1 $Repo/scripts/harness-splash.ps1 $Repo/scripts/splash-whale.png $Repo/scripts/harness-start.ps1 $Repo/scripts/harness-stop.ps1 $RunWsl/"
+  # start-server.ps1 and stop-server.ps1 are NOT in this list, and must not be:
+  # they are generated per machine by 30-tune.ps1 from templates/, with this
+  # machine's root substituted. Copying the repository's own copies over them
+  # replaced a correct D:\ with the author's F:\ on every single start, and the
+  # launcher then reported a missing llama-server.exe on a drive that is not there.
+  Wsl "cp $Repo/scripts/harness-splash.ps1 $Repo/scripts/splash-whale.png $Repo/scripts/harness-start.ps1 $Repo/scripts/harness-stop.ps1 $RunWsl/"
   # Message catalogs travel with the scripts, otherwise a Russian launcher would
   # fall back to English after every update.
   Wsl "mkdir -p $RunWsl/i18n && cp $Repo/i18n/*.json $RunWsl/i18n/ 2>/dev/null || true"

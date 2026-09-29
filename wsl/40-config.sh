@@ -9,6 +9,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
 
 DSHDIR="$HOME/.dsh"
+STAND_DIR_ENV="${STAND_DIR:-$HOME/Harness_AI}/stand.env"
 PROFILE="$DSHDIR/profiles/web"
 TPL="$ROOT/templates"
 MARK="# harness-stand"
@@ -102,8 +103,21 @@ else
   ok 'written'
 fi
 
+# Where the Windows side of the stand lives, in both spellings, for the scripts
+# that run INSIDE WSL and have to reach it: start-web.sh and stop-web.sh carried
+# the author's F: outright, so on any other drive the Power button in the web
+# interface wrote its signal nowhere and the sleep timeouts were never touched.
+step 'path to the Windows side (stand.env)'
+WINROOT_RAW="$(cfg .windowsRoot 'F:\Harness_AI')"
+{
+  printf '# Written by the installer. Both spellings of the same folder.\n'
+  printf 'WIN_ROOT_WSL=%s\n' "$(winpath "$WINROOT_RAW")"
+  printf "WIN_ROOT_WIN='%s'\n" "$WINROOT_RAW"
+} > "$STAND_DIR_ENV"
+ok 'written: %s' "$STAND_DIR_ENV"
+
 step 'chat template for llama-server'
-WINROOT="$(winpath "$(cfg .windowsRoot 'F:\Harness_AI')")"
+WINROOT="$(winpath "$WINROOT_RAW")"
 if [ -f "$TPL/chat-agent.jinja" ]; then
   # This said a bare "mkdir: Permission denied" when windowsRoot had fallen back
   # to the example's F: - creating a directory straight under /mnt needs root,

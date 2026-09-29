@@ -82,7 +82,13 @@ fi
 # here, and harness-start.ps1 -Hidden polls the file and stops the system. Set
 # unconditionally: with no launcher nobody reads it, and the RPC only returns a
 # clear error when the variable is missing.
-export DSH_POWER_REQUEST_FILE="${DSH_POWER_REQUEST_FILE:-/mnt/f/Harness_AI/run/power.request}"
+# Where the Windows side of the stand lives. Written by the installer, because
+# these paths used to be the author's F: spelled out - and on any other drive the
+# Power button wrote its signal nowhere and the sleep timeouts were never touched.
+STAND_ENV="${STAND_ENV:-$HOME/Harness_AI/stand.env}"
+# shellcheck source=/dev/null
+[ -f "$STAND_ENV" ] && . "$STAND_ENV"
+export DSH_POWER_REQUEST_FILE="${DSH_POWER_REQUEST_FILE:-${WIN_ROOT_WSL:-/mnt/f/Harness_AI}/run/power.request}"
 
 # cloudflared tunnel: dsh-bridge starts it as a child process and passes this
 # environment through; the plugin takes no flags, so it is configured by env
@@ -126,9 +132,13 @@ fi
 # does NOT count as activity, keyboard input does. The previous values go into
 # run/power-timeouts.json; stop-web.sh restores them, and if this process dies the
 # "Harness AI power restore" scheduled task does.
-( cd /mnt/c && powershell.exe -NoProfile -ExecutionPolicy Bypass \
-    -File 'F:\Harness_AI\run\harness-idle-sleep.ps1' -Off >/dev/null 2>&1 ) || \
-  echo "warning: could not disable idle sleep - the PC may fall asleep mid-run" >&2
+if [ -n "${WIN_ROOT_WIN:-}" ]; then
+  ( cd /mnt/c && powershell.exe -NoProfile -ExecutionPolicy Bypass \
+      -File "$WIN_ROOT_WIN\\run\\harness-idle-sleep.ps1" -Off >/dev/null 2>&1 ) || \
+    echo "warning: could not disable idle sleep - the PC may fall asleep mid-run" >&2
+else
+  echo "warning: no $STAND_ENV - idle sleep left alone, the PC may fall asleep mid-run" >&2
+fi
 
 # Warm the model with a BIG prompt. The first large request after llama-server
 # starts runs on a cold Windows file cache and unbuilt CUDA graphs: prefill
