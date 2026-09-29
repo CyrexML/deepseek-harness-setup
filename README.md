@@ -128,11 +128,16 @@ it. Use a forward slash — it works the same and cannot be got wrong:
 
 The trailing comma is required — it is already there, do not delete it.
 
-To check the file without running the whole install:
+To check the file without running the whole install. Open the folder holding
+`install.cmd` in Explorer, click the address bar, type `powershell` and press Enter —
+the console opens there. Then, on one line:
 
+```powershell
+try { Get-Content .\config.example.json -Raw -EA Stop | ConvertFrom-Json -EA Stop | Out-Null; 'OK' } catch { "ERROR: $($_.Exception.Message)" }
 ```
-powershell -Command "Get-Content config.example.json -Raw | ConvertFrom-Json | Out-Null; 'it parses'"
-```
+
+`-EA Stop` is not optional: without it a read error does not stop the line, and `OK`
+is printed even when the file is missing or broken.
 
 Edit the file in **Notepad or VS Code**. Word and phone note apps replace the straight `"`
 with curly quotes, which JSON does not accept. If the file does break, the installer now
