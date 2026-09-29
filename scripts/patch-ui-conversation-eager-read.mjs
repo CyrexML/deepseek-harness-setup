@@ -12,7 +12,10 @@
 // The file belongs to the harness build (not the pnpm store) and `pnpm build`
 // overwrites it, hence the layer in scripts/ensure-patches.sh. Idempotent (marker).
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-const path = process.argv[2] || `${process.env.HOME}/tools/deepseek-harness/packages/client/ui-conversation/lib/client.js`;
+// DSH_ROOT, like every sibling patch: the installer supports HARNESS_DIR, and
+// this script alone ignored it - with no argument it went for the default tree
+// whatever the caller meant. Caught while probing a build in another directory.
+const path = process.argv[2] || `${process.env.DSH_ROOT ?? `${process.env.HOME}/tools/deepseek-harness`}/packages/client/ui-conversation/lib/client.js`;
 const MARK = '/* dsh-local: eager image read */';
 let s = readFileSync(path, 'utf8');
 if (s.includes(MARK)) { console.log(`${path}: already patched`); process.exit(0); }
