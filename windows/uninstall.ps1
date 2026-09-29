@@ -36,6 +36,15 @@ $cfg = Read-StandConfig
 $root = $cfg.windowsRoot
 $distro = $cfg.wslDistro
 
+# Asked once, up front. Without it every WSL step prints the host's own
+# "no such distribution" error and then reports "done", which reads like the
+# removal half worked when in fact there was nothing left to remove.
+$distroPresent = $false
+try {
+  $installed = @((& wsl.exe --list --quiet) -replace "`0", '' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+  $distroPresent = $installed -contains $distro
+} catch { $distroPresent = $false }
+
 # An install abandoned between the reboot and the second pass can leave a
 # "continue at next logon" entry behind; removing the stand must not leave it
 # to fire later.
@@ -73,7 +82,7 @@ if (-not $KeepModel) { Write-Host (T '    - models: {0}\models' @($root)) } else
 if (-not $KeepData)  { Write-Host (T '    - DSH data inside WSL: ~/.dsh (chats, agent memory, settings)') }
 else { Write-Host (T '    - DSH data: KEPT (-KeepData)') }
 Write-Host (T '    - stand code inside WSL: ~/Harness_AI, ~/tools/deepseek-harness, ~/harness-stand')
-if ($RemoveWsl) { Write-Host (T '    - THE ENTIRE WSL DISTRIBUTION "{0}"' @($distro)) -ForegroundColor Red }
+if ($RemoveWsl -and $distroPresent) { Write-Host (T '    - THE ENTIRE WSL DISTRIBUTION "{0}"' @($distro)) -ForegroundColor Red }
 Write-Host ''
 Write-Host (T '  Left alone: Windows itself, WSL as a system component, the GPU driver and your projects outside the stand.')
 Write-Host ''
@@ -97,7 +106,9 @@ Try-Do 'stopping the stand' {
   $stopServer = Join-Path $root 'run\stop-server.ps1'
   if (Test-Path $stopServer) { & powershell -NoProfile -ExecutionPolicy Bypass -File $stopServer | Out-Null }
   Get-Process llama-server -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-  & wsl.exe -d $distro -- bash -lc 'pkill -f "bin.js web" 2>/dev/null; pkill -f cloudflared 2>/dev/null; true' 2>$null
+  if ($distroPresent) {
+    & wsl.exe -d $distro -- bash -lc 'pkill -f "bin.js web" 2>/dev/null; pkill -f cloudflared 2>/dev/null; true' 2>$null
+  }
 }
 
 Try-Do 'restoring the sleep timeouts' {
@@ -123,9 +134,14 @@ Try-Do 'removing the firewall rule' {
     Remove-NetFirewallRule -ErrorAction SilentlyContinue
 }
 
-Try-Do 'removing the stand contents inside WSL' {
-  $keep = if ($KeepData) { 'true' } else { 'rm -rf "$HOME/.dsh"' }
-  & wsl.exe -d $distro -- bash -lc "rm -rf `"`$HOME/Harness_AI`" `"`$HOME/tools/deepseek-harness`" `"`$HOME/harness-stand`"; $keep" 2>$null
+if ($distroPresent) {
+  Try-Do 'removing the stand contents inside WSL' {
+    $keep = if ($KeepData) { 'true' } else { 'rm -rf "$HOME/.dsh"' }
+    & wsl.exe -d $distro -- bash -lc "rm -rf `"`$HOME/Harness_AI`" `"`$HOME/tools/deepseek-harness`" `"`$HOME/harness-stand`"; $keep" 2>$null
+  }
+} else {
+  Write-Step 'the stand inside WSL'
+  Write-Ok 'the distribution "{0}" is not installed - nothing to remove there' $distro
 }
 
 Try-Do 'removing the engine and the launch scripts' {
@@ -148,13 +164,15 @@ Try-Do 'removing the empty stand directory' {
   }
 }
 
-if ($RemoveWsl -and -not $KeepWsl) {
+if ($RemoveWsl -and -not $KeepWsl -and -not $distroPresent) {
+  Write-Step 'the WSL distribution'
+  Write-Ok '"{0}" is already gone' $distro
+} elseif ($RemoveWsl -and -not $KeepWsl) {
+  # No third prompt here. Reaching this line already took choosing the mode that
+  # names the distribution in red, then typing the confirmation word - asking
+  # for the distribution's name on top of that only taught people to guess.
   Write-Warn 'removing the whole WSL distribution "{0}" - this wipes EVERYTHING that was in it' $distro
-  if (-not $Yes) {
-    $answer = Read-Host (T '  Really remove the distribution {0}? Type its name' @($distro))
-    if ($answer -ne $distro) { Write-Host (T '  the distribution was kept') }
-    else { & wsl.exe --unregister $distro }
-  } else { & wsl.exe --unregister $distro }
+  & wsl.exe --unregister $distro
 }
 
 Write-Host ''
