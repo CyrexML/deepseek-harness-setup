@@ -47,6 +47,19 @@ function Get-StandConfigPath {
   Join-Path $script:StandRoot 'config.json'
 }
 
+# Write config.json as UTF-8 WITHOUT a BOM.
+#
+# `Set-Content -Encoding UTF8` under Windows PowerShell 5.1 writes one, and the
+# WSL side parses this file with JSON.parse, which a BOM breaks. Every cfg()
+# read then fell back to its default in silence: the window came out 65536
+# instead of the computed one, and windowsRoot reverted to the example's F:,
+# so the install tried to mkdir under /mnt/f and got "Permission denied".
+function Write-ConfigJson {
+  param([string]$Path, $Config)
+  $json = ($Config | ConvertTo-Json -Depth 12)
+  [System.IO.File]::WriteAllText($Path, $json + "`r`n", (New-Object System.Text.UTF8Encoding($false)))
+}
+
 function Read-StandConfig {
   $path = Get-StandConfigPath
   if (-not (Test-Path $path)) {
@@ -97,7 +110,7 @@ function Read-StandConfig {
     $replacement = "$($best.Name):$tail"
     Write-Warn 'no drive {0}: - taking {1}: ({2} GB free)' $drive $best.Name ([math]::Round($best.Free/1GB))
     $cfg.windowsRoot = $replacement
-    ($cfg | ConvertTo-Json -Depth 12) | Set-Content -Path $path -Encoding UTF8
+    Write-ConfigJson $path $cfg
   }
   $cfg
 }
@@ -122,7 +135,7 @@ function Set-StandConfig {
     if ($node.PSObject.Properties[$leaf]) { $node.$leaf = $Values[$key] }
     else { $node | Add-Member -NotePropertyName $leaf -NotePropertyValue $Values[$key] }
   }
-  ($cfg | ConvertTo-Json -Depth 12) | Set-Content -Path $path -Encoding UTF8
+  Write-ConfigJson $path $cfg
 }
 
 # Continue the install by itself after the reboot WSL2 needs.

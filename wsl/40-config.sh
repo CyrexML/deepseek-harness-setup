@@ -105,7 +105,17 @@ fi
 step 'chat template for llama-server'
 WINROOT="$(winpath "$(cfg .windowsRoot 'F:\Harness_AI')")"
 if [ -f "$TPL/chat-agent.jinja" ]; then
-  mkdir -p "$WINROOT/models"
+  # This said a bare "mkdir: Permission denied" when windowsRoot had fallen back
+  # to the example's F: - creating a directory straight under /mnt needs root,
+  # and the message named neither the path nor the reason. Probing beforehand is
+  # no better: an unmounted drive leaves a root-owned stub at /mnt/<letter> that
+  # is mode 777, so it looks both present and writable. Only the attempt tells.
+  WINDRIVE="$(printf '%s' "$WINROOT" | cut -d/ -f3 | tr 'a-z' 'A-Z')"
+  mkdir -p "$WINROOT/models" 2>/dev/null || {
+    warn 'cannot create %s/models' "$WINROOT"
+    warn 'that path means drive %s: on the Windows side' "$WINDRIVE"
+    die 'check windowsRoot in config.json - and that drive %s: exists' "$WINDRIVE"
+  }
   cp "$TPL/chat-agent.jinja" "$WINROOT/models/chat-agent.jinja"
   ok 'copied to %s/models/chat-agent.jinja' "$WINROOT"
 else

@@ -52,14 +52,25 @@ cfg() {
   local value
   value="$(node -e '
     const fs = require("node:fs");
-    const cfg = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    // A BOM breaks JSON.parse. The installer no longer writes one, but Notepad
+    // and any PowerShell `Set-Content -Encoding UTF8` still do, and a silent
+    // fall back to every default is the worst possible way to find out.
+    const cfg = JSON.parse(fs.readFileSync(process.argv[1], "utf8").replace(/^\uFEFF/, ""));
     const path = process.argv[2].replace(/^\./, "").split(".").filter(Boolean);
     let node = cfg;
     for (const key of path) { if (node === undefined || node === null) break; node = node[key]; }
     if (node === undefined || node === null) process.exit(3);
     process.stdout.write(typeof node === "object" ? JSON.stringify(node) : String(node));
-  ' "$CONFIG" "$path" 2>/dev/null)" || { printf '%s' "$fallback"; return 0; }
-  printf '%s' "$value"
+  ' "$CONFIG" "$path" 2>&1)" && { printf '%s' "$value"; return 0; }
+  # Exit 3 is "that key is not in the file", and the default is the right answer.
+  # Anything else means the file itself could not be read, and defaulting on THAT
+  # is how a broken config.json silently produced a stand configured for someone
+  # else's GPU - every value quietly wrong, nothing on screen.
+  [ $? -eq 3 ] && { printf '%s' "$fallback"; return 0; }
+  # node prints the offending line plus a full stack; only the SyntaxError line
+  # says anything to whoever has to fix the file.
+  die 'config.json cannot be read (%s): %s' "$CONFIG" \
+      "$(printf '%s' "$value" | grep -m1 -E 'Error|error' || printf 'see %s' "$CONFIG")"
 }
 
 # Windows path -> WSL path: F:\Harness_AI -> /mnt/f/Harness_AI
