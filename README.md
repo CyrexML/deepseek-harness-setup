@@ -99,27 +99,40 @@ Do not run it from inside the archive: the scripts look for files next to themse
 > files, add the folder to its exclusions and unpack again. What gets downloaded is listed
 > in [`stand.lock.json`](stand.lock.json) and visible in the scripts themselves.
 
-### 2. Create config.json
+### 2. Set up config.json
 
-Copy `config.example.json` to `config.json` in the same folder. If you forget, the
-installer does it on the first run and says so.
+**Just open `config.example.json` and edit it.** Nothing to copy or rename: the installer
+creates `config.json` from the example on its first run, with your edits in it.
+
+That is safer than creating the file by hand. Windows Explorer hides file extensions by
+default, so "New → Text Document" gives you `config.json.txt`, which looks right and does
+not work.
 
 You only need to look at one line — `windowsRoot`, the folder for the model and the
-engine. It needs **40 GB of free space**.
+engine. It needs **40 GB of free space**; you do not have to create the folder, the
+installer does that.
 
 ```json
-"windowsRoot": "D:\\Harness_AI",
+"windowsRoot": "D:/Harness_AI",
 ```
 
-**The one real trap is backslashes.** This is JSON, and a backslash has to be written
-twice. `"D:\Harness_AI"` is a broken file and the installer never gets past it:
+**The one real trap is backslashes.** Explorer's address bar gives you a path like
+`D:\Harness_AI`, and pasting it as-is does not work: this is JSON, where a backslash is
+an escape character. `"D:\Harness_AI"` is a broken file and the installer never gets past
+it. Use a forward slash — it works the same and cannot be got wrong:
 
 | Works | Does not |
 |---|---|
-| `"D:\\Harness_AI"` | `"D:\Harness_AI"` |
-| `"D:/Harness_AI"` | `"D:\Harness AI"` (avoid spaces) |
+| `"D:/Harness_AI"` | `"D:\Harness_AI"` — Explorer's path as-is |
+| `"D:\\Harness_AI"` | `"D:/Harness AI"` — avoid spaces |
 
-A forward slash works just as well and is harder to get wrong — use it if in doubt.
+The trailing comma is required — it is already there, do not delete it.
+
+To check the file without running the whole install:
+
+```
+powershell -Command "Get-Content config.example.json -Raw | ConvertFrom-Json | Out-Null; 'it parses'"
+```
 
 Edit the file in **Notepad or VS Code**. Word and phone note apps replace the straight `"`
 with curly quotes, which JSON does not accept. If the file does break, the installer now

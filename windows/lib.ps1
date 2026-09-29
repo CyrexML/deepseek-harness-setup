@@ -76,6 +76,14 @@ function Read-StandConfig {
     throw (T 'config.json is not valid JSON')
   }
 
+  # A forward slash is accepted in config.json - it is the one spelling a user
+  # cannot get wrong by pasting a path - but everything downstream gets the
+  # canonical Windows form. Shortcut targets in particular are handed to
+  # IShellLink, which is not reliable about mixed separators.
+  # In a -replace REPLACEMENT string a backslash is literal (only $ is special),
+  # so '\\' here would insert two of them.
+  if ($cfg.windowsRoot) { $cfg.windowsRoot = ($cfg.windowsRoot -replace '/', '\').TrimEnd('\') }
+
   # The configured drive may not exist: the example says F:, the machine may only
   # have C:. Fall back to the drive with the most free space and write the choice
   # back, so every step sees the same path.
