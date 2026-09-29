@@ -21,7 +21,7 @@ param(
   # How long before the screen turns off when the user's setting is "never".
   # The stand itself does not care about a dark monitor.
   [int]$MonitorMinutes = 10,
-  [string]$Saved = 'F:\Harness_AI\run\power-timeouts.json'
+  [string]$Saved = "$PSScriptRoot\power-timeouts.json"
 )
 
 $RunDir = Split-Path -Parent $Saved

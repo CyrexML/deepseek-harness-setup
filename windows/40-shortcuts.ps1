@@ -22,6 +22,9 @@ Write-Step 'launch scripts into run\'
 $wslHome = (& wsl.exe -d $cfg.wslDistro -- bash -lc 'echo $HOME').Trim()
 $wslRunSource = "/mnt/$($root.Substring(0,1).ToLower())$($root.Substring(2) -replace '\\','/')/run"
 & wsl.exe -d $cfg.wslDistro -- bash -lc "cp `$HOME/Harness_AI/scripts/harness-start.ps1 `$HOME/Harness_AI/scripts/harness-stop.ps1 `$HOME/Harness_AI/scripts/harness-launch.vbs `$HOME/Harness_AI/scripts/harness-splash.ps1 `$HOME/Harness_AI/scripts/harness-idle-sleep.ps1 `$HOME/Harness_AI/scripts/harness-restore-power.ps1 `$HOME/Harness_AI/scripts/harness-hidden.vbs `$HOME/Harness_AI/scripts/harness.ico `$HOME/Harness_AI/scripts/splash-whale.png '$wslRunSource/' 2>/dev/null; true"
+# The copied scripts find their own folder, but not the distribution name. It
+# goes next to them, the same way the message language does.
+Set-Content -Path (Join-Path $runDir 'distro.txt') -Value $cfg.wslDistro -Encoding ascii -NoNewline
 Write-Ok 'copied'
 
 function New-Shortcut {
@@ -52,17 +55,20 @@ Write-Step 'shortcuts'
 $desktop = [Environment]::GetFolderPath('Desktop')
 $startMenu = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
 $launch = Join-Path $runDir 'harness-launch.vbs'
-$stop = Join-Path $runDir 'harness-stop.ps1'
 $icon = Join-Path $runDir 'harness.ico'
 
 if (Test-Path $launch) {
-  foreach ($dir in @($desktop, $startMenu)) {
-    New-Shortcut -Path (Join-Path $dir 'Harness AI.lnk') -Target "$env:WINDIR\System32\wscript.exe" `
-      -Arguments "`"$launch`"" -Icon $icon -Description 'Start the Harness AI stand'
+  # One shortcut, in the Start menu. It is a toggle - a second click stops the
+  # stand - and the Power button in the web interface does the same job from the
+  # phone, so a separate "stop" shortcut earned nothing but desktop clutter.
+  New-Shortcut -Path (Join-Path $startMenu 'Harness AI.lnk') -Target "$env:WINDIR\System32\wscript.exe" `
+    -Arguments "`"$launch`"" -Icon $icon -Description 'Start the Harness AI stand'
+  # Anything this installer put on the desktop before is taken back off.
+  foreach ($old in @('Harness AI.lnk', 'Harness AI - stop.lnk')) {
+    Remove-Item (Join-Path $desktop $old) -Force -ErrorAction SilentlyContinue
   }
-  New-Shortcut -Path (Join-Path $desktop 'Harness AI - stop.lnk') -Target "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe" `
-    -Arguments "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$stop`"" -Icon $icon -Description 'Stop the Harness AI stand'
-  Write-Ok 'created on the desktop and in the Start menu'
+  Remove-Item (Join-Path $startMenu 'Harness AI - stop.lnk') -Force -ErrorAction SilentlyContinue
+  Write-Ok 'created in the Start menu (search for "Harness")'
 } else {
   Write-Warn 'no {0} - shortcuts skipped (WSL side not installed yet?)' $launch
 }

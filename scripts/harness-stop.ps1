@@ -7,8 +7,13 @@ $ErrorActionPreference = 'Continue'
 chcp 65001 > $null
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 
-$Distro = 'Ubuntu'
-$RunDir = 'F:\Harness_AI\run'
+# These scripts are copied into <windowsRoot>\run, so the script's OWN folder is
+# RunDir. The author's F: used to be baked in here and nothing substituted it at
+# install time - so on any other drive the launcher looked for its files where
+# they were not, and silently did nothing at all.
+$RunDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+# Written next to these scripts by 40-shortcuts.ps1, for the same reason.
+$Distro = if (Test-Path "$RunDir\distro.txt") { (Get-Content -Raw "$RunDir\distro.txt").Trim() } else { 'Ubuntu' }
 
 Write-Host '=== stopping Harness AI ===' -ForegroundColor Cyan
 

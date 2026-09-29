@@ -16,8 +16,13 @@ $ErrorActionPreference = 'Stop'
 chcp 65001 > $null
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 
-$Distro = 'Ubuntu'
-$RunDir = 'F:\Harness_AI\run'
+# These scripts are copied into <windowsRoot>\run, so the script's OWN folder is
+# RunDir. The author's F: used to be baked in here and nothing substituted it at
+# install time - so on any other drive the launcher looked for its files where
+# they were not, and silently did nothing at all.
+$RunDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+# Written next to these scripts by 40-shortcuts.ps1, for the same reason.
+$Distro = if (Test-Path "$RunDir\distro.txt") { (Get-Content -Raw "$RunDir\distro.txt").Trim() } else { 'Ubuntu' }
 
 # Message language: HARNESS_LANG, else run\lang.txt written at install time,
 # else English. Translations are a table of "English string -> translation" in
@@ -94,7 +99,7 @@ function Stop-Everything {
   Restore-IdleSleep
   # Cleanup on shutdown (safe now that the web is stopped): old sessions are
   # archived, unreferenced attachments and stale backups removed. Disable by
-  # creating F:\Harness_AI\run\cleanup-off; rules live in scripts/dsh-cleanup.sh.
+  # creating <run>\cleanup-off; rules live in scripts/dsh-cleanup.sh.
   if (-not (Test-Path "$RunDir\cleanup-off")) {
     Write-Host (T 'cleaning up...')
     Wsl "$Repo/scripts/dsh-cleanup.sh --apply --quiet" 2>&1 | Out-Null
@@ -301,7 +306,7 @@ try {
     Start-Sleep -Seconds 1
   }
   Write-Host ''
-  if (-not $ready) { throw (T 'the model did not come up in 120 s, see F:\Harness_AI\run\server.log') }
+  if (-not $ready) { throw (T 'the model did not come up in 120 s, see {0}\server.log' @($RunDir)) }
   Write-Host (T 'model ready') -ForegroundColor Green
 
   # 2. The web interface. Stop any previous instance so the log and the token

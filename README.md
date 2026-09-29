@@ -236,7 +236,8 @@ The same thing in words — [docs/MODEL.md](docs/MODEL.md).
 
 ## Daily use
 
-- **Harness AI** on the desktop starts the model and the interface.
+- **Harness AI** in the Start menu brings up the model and the interface. It is also how you
+  stop it: a second click shuts the stand down. Nothing is put on the desktop.
 - Interface: <http://127.0.0.1:3080>.
 - From a phone — three ways: the home network via a QR code, a temporary tunnel (an address
   right away, no Cloudflare account) and a permanent domain. Set an access password before

@@ -4,8 +4,8 @@
 # If the status stops changing for 120 s the launcher is dead and the window
 # closes itself rather than hanging forever.
 param(
-  [string]$StatusFile = 'F:\Harness_AI\run\launch.status',
-  [string]$Image      = 'F:\Harness_AI\run\splash-whale.png'
+  [string]$StatusFile = "$PSScriptRoot\launch.status",
+  [string]$Image      = "$PSScriptRoot\splash-whale.png"
 )
 # A short stage log: the only way to tell what the screen showed when the
 # launcher runs without a console.

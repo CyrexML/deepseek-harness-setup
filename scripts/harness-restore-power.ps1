@@ -7,7 +7,7 @@
 # minutes: when power-timeouts.json exists and no launcher is running, the saved
 # values go back and the file is removed. While the launcher lives this touches
 # nothing; it restores them itself on shutdown.
-param([string]$Saved = 'F:\Harness_AI\run\power-timeouts.json')
+param([string]$Saved = "$PSScriptRoot\power-timeouts.json")
 $RunDir = Split-Path -Parent $Saved
 $LauncherLog = "$RunDir\launcher.log"
 function Log([string]$m) { try { Add-Content -Path $LauncherLog -Value ((Get-Date).ToString('yyyy-MM-dd HH:mm:ss') + " [restore-power] " + $m) } catch { } }
