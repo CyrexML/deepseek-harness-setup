@@ -136,12 +136,7 @@ the console opens there. Then, on one line:
 try { Get-Content .\config.example.json -Raw -EA Stop | ConvertFrom-Json -EA Stop | Out-Null; 'OK' } catch { "ERROR: $($_.Exception.Message)" }
 ```
 
-`-EA Stop` is not optional: without it a read error does not stop the line, and `OK`
-is printed even when the file is missing or broken.
-
-Edit the file in **Notepad or VS Code**. Word and phone note apps replace the straight `"`
-with curly quotes, which JSON does not accept. If the file does break, the installer now
-says so plainly and names the cause; you can also just delete `config.json` and run again.
+`OK` means you can start the install. Anything else prints the reason.
 
 Lines starting with `_` are comments — leave them alone. If the drive in `windowsRoot`
 does not exist on this machine, the installer picks the one with the most free space and
