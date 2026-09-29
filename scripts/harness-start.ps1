@@ -413,6 +413,11 @@ try {
     $mode = Wait-StopSignal
     if ($mode -eq 'gone') {
       Write-Host (T 'the system was stopped by another window')
+      # Usually another launcher stopped it and restored the timeouts already, in
+      # which case this is a no-op. But "gone" also covers a model and web that
+      # simply died, and then nobody restored anything: the scheduled task would
+      # get to it within fifteen minutes, and the PC would not sleep until then.
+      Restore-IdleSleep
     } else {
       Stop-Everything
       # wsl: stop Ubuntu only. sleep: suspend the PC and leave WSL alone, so
