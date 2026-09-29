@@ -62,7 +62,7 @@ if (-not $Yes -and -not $flagsGiven -and [Environment]::UserInteractive) {
   Write-Host (T '    1   the stand; the WSL distribution itself stays')
   Write-Host (T '    2   the same, but keep the downloaded models')
   Write-Host (T '    3   the same, but keep chats, agent memory and settings')
-  Write-Host (T '    4   everything, including the whole WSL distribution')
+  Write-Host (T '    4   everything: the stand, the WSL distribution and WSL itself')
   Write-Host (T '        2 and 3 can be combined: type 23')
   Write-Host ''
   $mode = Read-Host (T '  your choice [1]')
@@ -83,6 +83,7 @@ if (-not $KeepData)  { Write-Host (T '    - DSH data inside WSL: ~/.dsh (chats, 
 else { Write-Host (T '    - DSH data: KEPT (-KeepData)') }
 Write-Host (T '    - stand code inside WSL: ~/Harness_AI, ~/tools/deepseek-harness, ~/harness-stand')
 if ($RemoveWsl -and $distroPresent) { Write-Host (T '    - THE ENTIRE WSL DISTRIBUTION "{0}"' @($distro)) -ForegroundColor Red }
+if ($RemoveWsl) { Write-Host (T '    - WSL itself, if no other distribution needs it') -ForegroundColor Red }
 Write-Host ''
 Write-Host (T '  Left alone: Windows itself, WSL as a system component, the GPU driver and your projects outside the stand.')
 Write-Host ''
@@ -164,23 +165,55 @@ Try-Do 'removing the empty stand directory' {
   }
 }
 
-if ($RemoveWsl -and -not $KeepWsl -and -not $distroPresent) {
-  Write-Step 'the WSL distribution'
-  Write-Ok '"{0}" is already gone' $distro
-} elseif ($RemoveWsl -and -not $KeepWsl) {
-  # No third prompt here. Reaching this line already took choosing the mode that
-  # names the distribution in red, then typing the confirmation word - asking
-  # for the distribution's name on top of that only taught people to guess.
-  Write-Warn 'removing the whole WSL distribution "{0}" - this wipes EVERYTHING that was in it' $distro
-  & wsl.exe --unregister $distro
+# Script-scoped: Try-Do runs its block with `&`, which gives it a child scope,
+# so a plain assignment inside would never reach here.
+$script:wslRemoved = $false
+if ($RemoveWsl -and -not $KeepWsl) {
+  if ($distroPresent) {
+    # No third prompt here. Reaching this line already took choosing the mode
+    # that names the distribution in red, then typing the confirmation word -
+    # asking for the distribution's name on top of that only taught people to guess.
+    Write-Warn 'removing the whole WSL distribution "{0}" - this wipes EVERYTHING that was in it' $distro
+    & wsl.exe --unregister $distro
+  } else {
+    Write-Step 'the WSL distribution'
+    Write-Ok '"{0}" is already gone' $distro
+  }
+
+  # The installer put WSL on this machine, so a full removal takes it back off.
+  # But WSL is shared: Docker Desktop and anything else with a distribution of
+  # its own would break. The distribution list, re-read AFTER ours is gone, is
+  # the honest test - never a guess about what else might need it.
+  $others = @()
+  try { $others = @((& wsl.exe --list --quiet) -replace "`0", '' | ForEach-Object { $_.Trim() } | Where-Object { $_ }) } catch {}
+  if ($others.Count -gt 0) {
+    Write-Step 'WSL itself'
+    Write-Warn 'kept: other distributions are still installed ({0})' ($others -join ', ')
+    Write-Info 'removing WSL would break them. To remove it anyway: wsl --uninstall'
+  } else {
+    Try-Do 'removing WSL itself' {
+      & wsl.exe --uninstall
+      if ($LASTEXITCODE -ne 0) { throw (T 'wsl --uninstall returned {0}' @($LASTEXITCODE)) }
+      $script:wslRemoved = $true
+    }
+  }
 }
 
 Write-Host ''
 Write-Done 'the stand is removed'
-Write-Host (T '  Left untouched: Windows, WSL, the NVIDIA driver, Node.js inside the distribution.')
-# The penguin in Explorer's sidebar belongs to WSL itself and stays even with no
-# distributions left, which reads like something did not get removed.
-Write-Host (T '  The "Linux" folder still in Explorer is WSL''s own, not the stand''s; "wsl --uninstall" removes WSL too.')
+if ($script:wslRemoved) {
+  Write-Host (T '  Left untouched: Windows, the NVIDIA driver.')
+  # Removing the app leaves the optional features enabled. They do nothing on
+  # their own, and turning them off can break Hyper-V or Docker, so it stays a
+  # deliberate manual step rather than something an uninstaller does quietly.
+  Write-Host (T '  The Windows features "Virtual Machine Platform" and "Windows Subsystem for Linux" stay enabled;')
+  Write-Host (T '  they are inert on their own. Turn them off by hand if you want, in "Turn Windows features on or off".')
+} else {
+  Write-Host (T '  Left untouched: Windows, WSL, the NVIDIA driver, Node.js inside the distribution.')
+  # The penguin in Explorer's sidebar belongs to WSL itself and stays even with
+  # no distributions left, which reads like something did not get removed.
+  Write-Host (T '  The "Linux" folder still in Explorer is WSL''s own, not the stand''s; "wsl --uninstall" removes WSL too.')
+}
 if ($KeepModel) { Write-Host (T '  The models stayed in {0}\models - a new install will pick them up.' @($root)) }
 if ($KeepData)  { Write-Host (T '  DSH data stayed in ~/.dsh inside WSL.') }
 Write-Host ''

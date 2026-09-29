@@ -286,7 +286,7 @@ Double-click `uninstall.cmd` — no flags to work out, it asks how much to remov
     1   the stand; the WSL distribution itself stays
     2   the same, but keep the downloaded models
     3   the same, but keep chats, agent memory and settings
-    4   everything, including the whole WSL distribution
+    4   everything: the stand, the WSL distribution and WSL itself
         2 and 3 can be combined: type 23
 ```
 
@@ -297,9 +297,17 @@ Option 4 removes the WSL distribution whole, so anything else you kept inside it
 it. Windows itself, WSL as a system component and the GPU driver are never touched, in any
 mode.
 
-**The "Linux" folder stays in Explorer, and that is normal.** It belongs to WSL itself and
-remains with zero distributions installed; it will simply be empty. To confirm none are
-left: `wsl -l -v`. To remove WSL as well, if you no longer need it: `wsl --uninstall`.
+Option 4 takes WSL itself too — our installer put it there, so a full removal takes it
+back off. But only if nothing else needs it: the distribution list is re-read after ours is
+gone, and if anything else is still there (`docker-desktop`, say), WSL stays and the
+removal says why. To keep WSL deliberately: `uninstall.cmd -All -KeepWsl`.
+
+The Windows features "Virtual Machine Platform" and "Windows Subsystem for Linux" stay
+enabled either way. They do nothing on their own, and turning them off can break Hyper-V or
+Docker, so that is left as a manual step.
+
+**If you kept WSL, the "Linux" folder stays in Explorer, and that is normal.** It belongs
+to WSL itself and remains with zero distributions installed; it will simply be empty.
 
 The same choices exist as flags, for scripts with nobody to ask: `-KeepModel`, `-KeepData`,
 `-All`, `-Yes` (ask nothing at all). Passing a flag skips the menu. To remove only the

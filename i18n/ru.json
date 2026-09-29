@@ -11,7 +11,7 @@
   "    1   the stand; the WSL distribution itself stays": "    1   стенд; сам дистрибутив WSL остаётся",
   "    2   the same, but keep the downloaded models": "    2   то же, но скачанные модели остаются",
   "    3   the same, but keep chats, agent memory and settings": "    3   то же, но остаются переписки, память агента и настройки",
-  "    4   everything, including the whole WSL distribution": "    4   всё под ноль, вместе с дистрибутивом WSL",
+  "    4   everything: the stand, the WSL distribution and WSL itself": "    4   всё под ноль: стенд, дистрибутив WSL и сам WSL",
   "        2 and 3 can be combined: type 23": "        2 и 3 можно совместить: наберите 23",
   "  your choice [1]": "  ваш выбор [1]",
   "  The same choices exist as flags, for scripts: -KeepModel, -KeepData, -All, -Yes.": "  Те же варианты есть флагами, для скриптов: -KeepModel, -KeepData, -All, -Yes.",
@@ -338,5 +338,14 @@
   "{0}, driver {1}, supports CUDA up to {2}": "{0}, драйвер {1}, поддерживает CUDA до {2}",
   "{0}, variant {1}": "{0}, вариант {1}",
   "{0}, {1} GB of VRAM": "{0}, {1} ГБ видеопамяти",
-  "  The \"Linux\" folder still in Explorer is WSL's own, not the stand's; \"wsl --uninstall\" removes WSL too.": "  Папка «Linux» в проводнике — это сам WSL, а не стенд; убрать и его: «wsl --uninstall»."
+  "  The \"Linux\" folder still in Explorer is WSL's own, not the stand's; \"wsl --uninstall\" removes WSL too.": "  Папка «Linux» в проводнике — это сам WSL, а не стенд; убрать и его: «wsl --uninstall».",
+  "    - WSL itself, if no other distribution needs it": "    - сам WSL, если он больше никому не нужен",
+  "WSL itself": "сам WSL",
+  "kept: other distributions are still installed ({0})": "оставлен: есть другие дистрибутивы ({0})",
+  "removing WSL would break them. To remove it anyway: wsl --uninstall": "удаление WSL их сломает. Убрать всё равно: wsl --uninstall",
+  "removing WSL itself": "удаляю сам WSL",
+  "wsl --uninstall returned {0}": "wsl --uninstall вернул {0}",
+  "  Left untouched: Windows, the NVIDIA driver.": "  Не тронуты: Windows и драйвер видеокарты.",
+  "  The Windows features \"Virtual Machine Platform\" and \"Windows Subsystem for Linux\" stay enabled;": "  Компоненты Windows «Платформа виртуальной машины» и «Подсистема Windows для Linux» остаются включёнными;",
+  "  they are inert on their own. Turn them off by hand if you want, in \"Turn Windows features on or off\".": "  сами по себе они ничего не делают. Выключить вручную: «Включение или отключение компонентов Windows»."
 }
