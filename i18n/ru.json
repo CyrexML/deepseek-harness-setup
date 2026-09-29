@@ -370,5 +370,8 @@
   "the stand works without it; it only restores the sleep timeouts after a hard stop.": "стенд работает и без неё: она лишь возвращает таймауты сна после жёсткой остановки.",
   "to try again:  install.cmd -Step shortcuts   (as administrator)": "повторить:  install.cmd -Step shortcuts   (от администратора)",
   "handing over": "передача управления",
-  "the model server was stopped - the shortcut starts its own": "сервер модели остановлен — ярлык поднимет свой"
+  "the model server was stopped - the shortcut starts its own": "сервер модели остановлен — ярлык поднимет свой",
+  "Ubuntu will now ask for the password you chose when the distribution was created": "сейчас Ubuntu спросит пароль, который вы придумали при создании дистрибутива",
+  "type it and press Enter - the characters do not appear as you type": "введите его и нажмите Enter — символы при вводе не отображаются",
+  "profile settings (pnpm-workspace.yaml)": "настройки профиля (pnpm-workspace.yaml)"
 }

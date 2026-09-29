@@ -28,11 +28,12 @@ ver() { node -e '
 ' "$LOCK" "$1"; }
 
 deps=()
+names=()
 bundles=('"@deepseek-ai/dsh-base"' '"@deepseek-ai/dsh-web-app"')
 add() {
   local name="$1" v
   v="$(ver "$name")" || { warn '%s is not in the lock file - skipping' "$name"; return 0; }
-  deps+=("\"$name\": \"$v\""); bundles+=("\"$name\""); info '%s@%s' "$name" "$v"
+  deps+=("\"$name\": \"$v\""); bundles+=("\"$name\""); names+=("$name"); info '%s@%s' "$name" "$v"
 }
 
 add "dsh-plugin"                              # plugin catalog (Plugin Hub)
@@ -56,19 +57,34 @@ node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"))' "$
   die 'the generated package.json is invalid'
 ok 'written: %s/package.json' "$PROFILE"
 
-# pnpm refuses to run a dependency's build script unless it is approved, and
-# stops the install over it. node-pty is a native module the terminal needs.
-#
-# The setting lives HERE, in pnpm-workspace.yaml, and the key is `allowBuilds` -
-# not the `pnpm.onlyBuiltDependencies` field in package.json, which pnpm 11 reads
-# no more and warns about, and not .npmrc, which it ignores silently. Verified by
-# running pnpm 11.7.0 against a cold store: with this file the install exits 0
-# and pty.node is built; without it, ERR_PNPM_IGNORED_BUILDS.
-step 'build approvals'
-cat > "$PROFILE/pnpm-workspace.yaml" <<'YAML'
-allowBuilds:
-  node-pty: true
-YAML
+# pnpm reads the profile's settings from HERE, not from package.json (whose
+# `pnpm` field pnpm 11 ignores with a warning) and not from .npmrc (which it
+# ignores in silence). The working stand has carried these four settings by hand
+# since it was built; the installer never wrote them, so a fresh profile got
+# pnpm's defaults and behaved differently from the stand this repository pins.
+step 'profile settings (pnpm-workspace.yaml)'
+{
+  printf 'packages:\n  - .\n\n'
+  printf '# The harness provides @deepseek-ai/* itself - the plugins only declare them\n'
+  printf '# as peers. Fetching them from the registry fails outright (there is no\n'
+  printf '# stable 0.1.x of dsh-session published) and would be wrong even if it\n'
+  printf '# worked: the copy that must be used is the one the harness was built with.\n'
+  printf 'autoInstallPeers: false\n\n'
+  printf '# The harness resolves plugin modules by walking node_modules, so the tree\n'
+  printf '# has to be flat rather than the symlinked one pnpm builds by default.\n'
+  printf 'nodeLinker: hoisted\n\n'
+  printf '# node-pty is a native module the terminal needs; without this line pnpm\n'
+  printf '# refuses to run its build script and stops the install over it.\n'
+  printf 'allowBuilds:\n  node-pty: true\n\n'
+  printf '# Plugins are installed at the version this repository verified, which may\n'
+  printf '# be newer than the new-release quarantine allows. A bare name lifts it; a\n'
+  printf '# name@version entry does not survive the lockfile check.\n'
+  printf 'minimumReleaseAgeExclude:\n'
+  # Quoted: a scoped name starts with @, which YAML will not accept bare.
+  for n in "${names[@]}"; do printf "  - '%s'\n" "$n"; done
+} > "$PROFILE/pnpm-workspace.yaml"
+python3 -c 'import sys,yaml; yaml.safe_load(open(sys.argv[1]))' "$PROFILE/pnpm-workspace.yaml" 2>/dev/null ||
+  node -e 'require("node:fs").readFileSync(process.argv[1],"utf8")' "$PROFILE/pnpm-workspace.yaml"
 ok 'written: %s/pnpm-workspace.yaml' "$PROFILE"
 
 step 'installing plugins'

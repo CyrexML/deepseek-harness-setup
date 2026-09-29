@@ -25,6 +25,12 @@ NODE_DIR="$HOME/.local/node"
 
 step 'system packages'
 if need_sudo_apt; then
+  # sudo asks for the Ubuntu password here, in a console that until now has only
+  # printed progress. Unannounced, the prompt looks like part of the log and gets
+  # ignored until sudo gives up with "timed out" - which is what happened on the
+  # first run of a brand-new distribution.
+  warn 'Ubuntu will now ask for the password you chose when the distribution was created'
+  warn 'type it and press Enter - the characters do not appear as you type'
   sudo apt-get update -qq
   sudo apt-get install -y -qq git curl ca-certificates build-essential python3 python3-pip \
       unzip zstd jq libatk1.0-0 libnss3 libxss1 libasound2t64 2>/dev/null ||
