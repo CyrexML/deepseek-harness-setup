@@ -12,6 +12,15 @@ $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 . "$here\lib.ps1"
 
+# Registering the scheduled task needs elevation, and run as an ordinary user
+# this step died on a raw CIM "access denied" in the system language. Said here,
+# before anything is written, it costs one line instead of a puzzle.
+if (-not (Test-Admin)) {
+  Write-Warn 'this step needs administrator rights (it registers a scheduled task)'
+  Write-Info 'right-click install.cmd -> Run as administrator, or open PowerShell as administrator first'
+  exit 2
+}
+
 $cfg = Read-StandConfig
 $root = $cfg.windowsRoot
 $runDir = Join-Path $root 'run'
@@ -92,9 +101,18 @@ if (Test-Path $restore) {
   $repeat = New-ScheduledTaskTrigger -Once -At (Get-Date).Date.AddMinutes(1) `
     -RepetitionInterval (New-TimeSpan -Minutes 15) -RepetitionDuration (New-TimeSpan -Days 3650)
   $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-  Register-ScheduledTask -TaskName 'Harness AI power restore' -Action $action `
-    -Trigger @($logon, $repeat) -Settings $settings -Force | Out-Null
-  Write-Ok 'registered (at logon and every 15 minutes)'
+  try {
+    Register-ScheduledTask -TaskName 'Harness AI power restore' -Action $action `
+      -Trigger @($logon, $repeat) -Settings $settings -Force | Out-Null
+    Write-Ok 'registered (at logon and every 15 minutes)'
+  } catch {
+    # Everything above is already in place; the stand runs without this task,
+    # it only puts the sleep timeouts back if the stand was killed rather than
+    # stopped. Not worth failing a finished install over.
+    Write-Warn 'could not register the task: {0}' $_.Exception.Message
+    Write-Info 'the stand works without it; it only restores the sleep timeouts after a hard stop.'
+    Write-Info 'to try again:  install.cmd -Step shortcuts   (as administrator)'
+  }
 } else {
   Write-Warn 'no {0} - task skipped' $restore
 }

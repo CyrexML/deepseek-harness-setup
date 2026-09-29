@@ -363,5 +363,10 @@
   "agent config: window {0} -> {1}": "конфиг агента: окно {0} -> {1}",
   "rewritten": "перезаписан",
   "could not rewrite it: {0}": "перезаписать не удалось: {0}",
-  "do it by hand, or the agent and the server disagree:  install.cmd -Step wsl": "сделайте вручную, иначе агент и сервер разойдутся:  install.cmd -Step wsl"
+  "do it by hand, or the agent and the server disagree:  install.cmd -Step wsl": "сделайте вручную, иначе агент и сервер разойдутся:  install.cmd -Step wsl",
+  "this step needs administrator rights (it registers a scheduled task)": "этому шагу нужны права администратора (он регистрирует задачу планировщика)",
+  "right-click install.cmd -> Run as administrator, or open PowerShell as administrator first": "правый клик по install.cmd → «Запуск от имени администратора», либо сначала откройте PowerShell от администратора",
+  "could not register the task: {0}": "не удалось зарегистрировать задачу: {0}",
+  "the stand works without it; it only restores the sleep timeouts after a hard stop.": "стенд работает и без неё: она лишь возвращает таймауты сна после жёсткой остановки.",
+  "to try again:  install.cmd -Step shortcuts   (as administrator)": "повторить:  install.cmd -Step shortcuts   (от администратора)"
 }

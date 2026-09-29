@@ -14,9 +14,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $cfg = Read-StandConfig
 
 Write-Step 'administrator rights'
-$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-         ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if (-not $admin) { throw (T 'run PowerShell as administrator: installing WSL needs it') }
+if (-not (Test-Admin)) { throw (T 'run PowerShell as administrator: installing WSL needs it') }
 Write-Ok 'present'
 
 Write-Step 'free disk space'

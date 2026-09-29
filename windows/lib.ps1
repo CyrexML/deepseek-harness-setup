@@ -54,6 +54,14 @@ function Get-StandConfigPath {
 # read then fell back to its default in silence: the window came out 65536
 # instead of the computed one, and windowsRoot reverted to the example's F:,
 # so the install tried to mkdir under /mnt/f and got "Permission denied".
+# Is this process elevated? Several steps need it, and the failures without it
+# are unreadable: registering a scheduled task answers with a raw CIM error in
+# the system language, which says nothing about administrator rights.
+function Test-Admin {
+  ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+  ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
 function Write-ConfigJson {
   param([string]$Path, $Config)
   $json = ($Config | ConvertTo-Json -Depth 12)
