@@ -40,7 +40,24 @@ try { & wsl.exe --status *>$null; $wslOk = ($LASTEXITCODE -eq 0) } catch { $wslO
 if (-not $wslOk) {
   Write-Info 'installing WSL2 (a reboot will be needed)'
   & wsl.exe --install --no-distribution
-  Write-Warn 'reboot the computer and run this script again'
+  Write-Warn 'reboot the computer and run install.cmd again'
+  # Offering the reboot here saves the one step people get wrong: leaving the
+  # console, finding the Start menu and hoping they remember to come back.
+  # Never automatic - a reboot closes whatever else is open, so it takes a
+  # deliberate keypress, and the countdown leaves room to change your mind.
+  if ([Environment]::UserInteractive) {
+    Write-Host ''
+    $answer = Read-Host (T 'reboot now? type R and press Enter (anything else: later)')
+    if ($answer -match '^\s*[RrКк]\s*$') {
+      Write-Warn 'rebooting in 10 seconds - save your work now, Ctrl+C cancels'
+      Start-Sleep -Seconds 10
+      Write-Info 'after the reboot run install.cmd again - it continues from here'
+      Restart-Computer -Force
+      # Restart-Computer returns immediately; without this the script would fall
+      # through to the exit while Windows is still closing sessions.
+      Start-Sleep -Seconds 60
+    }
+  }
   # Exit code 2 = "not an error, but the install cannot go on in this boot".
   # install.cmd stops on it instead of running the remaining steps against a
   # machine that has no WSL yet.
