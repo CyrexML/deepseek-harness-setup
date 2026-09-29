@@ -33,7 +33,7 @@
   "  The models stayed in {0}\\models - a new install will pick them up.": "  Модели остались в {0}\\models — при новой установке мастер их подхватит.",
   "  To remove: run uninstall.cmd": "  Удаление: запустите uninstall.cmd",
   "  To restore the previous versions: bash ~/Harness_AI/scripts/update-plugin.sh --rollback <backup folder>": "  Вернуть прежние версии: bash ~/Harness_AI/scripts/update-plugin.sh --rollback <папка бэкапа>",
-  "  To start: the Harness AI shortcut on the desktop.": "  Запуск: ярлык «Harness AI» на рабочем столе.",
+  "  To start: the Harness AI shortcut in the Start menu (search for \"Harness\").": "  Запуск: ярлык Harness AI в меню «Пуск» (ищите «Harness»).",
   "  Updating the Harness AI stand": "  Обновление стенда Harness AI",
   "  VRAM free:     {0} MiB": "  свободно VRAM: {0} МиБ",
   "  a local model plus an agent interface you can reach from a phone": "  локальная модель + агентский интерфейс с доступом с телефона",
@@ -368,5 +368,7 @@
   "right-click install.cmd -> Run as administrator, or open PowerShell as administrator first": "правый клик по install.cmd → «Запуск от имени администратора», либо сначала откройте PowerShell от администратора",
   "could not register the task: {0}": "не удалось зарегистрировать задачу: {0}",
   "the stand works without it; it only restores the sleep timeouts after a hard stop.": "стенд работает и без неё: она лишь возвращает таймауты сна после жёсткой остановки.",
-  "to try again:  install.cmd -Step shortcuts   (as administrator)": "повторить:  install.cmd -Step shortcuts   (от администратора)"
+  "to try again:  install.cmd -Step shortcuts   (as administrator)": "повторить:  install.cmd -Step shortcuts   (от администратора)",
+  "handing over": "передача управления",
+  "the model server was stopped - the shortcut starts its own": "сервер модели остановлен — ярлык поднимет свой"
 }

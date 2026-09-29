@@ -105,6 +105,17 @@ Step-Tune
 Step-Shortcuts
 Step-Verify
 
+# The tuning step leaves llama-server running so the verify above has something
+# to talk to - but this whole install is elevated, and the Start-menu shortcut is
+# not. An elevated server the shortcut cannot stop is exactly what greeted the
+# first person who clicked it. So the install hands the machine over clean.
+Write-Step 'handing over'
+$stopServer = Join-Path $cfg.windowsRoot 'run\stop-server.ps1'
+if (Test-Path $stopServer) {
+  & powershell -NoProfile -ExecutionPolicy Bypass -File $stopServer | Out-Null
+  Write-Ok 'the model server was stopped - the shortcut starts its own'
+}
+
 # The install finished, so a pending "continue at next logon" entry has nothing
 # left to do. RunOnce would have dropped it on firing anyway; this covers the
 # run that reached the end without a reboot in between.
@@ -112,7 +123,7 @@ Clear-ResumeAfterReboot
 
 Write-Host ''
 Write-Done 'done'
-Write-Host (T '  To start: the Harness AI shortcut on the desktop.')
+Write-Host (T '  To start: the Harness AI shortcut in the Start menu (search for "Harness").')
 Write-Host (T '  Interface: http://127.0.0.1:{0}' @($cfg.webPort))
 Write-Host (T '  To remove: run uninstall.cmd')
 Write-Host ''

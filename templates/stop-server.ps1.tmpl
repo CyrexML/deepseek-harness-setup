@@ -7,4 +7,13 @@ if (Test-Path $pidfile) {
     }
     Remove-Item -Force $pidfile
 } else { Write-Host "no pid file" }
-Get-Process llama-server -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-Process llama-server -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+# A llama-server started from an ELEVATED console cannot be stopped by an
+# ordinary one, and the launcher runs unelevated. Without -ErrorAction the throw
+# travelled all the way up and killed the start with "access denied", naming no
+# cause and no cure.
+$left = @(Get-Process llama-server -ErrorAction SilentlyContinue)
+if ($left.Count -gt 0) {
+    Write-Host ("llama-server (PID " + ($left.Id -join ', ') + ") did not stop - it was started with administrator rights.") -ForegroundColor Yellow
+    Write-Host "Stop it from a PowerShell opened as administrator:  Stop-Process -Name llama-server -Force" -ForegroundColor Yellow
+}
