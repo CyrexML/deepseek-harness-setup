@@ -31,6 +31,13 @@ function Test-Engine {
     $script:EngineSays = ''
     $script:EngineCode = $null
     if (-not (Test-Path $exe)) { $script:EngineSays = (T 'the file is not there: {0}' @($exe)); return $false }
+    # llama-server prints its version banner to STDERR. Under the script-wide
+    # $ErrorActionPreference = 'Stop', merging that with 2>&1 makes PowerShell
+    # raise NativeCommandError on the first stderr line - so a perfectly healthy
+    # binary landed in the catch below and was reported as "does not start".
+    # Restoring the preference for the duration of the call is the whole fix.
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     try {
         $out = & $exe --version 2>&1 | Out-String
         # Out-String gives $null when the process printed nothing, which is
@@ -38,10 +45,14 @@ function Test-Engine {
         # below would replace the useful exit code with a null-reference message.
         $script:EngineCode = $LASTEXITCODE
         $script:EngineSays = if ($null -eq $out) { '' } else { $out.Trim() }
-        return ($LASTEXITCODE -eq 0) -or ($out -match 'version|llama')
+        # --version exits non-zero in some builds, so the printed banner is the
+        # signal that matters; the exit code alone would fail a working engine.
+        return ($script:EngineCode -eq 0) -or ($script:EngineSays -match 'version|llama|build')
     } catch {
         $script:EngineSays = $_.Exception.Message
         return $false
+    } finally {
+        $ErrorActionPreference = $prevEap
     }
 }
 
@@ -84,7 +95,9 @@ if (Test-Engine) {
 # requirement to install the Toolkit.
 function Get-GpuInfo {
     try {
-        $header = (& nvidia-smi 2>$null | Out-String)
+        # Out-String wraps at the console width by default, which can split the
+        # header line the CUDA version lives on.
+        $header = (& nvidia-smi 2>$null | Out-String -Width 500)
         if (-not $header) { return $null }
         # $null means "nvidia-smi did not say" - a very different thing from
         # "the driver supports nothing". Reported as 0, it silently pushed every
