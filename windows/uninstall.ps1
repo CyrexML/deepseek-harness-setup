@@ -1,6 +1,6 @@
 ﻿# Complete removal of the Harness AI stand.
 #
-#   powershell -ExecutionPolicy Bypass -File uninstall.ps1
+#   right-click uninstall.cmd -> Run as administrator
 #
 # Flags:
 #   -KeepModel     keep the downloaded models (13+ GB, slow to fetch again)
@@ -27,7 +27,9 @@ param(
 )
 if ($All) { $RemoveWsl = $true; $KeepModel = $false; $KeepData = $false }
 $ErrorActionPreference = 'Continue'
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+# This script lives in windows\, so the repository root - which is what every
+# path below is relative to, including the tree copied into WSL - is one up.
+$here = Split-Path -Parent $PSScriptRoot
 . "$here\windows\lib.ps1"
 
 $cfg = Read-StandConfig

@@ -91,6 +91,10 @@ engine — but the model then runs tens of times slower.
 **Code → Download ZIP**, unpack into an ordinary folder such as `C:\harness-setup`.
 Do not run it from inside the archive: the scripts look for files next to themselves.
 
+The only things you ever run are in the root of the unpacked folder, and there are
+exactly three: `install.cmd`, `update.cmd` and `uninstall.cmd`. Everything else lives in
+subfolders and needs no attention.
+
 > **Windows will complain, and that is expected.** SmartScreen shows "Windows protected
 > your PC", and an antivirus may flag the installer. The reason is plain: these are
 > unsigned PowerShell scripts that download executables from the internet — exactly the

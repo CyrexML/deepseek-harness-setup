@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Remove the stand from inside WSL (what uninstall.ps1 does, minus the Windows side).
+# Remove the stand from inside WSL (what uninstall.cmd does, minus the Windows side).
 #
 #   bash wsl/uninstall.sh [--keep-data] [--yes]
 #
@@ -58,4 +58,4 @@ else
 fi
 
 done_step 'stand removed from WSL'
-t 'The Windows side (models, engine, shortcuts) is removed separately: uninstall.ps1\n'
+t 'The Windows side (models, engine, shortcuts) is removed separately: uninstall.cmd\n'

@@ -2,7 +2,7 @@
 #
 #   right-click install.cmd -> Run as administrator
 # or
-#   powershell -ExecutionPolicy Bypass -File install.ps1
+#   powershell -ExecutionPolicy Bypass -File windows\install.ps1
 #
 # Flags:
 #   -SkipModel     leave the model alone (already downloaded and tuned)
@@ -17,7 +17,9 @@ param(
   [string]$Step = ''
 )
 $ErrorActionPreference = 'Stop'
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+# This script lives in windows\, so the repository root - which is what every
+# path below is relative to, including the tree copied into WSL - is one up.
+$here = Split-Path -Parent $PSScriptRoot
 . "$here\windows\lib.ps1"
 
 $cfg = Read-StandConfig
@@ -107,5 +109,5 @@ Write-Host ''
 Write-Done 'done'
 Write-Host (T '  To start: the Harness AI shortcut on the desktop.')
 Write-Host (T '  Interface: http://127.0.0.1:{0}' @($cfg.webPort))
-Write-Host (T '  To remove: powershell -ExecutionPolicy Bypass -File uninstall.ps1')
+Write-Host (T '  To remove: run uninstall.cmd')
 Write-Host ''

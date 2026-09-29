@@ -42,7 +42,7 @@ if (-not $wslOk) {
   & wsl.exe --install --no-distribution
   Write-Warn 'reboot the computer and run this script again'
   # Exit code 2 = "not an error, but the install cannot go on in this boot".
-  # install.ps1 stops on it instead of running the remaining steps against a
+  # install.cmd stops on it instead of running the remaining steps against a
   # machine that has no WSL yet.
   exit 2
 }
@@ -55,7 +55,7 @@ if ($installed -contains $cfg.wslDistro) {
 } else {
   Write-Info 'installing {0} - a window will open to create the user' $cfg.wslDistro
   & wsl.exe --install -d $cfg.wslDistro
-  Write-Info 'after creating the user close the distribution window and run install.ps1 again'
+  Write-Info 'after creating the user close the distribution window and run install.cmd again'
   exit 2
 }
 
