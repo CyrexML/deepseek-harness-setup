@@ -159,7 +159,7 @@ Right-click **install.cmd** → **Run as administrator**.
 
 That password belongs to the user inside Ubuntu and is rarely needed — write it down.
 
-A prompt like `you@PC:/mnt/c/...$` is not an error and not a question: the installer is
+A prompt like `user@PC:/mnt/c/...$` is not an error and not a question: the installer is
 waiting for that shell to exit. **Do not close the window** — that would take the
 installer with it. Type `exit`.
 
