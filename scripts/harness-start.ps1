@@ -23,6 +23,10 @@ chcp 65001 > $null
 $RunDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 # Written next to these scripts by 40-shortcuts.ps1, for the same reason.
 $Distro = if (Test-Path "$RunDir\distro.txt") { (Get-Content -Raw "$RunDir\distro.txt").Trim() } else { 'Ubuntu' }
+# The same folder as WSL sees it: D:\Harness_AI\run -> /mnt/d/Harness_AI/run.
+# The copy step below used to name /mnt/f outright, so on any other drive the
+# launcher refreshed its own files into a folder that was not there.
+$RunWsl = '/mnt/' + $RunDir.Substring(0, 1).ToLower() + ($RunDir.Substring(2) -replace '\\', '/')
 
 # Message language: HARNESS_LANG, else run\lang.txt written at install time,
 # else English. Translations are a table of "English string -> translation" in
@@ -239,8 +243,39 @@ function Wait-StopSignal {
   }
 }
 
+# One click, one launcher.
+#
+# A DOUBLE click - which is what most people give a shortcut - started two copies
+# in the same second. Both looked at Test-SystemRunning before either had started
+# anything, both saw nothing, both went on to start, and they collided on
+# server.pid and server.log. What the person saw was "could not start", naming a
+# file rather than the second copy of itself.
+#
+# The lock is held for the START PHASE ONLY and released once the system is up,
+# so a LATER click still stops everything - the toggle is the whole point of this
+# shortcut.
+$script:StartLock = $null
+$script:HaveStartLock = $true
+try {
+  $script:StartLock = New-Object System.Threading.Mutex($false, 'Global\HarnessAiLauncherStart')
+  $script:HaveStartLock = $script:StartLock.WaitOne(0)
+} catch {
+  # A mutex we cannot create must never be a reason not to start.
+  $script:HaveStartLock = $true
+}
+function Release-StartLock {
+  if ($script:StartLock -and $script:HaveStartLock) {
+    try { $script:StartLock.ReleaseMutex() } catch { }
+    $script:HaveStartLock = $false
+  }
+}
+
 try {
   Log ('start hidden=' + $Hidden)
+  if (-not $script:HaveStartLock) {
+    Log 'another launcher is still starting - this click is ignored (double click?)'
+    exit 0
+  }
   Write-Host '=== Harness AI ===' -ForegroundColor Cyan
 
   # Toggle branch, before deploying the .ps1 files: a shutdown has nothing to
@@ -271,10 +306,10 @@ try {
   # nine days old because it was the one file that copied itself nowhere).
   # harness-start.ps1 is included: PowerShell has already read it into memory, so
   # replacing the file mid-run is safe and the NEXT click gets the fresh code.
-  Wsl "cp $Repo/scripts/start-server.ps1 $Repo/scripts/stop-server.ps1 $Repo/scripts/harness-splash.ps1 $Repo/scripts/splash-whale.png $Repo/scripts/harness-start.ps1 $Repo/scripts/harness-stop.ps1 /mnt/f/Harness_AI/run/"
+  Wsl "cp $Repo/scripts/start-server.ps1 $Repo/scripts/stop-server.ps1 $Repo/scripts/harness-splash.ps1 $Repo/scripts/splash-whale.png $Repo/scripts/harness-start.ps1 $Repo/scripts/harness-stop.ps1 $RunWsl/"
   # Message catalogs travel with the scripts, otherwise a Russian launcher would
   # fall back to English after every update.
-  Wsl "mkdir -p /mnt/f/Harness_AI/run/i18n && cp $Repo/i18n/*.json /mnt/f/Harness_AI/run/i18n/ 2>/dev/null || true"
+  Wsl "mkdir -p $RunWsl/i18n && cp $Repo/i18n/*.json $RunWsl/i18n/ 2>/dev/null || true"
   Remove-Item -Force $PowerRequest -ErrorAction SilentlyContinue
   Remove-Item -Force $LaunchStatus -ErrorAction SilentlyContinue
   Set-Stage 'model'
@@ -355,6 +390,9 @@ try {
     Set-Stage 'done'
   }
   Log 'ready'
+  # The start phase is over: from here a click is a deliberate second one and
+  # must be allowed through to stop the system.
+  Release-StartLock
   if (-not $NoBrowser) { Start-Process $url }
 
   # While this window lives the PC does not sleep: ES_CONTINUOUS|ES_SYSTEM_REQUIRED
