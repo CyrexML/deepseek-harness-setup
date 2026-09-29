@@ -69,11 +69,22 @@ winpath() {
   printf '/mnt/%s%s' "$(printf '%s' "$drive" | tr 'A-Z' 'a-z')" "${p#*:}"
 }
 
-# Whether passwordless sudo exists and whether apt is needed at all.
+# Whether apt is needed at all.
+#
+# The probe has to cover what the BUILD uses, not what is convenient to check.
+# A stock Ubuntu image already ships git, curl and python3, so probing only
+# those reported "packages already present" on a brand-new distribution and left
+# it without a C compiler - and the harness has a native module, whose build
+# then died compiling flock.c with a stack trace that named no missing package.
 need_sudo_apt() {
-  command -v git >/dev/null 2>&1 && command -v curl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1 && return 1
-  command -v sudo >/dev/null 2>&1 || die 'no sudo and the packages are missing - install git curl python3 by hand'
-  return 0
+  local c
+  for c in git curl python3 cc make unzip zstd jq; do
+    if ! command -v "$c" >/dev/null 2>&1; then
+      command -v sudo >/dev/null 2>&1 || die 'no sudo and %s is missing - install git curl python3 build-essential unzip zstd jq by hand' "$c"
+      return 0
+    fi
+  done
+  return 1
 }
 
 # Run a long step with its output in a file, and a heartbeat on screen.

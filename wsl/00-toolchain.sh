@@ -22,6 +22,12 @@ else
   ok 'packages already present'
 fi
 
+# Checked here, not at build time: the harness compiles a native module, and
+# without a compiler the failure surfaces twenty minutes later as a C toolchain
+# stack trace that never says which package is missing.
+command -v cc >/dev/null 2>&1 ||
+  die 'no C compiler (cc) - the harness has a native module that needs one. Install it: sudo apt-get install -y build-essential'
+
 step 'Node.js %s' "$NODE_VERSION"
 if [ -x "$NODE_DIR/bin/node" ] && [ "v$NODE_VERSION" = "$("$NODE_DIR/bin/node" --version 2>/dev/null)" ]; then
   ok 'already installed'
