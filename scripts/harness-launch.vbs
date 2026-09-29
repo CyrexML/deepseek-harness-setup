@@ -1,4 +1,4 @@
-﻿' Start the launcher without a console window. The Harness AI shortcut points
+' Start the launcher without a console window. The Harness AI shortcut points
 ' here (wscript //B) rather than at powershell.exe: powershell -WindowStyle Hidden
 ' still flashes a window, while WScript.Shell.Run with mode 0 shows none.
 ' All the logic lives in harness-start.ps1 (-Hidden: it waits for the

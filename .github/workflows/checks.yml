@@ -61,6 +61,19 @@ jobs:
           sys.exit(1 if bad else 0)
           PY
 
+      - name: .vbs files carry NO BOM
+        run: |
+          # The mirror image of the .ps1 rule. wscript reads a .vbs as ANSI and
+          # dies on the BOM bytes with "Invalid character" (800A0408) - and the
+          # shortcut that runs it then does nothing but show that dialog.
+          fail=0
+          while IFS= read -r f; do
+            if [ "$(head -c 3 "$f" | od -An -tx1 | tr -d ' \n')" = "efbbbf" ]; then
+              echo "BOM in $f - wscript will refuse to run it"; fail=1
+            fi
+          done < <(find . -name '*.vbs' -not -path './.git/*')
+          exit $fail
+
       - name: no traces of personal data
         run: |
           # A home path is caught by the user name, but generic examples
