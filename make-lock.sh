@@ -22,6 +22,7 @@ commit="$(git -C "$DSH_ROOT" rev-parse HEAD)"
 
 node - "$PROFILE" "$HERE" "$tag" "$commit" "$OUT" <<'NODE'
 const fs = require('node:fs');
+const { execSync } = require('node:child_process');
 const [profile, here, tag, commit, out] = process.argv.slice(2);
 
 const pkg = JSON.parse(fs.readFileSync(`${profile}/package.json`, 'utf8'));
@@ -41,9 +42,19 @@ for (const name of Object.keys(pkg.dependencies ?? {})) {
 const ensure = fs.readFileSync(`${here}/scripts/ensure-patches.sh`, 'utf8');
 const layers = [...ensure.matchAll(/^layer\s+(\S+)\s+"[^"]+"\s+"([^"]+)"/gm)].map(m => ({ name: m[1], marker: m[2] }));
 
+// The toolchain belongs in the lock as much as the plugins do. pnpm was taken
+// as @latest, so a fresh machine got a newer major than the one this stand was
+// verified with - and that major turns "ignored build scripts" from a warning
+// into a failure, which stopped the install at the plugin step.
+const tools = {
+  node: process.version.replace(/^v/, ''),
+  pnpm: (() => { try { return execSync('pnpm --version', { encoding: 'utf8' }).trim(); } catch { return ''; } })(),
+};
+
 const lock = {
   _: 'Snapshot of the verified combination. Changed deliberately: edit the numbers and publish a new lock.',
   createdAt: new Date().toISOString().slice(0, 10),
+  tools,
   harness: { tag, commit },
   plugins,
   patchLayers: layers,

@@ -47,7 +47,13 @@ step 'profile package.json'
 {
   printf '{\n  "name": "dsh-profile-web",\n  "private": true,\n  "dependencies": {\n    '
   (IFS=$',\n    '; printf '%s' "${deps[*]}")
-  printf '\n  },\n  "dsh": {\n    "profile": {\n      "bundles": [\n        '
+  printf '\n  },\n'
+  # pnpm 10+ refuses to run a dependency's build script unless it is named here.
+  # node-pty is a native module the terminal needs, and leaving it unapproved is
+  # a warning on pnpm 11 but a failed install on 12 - so say it explicitly
+  # instead of depending on which pnpm happens to be present.
+  printf '  "pnpm": {\n    "onlyBuiltDependencies": ["node-pty"]\n  },\n'
+  printf '  "dsh": {\n    "profile": {\n      "bundles": [\n        '
   (IFS=$',\n        '; printf '%s' "${bundles[*]}")
   printf '\n      ],\n      "patchReload": "live"\n    }\n  }\n}\n'
 } > "$PROFILE/package.json"
