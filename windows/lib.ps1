@@ -152,6 +152,21 @@ function Clear-ResumeAfterReboot {
   try { Remove-ItemProperty -Path $script:ResumeKey -Name $script:ResumeName -ErrorAction SilentlyContinue } catch {}
 }
 
+# Run a native command whose stderr is redirected, without PowerShell turning
+# that stderr into a terminating error.
+#
+# Under $ErrorActionPreference = 'Stop' - which every step sets, to fail fast -
+# ANY redirection of a native command's error stream (2>$null as much as 2>&1)
+# makes PowerShell wrap the first stderr line in a NativeCommandError and throw.
+# curl draws its progress meter there; llama-server prints its version banner
+# there; nvidia-smi warns there. Each of those was reported as a broken tool.
+function Invoke-Native {
+  param([scriptblock]$Command)
+  $prev = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try { & $Command } finally { $ErrorActionPreference = $prev }
+}
+
 # Run a bash command inside WSL, passing its output through unchanged.
 function Invoke-Wsl {
   param([string]$Distro, [string]$Command)

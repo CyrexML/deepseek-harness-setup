@@ -21,7 +21,7 @@ $modelPath = if ($cfg.model.PSObject.Properties['path']) { $cfg.model.path } els
 if (-not (Test-Path $modelPath)) { throw (T 'no model file: {0} (run windows\20-model.ps1 first)' @($modelPath)) }
 
 function Get-FreeVramMb {
-  try { [int]((& nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>$null | Select-Object -First 1)) }
+  try { [int]((Invoke-Native { & nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>$null } | Select-Object -First 1)) }
   catch { 0 }
 }
 
@@ -102,7 +102,7 @@ $r2 = Invoke-RestMethod -Uri "$url/completion" -Method Post -Body $body2 -Conten
 
 $prefill = [math]::Round($r1.timings.prompt_per_second)
 $decode  = [math]::Round($r2.timings.predicted_per_second)
-$freeMb  = try { [int]((& nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits 2>$null | Select-Object -First 1)) } catch { 0 }
+$freeMb  = try { [int]((Invoke-Native { & nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits 2>$null } | Select-Object -First 1)) } catch { 0 }
 
 Write-Host ''
 Write-Host (T '  model:         {0}' @((Split-Path -Leaf $modelPath)))

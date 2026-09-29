@@ -26,7 +26,7 @@ if ($free -lt 40) { Write-Warn 'drive {0} has {1} GB free, at least 40 are neede
 else { Write-Ok 'drive {0} has {1} GB free' $drive $free }
 
 Write-Step 'GPU and driver'
-$smi = try { & nvidia-smi --query-gpu=name,driver_version --format=csv,noheader 2>$null } catch { $null }
+$smi = try { Invoke-Native { & nvidia-smi --query-gpu=name,driver_version --format=csv,noheader 2>$null } } catch { $null }
 if ($smi) { Write-Ok $smi }
 else {
   Write-Warn 'nvidia-smi not found. The stand is built for an NVIDIA GPU.'
@@ -36,7 +36,7 @@ else {
 
 Write-Step 'WSL2'
 $wslOk = $false
-try { & wsl.exe --status *>$null; $wslOk = ($LASTEXITCODE -eq 0) } catch { $wslOk = $false }
+try { Invoke-Native { & wsl.exe --status *>$null }; $wslOk = ($LASTEXITCODE -eq 0) } catch { $wslOk = $false }
 if (-not $wslOk) {
   Write-Info 'installing WSL2 (a reboot will be needed)'
   & wsl.exe --install --no-distribution

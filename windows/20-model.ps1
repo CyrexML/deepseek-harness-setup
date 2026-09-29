@@ -37,13 +37,19 @@ $catalog = @(
 )
 
 function Get-VramGb {
+  # Redirecting a native command's stderr under $ErrorActionPreference = 'Stop'
+  # makes PowerShell wrap the first stderr line into a terminating
+  # NativeCommandError. Here that would be caught below and silently downgrade a
+  # real card to "no GPU, assume 8 GB", picking a model that does not fit.
+  $prevEap = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
   try {
     $line = (& nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>$null | Select-Object -First 1)
     if (-not $line) { return $null }
     $parts = $line -split ','
     $mb = [int](($parts[1] -replace '[^0-9]', ''))
     return @{ name = $parts[0].Trim(); gb = [math]::Round($mb / 1024, 0) }
-  } catch { return $null }
+  } catch { return $null } finally { $ErrorActionPreference = $prevEap }
 }
 
 Write-Step 'GPU'

@@ -94,6 +94,11 @@ if (Test-Engine) {
 # its header ("CUDA Version: 13.0"). This is the driver's ceiling, not a
 # requirement to install the Toolkit.
 function Get-GpuInfo {
+    # Same trap as Test-Engine: a redirected stderr under 'Stop' becomes a
+    # terminating error, and the catch below would report a healthy card as
+    # "no NVIDIA GPU" and install the CPU build.
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     try {
         # Out-String wraps at the console width by default, which can split the
         # header line the CUDA version lives on.
@@ -106,7 +111,7 @@ function Get-GpuInfo {
         $name = (& nvidia-smi --query-gpu=name --format=csv,noheader 2>$null | Select-Object -First 1)
         $driver = (& nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>$null | Select-Object -First 1)
         return @{ name = $name; driver = $driver; cuda = $cuda }
-    } catch { return $null }
+    } catch { return $null } finally { $ErrorActionPreference = $prevEap }
 }
 
 Write-Step 'GPU and driver'
