@@ -8,7 +8,9 @@ import { readFileSync, writeFileSync, copyFileSync, existsSync, rmSync } from 'n
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';
-const dir = process.argv[2] || `${process.env.HOME}/.dsh/profiles/web/node_modules/@anionex/dsh-turn-rewind`;
+// DSH_HOME, like everywhere else: pinned to $HOME/.dsh this translated the
+// WORKING profile's plugin while a second stand was being built beside it.
+const dir = process.argv[2] || `${process.env.DSH_HOME ?? `${process.env.HOME}/.dsh`}/profiles/web/node_modules/@anionex/dsh-turn-rewind`;
 const MARK = '/* dsh-turn-rewind-en */';
 const file = join(dir, 'lib/client.js');
 let s = readFileSync(file, 'utf8');

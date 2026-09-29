@@ -83,12 +83,13 @@ ${HELPERS}`],
       openPanels.forEach((p) => p.classList.add('nArs4W_panelHidden'));
     };`, `    titleEl.onclick = () => { closeSidebarPanel(); };`],
   // new-session click: close via the real toggle
+  // 2.11.2 slipped a comment line between the forEach and `const dshNewBtn`,
+  // so an anchor spanning both stopped matching. It ends at the forEach now:
+  // shorter, still unique (rightBtn.onclick occurs once), and identical on 2.10.x.
   [`    rightBtn.onclick = () => {
       const openPanels = document.querySelectorAll('div[class*="nArs4W_panel"]:not([class*="panelHidden"]), div[class*="workbench_panel"]:not([class*="panelHidden"])');
-      openPanels.forEach((p) => p.classList.add('nArs4W_panelHidden'));
-      const dshNewBtn`, `    rightBtn.onclick = () => {
-      closeSidebarPanel();
-      const dshNewBtn`],
+      openPanels.forEach((p) => p.classList.add('nArs4W_panelHidden'));`, `    rightBtn.onclick = () => {
+      closeSidebarPanel();`],
   // header: sidebar button between the title and (+)
   [`    header.appendChild(leftBtn);
     header.appendChild(titleEl);

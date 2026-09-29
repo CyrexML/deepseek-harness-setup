@@ -18,7 +18,10 @@
 // update the anchors may move - then MATCH COUNT is not 1 and it exits 1.
 // Written through unlink: the file is a hardlink into the pnpm store.
 import { readFileSync, writeFileSync, rmSync } from 'node:fs';
-const path = process.argv[2] || `${process.env.HOME}/.dsh/profiles/web/node_modules/graph-memory/dist/dsh.js`;
+// DSH_HOME, like DSH_ROOT elsewhere: without it a second stand built beside the
+// working one had its layers applied to the WORKING profile - this path was
+// pinned to $HOME/.dsh outright, and ensure-patches.sh passes no argument here.
+const path = process.argv[2] || `${process.env.DSH_HOME ?? `${process.env.HOME}/.dsh`}/profiles/web/node_modules/graph-memory/dist/dsh.js`;
 const MARK = '/* dsh-local: workspace-scoped recall */';
 let s = readFileSync(path, 'utf8');
 if (s.includes(MARK)) { console.log(`${path}: already patched`); process.exit(0); }

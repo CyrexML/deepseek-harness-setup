@@ -19,7 +19,7 @@
 set -uo pipefail
 export PATH="$HOME/.local/node/bin:$PATH"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-PROFILE="$HOME/.dsh/profiles/web"
+PROFILE="${DSH_HOME:-$HOME/.dsh}/profiles/web"
 KEEP="$HOME/Harness_AI/run/backups/keep"
 step() { echo; echo "=== $*"; }
 die() { echo "ERROR: $*" >&2; exit 1; }

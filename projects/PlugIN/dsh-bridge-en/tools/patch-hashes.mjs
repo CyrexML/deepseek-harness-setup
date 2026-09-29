@@ -86,13 +86,9 @@ function remapHostHashes(css) {
 }
 `,
   ],
-  [
-    `        const collapsedToggle = document.querySelector('div[class*="hHd-Xa_collapsed"] button[class*="hHd-Xa_toggle"]');
-        if (collapsedToggle) collapsedToggle.click();
-`,
-    `        ${MARK} // same expand selector as the header menu button; the hashed one is build-specific
-        const collapsedToggle = document.querySelector('button[aria-label*="打开侧边栏"], button[title*="打开侧边栏"], button[aria-label*="Open sidebar"], button[title*="Open sidebar"]');
-        if (collapsedToggle) collapsedToggle.click();
-`,
-  ],
+  // The collapsed-sidebar toggle edit lived here and is GONE as of bridge 2.11.2:
+  // upstream's own selector now carries the English aria-labels next to the hashed
+  // one ('… , button[aria-label*="Open sidebar"], button[title*="Open sidebar"]'),
+  // which is exactly what this edit used to add - and it did so in Chinese only.
+  // Re-adding it would narrow a selector upstream had already widened.
 ]);

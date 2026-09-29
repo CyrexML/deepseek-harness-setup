@@ -7,7 +7,7 @@
 # otherwise.
 set -uo pipefail
 export PATH="$HOME/.local/node/bin:$PATH"
-P="${1:-$HOME/.dsh/profiles/web/node_modules/@wenbin_wb/dsh-bridge}"
+P="${1:-${DSH_HOME:-$HOME/.dsh}/profiles/web/node_modules/@wenbin_wb/dsh-bridge}"
 TOOLS="$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools"
 OUT="$P/client/client.js"
 # There are several sources (index.js, mobile-styles.js, ...) so the newest one is

@@ -64,7 +64,7 @@ echo "current version: $CUR -> target: $TAG"
 # modified tracked files stop the update.
 dirty="$(git status --porcelain --untracked-files=no)"
 [ -z "$dirty" ] || { echo "$dirty" | head -5; die "the harness tree has modified files - sort that out before updating"; }
-(cd "$HOME/.dsh/profiles/web" && pnpm ls --depth 0 2>/dev/null | tail -n +2 > "$WORK/plugins-before.txt")
+(cd "${DSH_HOME:-$HOME/.dsh}/profiles/web" && pnpm ls --depth 0 2>/dev/null | tail -n +2 > "$WORK/plugins-before.txt")
 if [ "$SKIP_BACKUP" = 0 ]; then
   TS="$(date +%Y%m%d-%H%M%S)"
   echo "backing up ~/.dsh -> $WORK/dsh-home-$TS.tar.gz (without node_modules)"
@@ -97,7 +97,7 @@ sleep 30
 bash "$HERE/ensure-patches.sh" --check || die "some layers are missing"
 bash "$HERE/check-chat-template.sh" | tail -1
 node "$HERE/bridge-verify.mjs" 2>&1 | grep -E "^(PASS|FAIL)" | sort | uniq -c
-(cd "$HOME/.dsh/profiles/web" && pnpm ls --depth 0 2>/dev/null | tail -n +2 > "$WORK/plugins-after.txt")
+(cd "${DSH_HOME:-$HOME/.dsh}/profiles/web" && pnpm ls --depth 0 2>/dev/null | tail -n +2 > "$WORK/plugins-after.txt")
 diff "$WORK/plugins-before.txt" "$WORK/plugins-after.txt" | grep -E "^[<>]" || echo "plugins: unchanged"
 echo
 echo "done: $CUR -> $TAG. Roll back: bash $0 --rollback"

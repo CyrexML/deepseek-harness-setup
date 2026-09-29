@@ -17,7 +17,10 @@
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const dir = process.argv[2] || `${process.env.HOME}/.dsh/profiles/web/node_modules/dsh-univer-office`;
+// DSH_HOME, like DSH_ROOT elsewhere: without it a second stand built beside the
+// working one had its layers applied to the WORKING profile - this path was
+// pinned to $HOME/.dsh outright, and ensure-patches.sh passes no argument here.
+const dir = process.argv[2] || `${process.env.DSH_HOME ?? `${process.env.HOME}/.dsh`}/profiles/web/node_modules/dsh-univer-office`;
 const MARK = '/* dsh-local: turnTail slot id */';
 const path = join(dir, 'lib/client.js');
 if (!existsSync(path)) { console.error(`no ${path}`); process.exit(1); }

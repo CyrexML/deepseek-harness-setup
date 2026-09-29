@@ -29,7 +29,10 @@
 set -uo pipefail
 export PATH="$HOME/.local/node/bin:$PATH"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-NM="$HOME/.dsh/profiles/web/node_modules"
+# DSH_HOME, the same way DSH_ROOT is overridable below: without it a second
+# stand built beside the working one would have its plugin layers applied to the
+# WORKING profile, because this path was pinned to $HOME/.dsh outright.
+NM="${DSH_HOME:-$HOME/.dsh}/profiles/web/node_modules"
 DSH_ROOT="${DSH_ROOT:-$HOME/tools/deepseek-harness}"
 CHECK=0; [ "${1:-}" = "--check" ] && CHECK=1
 missing=0

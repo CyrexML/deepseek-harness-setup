@@ -66,7 +66,9 @@
 # Idempotent - safe to run repeatedly and after any plugin update.
 set -uo pipefail
 
-PKG="$HOME/.dsh/profiles/web/node_modules/dsh-better-sidebar"
+# DSH_HOME, like DSH_ROOT elsewhere: pinned to $HOME/.dsh this patched the
+# WORKING profile when a second stand was being built beside it.
+PKG="${DSH_HOME:-$HOME/.dsh}/profiles/web/node_modules/dsh-better-sidebar"
 LIB="$PKG/lib/index.js"
 SRC="$PKG/src/index.ts"
 CLIENT="$PKG/lib/client-editor.js"
