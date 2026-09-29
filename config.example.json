@@ -1,4 +1,4 @@
-﻿{
+{
   "_": "A copy of this file named config.json is the only place personal values live. Everything else in the repository is impersonal.",
   "windowsRoot": "F:/Harness_AI",
   "_windowsRoot": "Where models, llama.cpp, logs and launch scripts go on Windows. Needs ~40 GB free (model + build). Use forward slashes: a path pasted from Explorer (F:\\Harness_AI) is not valid JSON unless every backslash is doubled.",
