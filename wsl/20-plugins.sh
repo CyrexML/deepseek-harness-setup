@@ -56,7 +56,7 @@ node -e 'JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"))' "$
 ok 'written: %s/package.json' "$PROFILE"
 
 step 'installing plugins'
-( cd "$PROFILE" && pnpm install 2>&1 | tail -4 )
+run_logged plugins "$PROFILE" pnpm install
 ok 'installed'
 
 done_step 'plugins ready'

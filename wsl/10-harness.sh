@@ -25,7 +25,9 @@ if [ -d "$DST/.git" ]; then
 else
   mkdir -p "$(dirname "$DST")"
   info 'cloning %s (a few minutes)' "$REPO"
-  git clone --quiet "$REPO" "$DST"
+  # Not --quiet: a silent clone of a repository this size is several minutes
+  # with nothing on screen, which is indistinguishable from a hang.
+  git clone --progress "$REPO" "$DST"
 fi
 
 current="$(git -C "$DST" describe --tags --exact-match 2>/dev/null || echo '')"
@@ -34,36 +36,21 @@ if [ "$current" = "$TAG" ]; then
 else
   git -C "$DST" rev-parse --verify --quiet "refs/tags/$TAG" >/dev/null ||
     die 'tag %s is not in the repository - check harnessTag in config.json' "$TAG"
-  info 'checking out %s' "$TAG"
-  git -C "$DST" checkout --quiet --detach "$TAG"
+  info 'checking out %s (a minute or two, no output)' "$TAG"
+  git -C "$DST" checkout --detach "$TAG"
   # Switching tags without cleaning leaves lib/ from the previous version and the
   # build fails on "Could not resolve '@deepseek-ai/dsh-subprocess-local/output'".
+  info 'clearing build output from the previous version'
   ( cd "$DST" && pnpm clean >/dev/null 2>&1 || true )
   ok 'checked out'
 fi
 
 step 'dependencies'
-# The full output goes to a file and only the tail to the screen: a failure here
-# used to show five lines of a stack trace and nothing that said what broke.
-LOG_DIR="$HOME/.harness-stand-logs"
-mkdir -p "$LOG_DIR"
-run_logged() {
-  local what="$1"; shift
-  local log="$LOG_DIR/$what.log"
-  if ( cd "$DST" && "$@" ) >"$log" 2>&1; then
-    tail -3 "$log" | sed 's/^/    /'
-    return 0
-  fi
-  warn '%s failed - last 25 lines:' "$what"
-  tail -25 "$log" | sed 's/^/    /'
-  die 'full log: %s' "$log"
-}
-
-run_logged install pnpm install --prefer-offline
+run_logged install "$DST" pnpm install --prefer-offline
 ok 'installed'
 
 step 'build (long: 5-15 minutes)'
-run_logged build pnpm build
+run_logged build "$DST" pnpm build
 [ -f "$DST/apps/cli/lib/bin.js" ] || die 'the build produced no apps/cli/lib/bin.js'
 ok 'built'
 

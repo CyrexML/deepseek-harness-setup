@@ -76,4 +76,36 @@ need_sudo_apt() {
   return 0
 }
 
+# Run a long step with its output in a file, and a heartbeat on screen.
+#
+# The file is what makes a failure readable: the tail of a stack trace says
+# nothing, and piping through `tail -5` threw the rest away. The heartbeat is
+# what makes SUCCESS readable - a build that prints nothing for a quarter of an
+# hour looks exactly like a hung one, and there is nothing to press either way.
+#
+#   run_logged <name> <working directory> <command...>
+LOG_DIR="$HOME/.harness-stand-logs"
+run_logged() {
+  local what="$1" dir="$2"; shift 2
+  mkdir -p "$LOG_DIR"
+  local log="$LOG_DIR/$what.log"
+  info 'full output: %s' "$log"
+  ( cd "$dir" && "$@" ) >"$log" 2>&1 </dev/null &
+  local pid=$! secs=0
+  while kill -0 "$pid" 2>/dev/null; do
+    sleep 15
+    secs=$((secs + 15))
+    if [ $((secs % 60)) -eq 0 ]; then
+      printf '    · %s min, %s lines of output so far\n' "$((secs / 60))" "$(wc -l < "$log" 2>/dev/null || echo 0)"
+    fi
+  done
+  if wait "$pid"; then
+    tail -3 "$log" | sed 's/^/    /'
+    return 0
+  fi
+  warn '%s failed - last 25 lines:' "$what"
+  tail -25 "$log" | sed 's/^/    /'
+  die 'full log: %s' "$log"
+}
+
 export PATH="$HOME/.local/node/bin:$PATH"
