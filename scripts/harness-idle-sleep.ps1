@@ -21,6 +21,9 @@ param(
   # How long before the screen turns off when the user's setting is "never".
   # The stand itself does not care about a dark monitor.
   [int]$MonitorMinutes = 10,
+  # What the machine goes back to when the standby timeout reads "never" at the
+  # moment we disable it - see the comment where the values are saved.
+  [int]$StandbyFallbackMinutes = 10,
   [string]$Saved = "$PSScriptRoot\power-timeouts.json"
 )
 
@@ -54,6 +57,19 @@ if ($Off) {
     $values = @{}
     foreach ($pair in @(@('STANDBYIDLE', 'standby-timeout-ac'), @('HIBERNATEIDLE', 'hibernate-timeout-ac'))) {
       $min = Get-AcTimeoutMinutes $pair[0]
+      # A standby timeout that already reads "never" is almost certainly OUR OWN
+      # leftover: a machine that never sleeps gives this script nothing to
+      # disable. Recorded as the original it is restored forever, and the PC
+      # never sleeps again - which is exactly what happened, and why a stand
+      # stopped properly through the Power button still left the value at zero.
+      # The monitor branch below has guarded against this case from the start.
+      #
+      # Hibernate is left alone: "never" there is an ordinary, deliberate setting
+      # on most machines, not a trace of ours.
+      if ($pair[1] -eq 'standby-timeout-ac' -and $min -eq 0) {
+        $min = $StandbyFallbackMinutes
+        Log "standby timeout read as 'never' - recording $StandbyFallbackMinutes min as the value to restore"
+      }
       if ($null -ne $min) { $values[$pair[1]] = $min }
     }
     $video = Get-AcTimeoutMinutes 'VIDEOIDLE' 'SUB_VIDEO'
