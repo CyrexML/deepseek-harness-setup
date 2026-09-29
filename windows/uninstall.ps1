@@ -44,6 +44,28 @@ Clear-ResumeAfterReboot
 Write-Host ''
 Write-Host (T '  Removing the Harness AI stand') -ForegroundColor Yellow
 Write-Host ''
+# The flags are for scripts. Someone who started uninstall.cmd from Explorer has
+# nowhere to type one, so the same choice is offered here - and it has to come
+# before the list, because the choice decides what the list says.
+$flagsGiven = $KeepModel -or $KeepData -or $KeepWsl -or $RemoveWsl -or $All
+if (-not $Yes -and -not $flagsGiven -and [Environment]::UserInteractive) {
+  Write-Host (T '  How much to remove:') -ForegroundColor Cyan
+  Write-Host (T '    1   the stand; the WSL distribution itself stays')
+  Write-Host (T '    2   the same, but keep the downloaded models')
+  Write-Host (T '    3   the same, but keep chats, agent memory and settings')
+  Write-Host (T '    4   everything, including the whole WSL distribution')
+  Write-Host (T '        2 and 3 can be combined: type 23')
+  Write-Host ''
+  $mode = Read-Host (T '  your choice [1]')
+  if ($mode -match '4') {
+    $RemoveWsl = $true; $KeepModel = $false; $KeepData = $false
+  } else {
+    if ($mode -match '2') { $KeepModel = $true }
+    if ($mode -match '3') { $KeepData = $true }
+  }
+  Write-Host ''
+}
+
 Write-Host (T '  to be removed:')
 Write-Host (T '    - shortcuts, the scheduled task, the firewall rule (port {0})' @($cfg.modelPort))
 Write-Host (T '    - engine and launch scripts: {0}\llama.cpp, {0}\run' @($root))
@@ -55,11 +77,7 @@ if ($RemoveWsl) { Write-Host (T '    - THE ENTIRE WSL DISTRIBUTION "{0}"' @($dis
 Write-Host ''
 Write-Host (T '  Left alone: Windows itself, WSL as a system component, the GPU driver and your projects outside the stand.')
 Write-Host ''
-Write-Host (T '  Modes:') -ForegroundColor Cyan
-Write-Host (T '    uninstall.cmd                 normal removal (asks for confirmation)')
-Write-Host (T '    uninstall.cmd -KeepModel      keep the downloaded models (slow to fetch again)')
-Write-Host (T '    uninstall.cmd -KeepData       keep chats, agent memory and settings')
-Write-Host (T '    uninstall.cmd -All            EVERYTHING: the above plus the whole WSL distribution')
+Write-Host (T '  The same choices exist as flags, for scripts: -KeepModel, -KeepData, -All, -Yes.')
 Write-Host ''
 
 if (-not $Yes) {

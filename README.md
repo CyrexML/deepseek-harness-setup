@@ -279,23 +279,27 @@ roll back.
 
 ## Uninstall
 
+Double-click `uninstall.cmd` — no flags to work out, it asks how much to remove:
+
 ```
-uninstall.cmd
+  How much to remove:
+    1   the stand; the WSL distribution itself stays
+    2   the same, but keep the downloaded models
+    3   the same, but keep chats, agent memory and settings
+    4   everything, including the whole WSL distribution
+        2 and 3 can be combined: type 23
 ```
 
-It asks for confirmation and lists what will be removed before doing anything.
+It then lists what will go and asks you to type `delete` to confirm. An empty answer to
+the first question means option 1.
 
-| Command | What it removes |
-|---|---|
-| `uninstall.cmd` | shortcuts, scheduled task, firewall rule, engine, launch scripts, models, and the stand's data inside WSL |
-| `uninstall.cmd -KeepModel` | the same, but the downloaded models stay (they take a long time to fetch again) |
-| `uninstall.cmd -KeepData` | the same, but your chats, agent memory and settings stay |
-| `uninstall.cmd -All` | **everything, down to zero**: the above plus the whole WSL distribution |
-| `bash wsl/uninstall.sh` | only the Linux side, from inside WSL |
+Option 4 removes the WSL distribution whole, so anything else you kept inside it goes with
+it. Windows itself, WSL as a system component and the GPU driver are never touched, in any
+mode.
 
-`-All` also removes the WSL distribution, so anything else you kept inside it goes too —
-it asks you to type the distribution name to confirm. Windows itself, WSL as a system
-component and the GPU driver are never touched.
+The same choices exist as flags, for scripts with nobody to ask: `-KeepModel`, `-KeepData`,
+`-All`, `-Yes` (ask nothing at all). Passing a flag skips the menu. To remove only the
+Linux side, from inside WSL, run `bash wsl/uninstall.sh`.
 
 ## What gets installed
 
