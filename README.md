@@ -297,6 +297,10 @@ Option 4 removes the WSL distribution whole, so anything else you kept inside it
 it. Windows itself, WSL as a system component and the GPU driver are never touched, in any
 mode.
 
+**The "Linux" folder stays in Explorer, and that is normal.** It belongs to WSL itself and
+remains with zero distributions installed; it will simply be empty. To confirm none are
+left: `wsl -l -v`. To remove WSL as well, if you no longer need it: `wsl --uninstall`.
+
 The same choices exist as flags, for scripts with nobody to ask: `-KeepModel`, `-KeepData`,
 `-All`, `-Yes` (ask nothing at all). Passing a flag skips the menu. To remove only the
 Linux side, from inside WSL, run `bash wsl/uninstall.sh`.

@@ -178,6 +178,9 @@ if ($RemoveWsl -and -not $KeepWsl -and -not $distroPresent) {
 Write-Host ''
 Write-Done 'the stand is removed'
 Write-Host (T '  Left untouched: Windows, WSL, the NVIDIA driver, Node.js inside the distribution.')
+# The penguin in Explorer's sidebar belongs to WSL itself and stays even with no
+# distributions left, which reads like something did not get removed.
+Write-Host (T '  The "Linux" folder still in Explorer is WSL''s own, not the stand''s; "wsl --uninstall" removes WSL too.')
 if ($KeepModel) { Write-Host (T '  The models stayed in {0}\models - a new install will pick them up.' @($root)) }
 if ($KeepData)  { Write-Host (T '  DSH data stayed in ~/.dsh inside WSL.') }
 Write-Host ''
