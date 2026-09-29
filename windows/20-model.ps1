@@ -118,8 +118,13 @@ $mmproj = Join-Path $modelsDir 'mmproj-F16.gguf'
 if (Test-Path $mmproj) {
   Write-Ok 'already in place'
 } elseif (-not $NoDownload) {
+  # curl draws its progress meter on stderr, and sending that to $null left the
+  # step silent for minutes on a file approaching a gigabyte. Silence with no
+  # prompt and no bar reads like a hang, and there is nothing to press.
+  Write-Info 'a separate file (~0.9 GB) that lets the agent look at images you send it'
+  Write-Info 'optional: if it is not there, the install carries on without it'
   $url = "https://huggingface.co/$($choice.repo)/resolve/main/mmproj-F16.gguf?download=true"
-  & curl.exe -L --fail --retry 3 -C - -o "$mmproj" "$url" 2>$null
+  & curl.exe -L --fail --retry 3 -C - -o "$mmproj" "$url"
   if ($LASTEXITCODE -eq 0) { Write-Ok 'downloaded - the stand will see images' }
   else { Remove-Item -Force $mmproj -ErrorAction SilentlyContinue; Write-Info 'this model has no projector - images will not be available' }
 }
