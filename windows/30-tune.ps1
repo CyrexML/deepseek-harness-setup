@@ -50,8 +50,24 @@ if (-not $CheckOnly) {
     else { Write-Warn 'VRAM is tight: an 8k window. Take a smaller quant (docs/MODEL.md section 2)' }
   }
   Write-Ok 'VRAM {0} MiB, model {1} MiB -> window {2} tokens' $vramMb $modelMb $ctx
+  $oldCtx = $cfg.server.ctx
   Set-StandConfig @{ 'server.ctx' = $ctx }
   $cfg = Read-StandConfig
+
+  # The agent carries this number too: cordis.patch.yml's contextWindow has to
+  # equal the server's -c. The WSL step that writes it runs BEFORE this one, so
+  # it used the pre-tune value - and the agent then believes it has a window the
+  # server will never give it. Rewrite it here, where the final number is known.
+  if ($oldCtx -ne $ctx) {
+    Write-Step 'agent config: window {0} -> {1}' $oldCtx $ctx
+    try {
+      Invoke-Wsl $cfg.wslDistro "cd `$HOME/harness-stand && bash wsl/40-config.sh >/dev/null"
+      Write-Ok 'rewritten'
+    } catch {
+      Write-Warn 'could not rewrite it: {0}' $_.Exception.Message
+      Write-Info 'do it by hand, or the agent and the server disagree:  install.cmd -Step wsl'
+    }
+  }
 
   Write-Step 'launch command (run\start-server.ps1)'
   $runDir = Join-Path $root 'run'
