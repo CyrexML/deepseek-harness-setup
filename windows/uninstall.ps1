@@ -36,6 +36,11 @@ $cfg = Read-StandConfig
 $root = $cfg.windowsRoot
 $distro = $cfg.wslDistro
 
+# An install abandoned between the reboot and the second pass can leave a
+# "continue at next logon" entry behind; removing the stand must not leave it
+# to fire later.
+Clear-ResumeAfterReboot
+
 Write-Host ''
 Write-Host (T '  Removing the Harness AI stand') -ForegroundColor Yellow
 Write-Host ''

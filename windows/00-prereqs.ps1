@@ -40,7 +40,13 @@ try { & wsl.exe --status *>$null; $wslOk = ($LASTEXITCODE -eq 0) } catch { $wslO
 if (-not $wslOk) {
   Write-Info 'installing WSL2 (a reboot will be needed)'
   & wsl.exe --install --no-distribution
-  Write-Warn 'reboot the computer and run install.cmd again'
+  Write-Warn 'WSL2 is installed, and Windows needs a reboot before it works'
+  if (Set-ResumeAfterReboot) {
+    Write-Ok 'the install will continue by itself after you log back in'
+    Write-Info 'it asks for administrator rights once more, then carries on'
+  } else {
+    Write-Info 'after the reboot run install.cmd again - it continues from here'
+  }
   # Offering the reboot here saves the one step people get wrong: leaving the
   # console, finding the Start menu and hoping they remember to come back.
   # Never automatic - a reboot closes whatever else is open, so it takes a
@@ -51,7 +57,6 @@ if (-not $wslOk) {
     if ($answer -match '^\s*[RrКк]\s*$') {
       Write-Warn 'rebooting in 10 seconds - save your work now, Ctrl+C cancels'
       Start-Sleep -Seconds 10
-      Write-Info 'after the reboot run install.cmd again - it continues from here'
       Restart-Computer -Force
       # Restart-Computer returns immediately; without this the script would fall
       # through to the exit while Windows is still closing sessions.
@@ -72,7 +77,12 @@ if ($installed -contains $cfg.wslDistro) {
 } else {
   Write-Info 'installing {0} - a window will open to create the user' $cfg.wslDistro
   & wsl.exe --install -d $cfg.wslDistro
-  Write-Info 'after creating the user close the distribution window and run install.cmd again'
+  if (Set-ResumeAfterReboot) {
+    Write-Info 'close the distribution window when the user is created; the install continues at your next logon'
+    Write-Info 'to carry on right away instead, just run install.cmd again'
+  } else {
+    Write-Info 'after creating the user close the distribution window and run install.cmd again'
+  }
   exit 2
 }
 

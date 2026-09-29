@@ -154,7 +154,7 @@ Right-click **install.cmd** → **Run as administrator**.
 
 | Pass | What happens | What you do |
 |---|---|---|
-| 1st | WSL2 is installed, the installer offers to reboot | press `R` and Enter and it reboots for you; afterwards run `install.cmd` again |
+| 1st | WSL2 is installed, the installer offers to reboot | press `R` and Enter: it reboots, and after you log back in it continues on its own (asking for administrator rights once) |
 | 2nd | Ubuntu is installed; a black window opens and asks for a user name and password | type any latin name and a password (**the password does not echo — that is not a hang**), then close that window and run `install.cmd` again |
 | 3rd | the full install runs | wait |
 

@@ -125,6 +125,33 @@ function Set-StandConfig {
   ($cfg | ConvertTo-Json -Depth 12) | Set-Content -Path $path -Encoding UTF8
 }
 
+# Continue the install by itself after the reboot WSL2 needs.
+#
+# RunOnce and not Run: it fires at the next logon and deletes its own entry
+# before running, so an abandoned install leaves nothing behind and a second
+# reboot does not start it again. It runs UNELEVATED, hence Start-Process
+# -Verb RunAs - the user answers one UAC prompt and the install carries on.
+$script:ResumeKey  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce'
+$script:ResumeName = 'HarnessAiInstall'
+
+function Set-ResumeAfterReboot {
+  $cmd = Join-Path $script:StandRoot 'install.cmd'
+  if (-not (Test-Path $cmd)) { return $false }
+  # A RunOnce value is capped at 260 characters; a path deep enough to overflow
+  # it is rare, but a silently truncated command would be worse than none.
+  $value = "powershell -NoProfile -ExecutionPolicy Bypass -Command ""Start-Process -FilePath '$cmd' -Verb RunAs"""
+  if ($value.Length -gt 255) { return $false }
+  try {
+    if (-not (Test-Path $script:ResumeKey)) { New-Item -Path $script:ResumeKey -Force | Out-Null }
+    Set-ItemProperty -Path $script:ResumeKey -Name $script:ResumeName -Value $value
+    return $true
+  } catch { return $false }
+}
+
+function Clear-ResumeAfterReboot {
+  try { Remove-ItemProperty -Path $script:ResumeKey -Name $script:ResumeName -ErrorAction SilentlyContinue } catch {}
+}
+
 # Run a bash command inside WSL, passing its output through unchanged.
 function Invoke-Wsl {
   param([string]$Distro, [string]$Command)

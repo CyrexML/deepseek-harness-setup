@@ -105,6 +105,11 @@ Step-Tune
 Step-Shortcuts
 Step-Verify
 
+# The install finished, so a pending "continue at next logon" entry has nothing
+# left to do. RunOnce would have dropped it on firing anyway; this covers the
+# run that reached the end without a reboot in between.
+Clear-ResumeAfterReboot
+
 Write-Host ''
 Write-Done 'done'
 Write-Host (T '  To start: the Harness AI shortcut on the desktop.')
