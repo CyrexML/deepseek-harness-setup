@@ -75,15 +75,33 @@ $installed = (& wsl.exe --list --quiet) -replace "`0", '' | ForEach-Object { $_.
 if ($installed -contains $cfg.wslDistro) {
   Write-Ok 'already there'
 } else {
-  Write-Info 'installing {0} - a window will open to create the user' $cfg.wslDistro
+  # No separate window opens: wsl --install -d drops a Linux shell into THIS
+  # console and blocks until it exits. Saying "close the distribution window"
+  # was worse than useless - closing this window kills the installer with it.
+  Write-Info 'installing {0}' $cfg.wslDistro
+  Write-Info 'a Linux shell opens right here and asks for a user name and a password'
+  Write-Warn 'the password does not appear as you type it - that is not a hang'
+  Write-Info 'when you reach a prompt like  you@machine:~$  type  exit  and press Enter'
+  Write-Host ''
   & wsl.exe --install -d $cfg.wslDistro
-  if (Set-ResumeAfterReboot) {
-    Write-Info 'close the distribution window when the user is created; the install continues at your next logon'
-    Write-Info 'to carry on right away instead, just run install.cmd again'
+  Write-Host ''
+
+  # Back here means that shell is gone, so the distribution is provisioned.
+  # Checking beats assuming, and when it is there the install simply carries
+  # on rather than sending the user round another pass.
+  $now = @()
+  try { $now = @((& wsl.exe --list --quiet) -replace "`0", '' | ForEach-Object { $_.Trim() } | Where-Object { $_ }) } catch {}
+  if ($now -contains $cfg.wslDistro) {
+    Write-Ok 'created'
   } else {
-    Write-Info 'after creating the user close the distribution window and run install.cmd again'
+    if (Set-ResumeAfterReboot) {
+      Write-Info 'finish creating the user, then the install continues at your next logon'
+      Write-Info 'to carry on right away instead, just run install.cmd again'
+    } else {
+      Write-Info 'finish creating the user, then run install.cmd again'
+    }
+    exit 2
   }
-  exit 2
 }
 
 Write-Step 'WSL version of the distribution'

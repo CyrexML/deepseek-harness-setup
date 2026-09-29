@@ -150,17 +150,18 @@ writes that choice back into `config.json`.
 
 Right-click **install.cmd** → **Run as administrator**.
 
-**If WSL was not installed before**, the install takes three passes. That is by design:
+**If WSL was not installed before**, the install takes two passes. That is by design:
 
 | Pass | What happens | What you do |
 |---|---|---|
 | 1st | WSL2 is installed, the installer offers to reboot | press `R` and Enter: it reboots, and after you log back in it continues on its own (asking for administrator rights once) |
-| 2nd | Ubuntu is installed; a black window opens and asks for a user name and password | type any latin name and a password (**the password does not echo — that is not a hang**), then close that window and run `install.cmd` again |
-| 3rd | the full install runs | wait |
+| 2nd | Ubuntu is installed; a Linux shell opens **in the same window** and asks for a user name and password | type any latin name and a password (**the password does not echo — that is not a hang**), then type `exit` and press Enter — the install carries on by itself |
 
 That password belongs to the user inside Ubuntu and is rarely needed — write it down.
-After the second pass the window is left at a prompt like `you@PC:/mnt/c/...$`. That is
-not an error and not a question: just close the window.
+
+A prompt like `you@PC:/mnt/c/...$` is not an error and not a question: the installer is
+waiting for that shell to exit. **Do not close the window** — that would take the
+installer with it. Type `exit`.
 
 The installer explains every step as it goes:
 
