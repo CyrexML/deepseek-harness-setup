@@ -91,11 +91,19 @@ layer better-sidebar "$NM/dsh-better-sidebar/lib/index.js" "DSH_PREVIEW_TRUSTED_
 layer llm-pi-ai "$DSH_ROOT/packages/llm/llm-pi-ai/lib/index.js" "dsh-local: replay usage" \
   node "$HERE/patch-llm-pi-ai-usage.mjs"
 # Session format v4 refuses a message whose source.kind is "plugin" and fails the
-# WHOLE turn; graph-memory still stamps the retired shape on its per-turn trace,
-# which it writes at the end of every turn. Marker file is the projection, the
-# script fixes all three messages.
-layer graph-memory-source "$NM/graph-memory/dist/src/format/dsh-turn-projection.js" "dsh-local: producer-owned source kind" \
-  node "$HERE/patch-graph-memory-source-kind.mjs" "$NM/graph-memory"
+# WHOLE turn; graph-memory still stamps the retired shape, in four places that
+# each fire in their own circumstance - the recall snapshot, the extraction
+# request, the per-turn trace, the compaction archive marker.
+#
+# NOT a marker-gated layer on purpose. The marker would sit in whichever file was
+# named, and a site in ANOTHER file would then be skipped for as long as that
+# marker survived - which is exactly how the second and third of these reached a
+# failed turn. The script sweeps every file under dist/ and asserts that no
+# retired shape is left, so it is safe and cheap to run every time; a non-zero
+# exit refuses the start the same way a missing layer does.
+if [ -d "$NM/graph-memory" ]; then
+  node "$HERE/patch-graph-memory-source-kind.mjs" "$NM/graph-memory" | sed 's/^/patches: /' || missing=1
+fi
 
 layer graph-memory "$NM/graph-memory/dist/dsh.js" "dsh-local: workspace-scoped recall" \
   node "$HERE/patch-graph-memory-scope.mjs"

@@ -36,10 +36,6 @@
       "marker": "dsh-local: replay usage"
     },
     {
-      "name": "graph-memory-source",
-      "marker": "dsh-local: producer-owned source kind"
-    },
-    {
       "name": "graph-memory",
       "marker": "dsh-local: workspace-scoped recall"
     },
