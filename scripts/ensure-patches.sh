@@ -112,6 +112,19 @@ layer mobile-back "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: mo
 layer html-no-store "$NM/@wenbin_wb/dsh-bridge/lib/index.js" "dsh-bridge-en: html no-store" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-html-no-store.mjs" "$NM/@wenbin_wb/dsh-bridge"
 
+# DSH 0.1.7 removed the `settingsScope` service, and the plugin still lists it as
+# a REQUIRED client dependency - so it never activates, and one pending entry
+# blocks the whole client ("Failed to load plugins", blank page). Its own code
+# already guards the call with `?.`, so only the dependency list was wrong.
+# A no-op on 0.1.6, where the service still exists.
+# Registered ONLY on a host without the service. Declaring it unconditionally
+# made --check report it MISSING on 0.1.6 - and start-web.sh refuses to start a
+# stand with an incomplete layer set, so the working stand would not have come up.
+if [ ! -f "$DSH_ROOT/packages/client/ui-settings/src/client/settings-scope.ts" ]; then
+  layer turn-rewind-settings "$NM/@anionex/dsh-turn-rewind/lib/client.js" "dsh-local: settingsScope optional" \
+    node "$HERE/patch-turn-rewind-settings-optional.mjs" "$NM/@anionex/dsh-turn-rewind"
+fi
+
 layer sidebar-slot-id "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: turnTail slot id" \
   node "$HERE/patch-better-sidebar-slot-id.mjs"
 layer univer-slot-id "$NM/dsh-univer-office/lib/client.js" "dsh-local: turnTail slot id" \
