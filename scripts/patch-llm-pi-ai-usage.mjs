@@ -74,9 +74,9 @@ function dropStaleUsage(source, messages) {
 	let stale = last < 0;
 	for (let i = last + 1; i < source.length && !stale; i++) {
 		const src = source[i].source;
-		// 0.1.7 retired the `plugin` source wrapper: the compaction checkpoint now
+		// 0.1.7 retired the "plugin" source wrapper: the compaction checkpoint now
 		// carries its own producer kind (session-format-v3-to-v4/src/sources.ts:21,
-		// `compact` -> `compact-checkpoint`, `dsh-compaction-basic` -> `compact-basic`).
+		// "compact" -> "compact-checkpoint", "dsh-compaction-basic" -> "compact-basic").
 		// The old shape is kept so the same patch still works on 0.1.6.
 		if (src !== void 0 && (src.kind === "compact-checkpoint" || src.kind === "compact-basic"
 			|| (src.kind === "plugin" && src.plugin === "compact"))) stale = true;
