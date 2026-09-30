@@ -11,6 +11,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 DSHDIR="${DSH_HOME:-$HOME/.dsh}"
 STAND_DIR_ENV="${STAND_DIR:-$HOME/Harness_AI}/stand.env"
 PROFILE="$DSHDIR/profiles/web"
+STAND_SCRIPTS="${STAND_DIR:-$HOME/Harness_AI}/scripts"
 TPL="$ROOT/templates"
 MARK="# harness-stand"
 
@@ -92,6 +93,17 @@ if [ -d "$TPL/presets/local-64k" ]; then
   ok 'installed'
 else
   warn 'no preset template - the stand will run on the built-in standard preset'
+fi
+
+# DSH 0.1.7 no longer DISCOVERS preset directories - the whole `.agent-presets`
+# mechanism went with the `agent-presets` package. A preset is a row in the
+# profile now, so the directory installed above has to be written into
+# cordis.patch.yml or the mode menu offers only the four shipped presets. The
+# script is a no-op on a host that still discovers directories, because the row
+# it appends simply declares the same preset twice under one id.
+if [ -f "$STAND_SCRIPTS/port-presets-to-profile.mjs" ]; then
+  step 'writing the preset into the profile'
+  DSH_HOME="$DSHDIR" node "$STAND_SCRIPTS/port-presets-to-profile.mjs" | sed 's/^/    /'
 fi
 
 step 'interface settings (settings.yaml)'

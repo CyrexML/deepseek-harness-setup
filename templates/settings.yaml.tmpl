@@ -3,9 +3,11 @@ ui-onboarding:
   welcomeNoticeVersion: 2026-08-13.1
 ui-chat:
   transcriptView: compact
-agent-presets:
+# 0.1.7 imports this document into the profile and renames it .imported, so
+# these section names are the ENTRY ids it writes into, not the old namespaces.
+agent-preset-registry:
   default: @PRESET@
-subagent-model-selection:
+subagent-model-selection-settings:
   enabled: true
   allowedModels:
     - provider: qwen-local
@@ -13,16 +15,12 @@ subagent-model-selection:
 locale:
   preference: en
 dsh-better-sidebar:
-  openByDefault: true
   tabsEnabled:
     terminal: false
     diff: false
     sidechat: false
     browser: true
   agentOpenTools: true
-  defaultWidthPercent: 30
-  browserInterceptHttps: true
-  browserInterceptHttp: true
   # The preview renders the page in a sandboxed iframe without allow-same-origin,
   # i.e. with an opaque origin. The core's trust fence rejects Origin: null, so
   # EVERY sub-resource (<script src>, <link>) gets a 403 while the page itself

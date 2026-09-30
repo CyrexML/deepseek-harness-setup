@@ -124,7 +124,7 @@
 # The compactor's thresholdRatio cannot be set from here: in the web profile the
 # compaction-basic row is disabled in the host plan and the live instance comes
 # from the agent preset composition, which a profile patch cannot reach. The
-# preset layer has no patch semantics of its own - see the dsh-agent-presets
+# preset layer has no patch semantics of its own - see the agent-preset
 # README, section
 # Known Limitations: "there is no patch semantics at this layer to express
 # 'standard plus one change'". So the preset is copied whole into
@@ -136,10 +136,20 @@
 # dev-tool-search, compaction-epoch).
 #
 # The copy does not update with dsh: after an upgrade it has to be re-taken from
-# the new standard preset and the changes above re-applied.
+# the new standard preset and the changes above re-applied. Between 0.1.6 and
+# 0.1.7 the stock preset did not change at all (parsed and compared field by
+# field), so that upgrade needed no re-take.
 #
-# The live value still comes from ~/.dsh/settings.yaml (agent-presets.default),
-# written by the "Set as default" button; this line is only a fallback.
-- id: agent-presets
+# The entry is `agent-preset-registry`. DSH 0.1.7 replaced the `agent-presets`
+# package with `agent-preset` + `agent-preset-registry`, and a row naming the old
+# id targets nothing: a patch whose target row is absent is only a Loader
+# warning, so the stand would quietly start every session on the built-in
+# standard preset.
+#
+# The preset ITSELF is appended to this file by
+# scripts/port-presets-to-profile.mjs - 0.1.7 discovers no preset directories,
+# only rows. `selectedDefault` (what the "Set as default" button writes) wins
+# over this line once it is set.
+- id: agent-preset-registry
   config:
     default: local-64k
