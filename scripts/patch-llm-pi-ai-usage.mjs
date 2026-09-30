@@ -15,7 +15,7 @@
 //  1. toPiReplayState: store the response usage (minus its own reasoning tokens: the next prefix
 //     never contains them) in replayState.response.usage. readReplayState ignores unknown keys.
 //  2. replayedAssistant: restore that usage (validated) instead of emptyPiUsage().
-//  3. piContext: if a compaction summary (source plugin "compact") follows the last assistant,
+//  3. piContext: if a compaction checkpoint follows the last assistant,
 //     every replayed usage describes a prefix that no longer exists -> zero them, pi-ai falls
 //     back to chars/4 for that one step (small: retained tail + summary).
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -74,7 +74,12 @@ function dropStaleUsage(source, messages) {
 	let stale = last < 0;
 	for (let i = last + 1; i < source.length && !stale; i++) {
 		const src = source[i].source;
-		if (src !== void 0 && src.kind === "plugin" && src.plugin === "compact") stale = true;
+		// 0.1.7 retired the `plugin` source wrapper: the compaction checkpoint now
+		// carries its own producer kind (session-format-v3-to-v4/src/sources.ts:21,
+		// `compact` -> `compact-checkpoint`, `dsh-compaction-basic` -> `compact-basic`).
+		// The old shape is kept so the same patch still works on 0.1.6.
+		if (src !== void 0 && (src.kind === "compact-checkpoint" || src.kind === "compact-basic"
+			|| (src.kind === "plugin" && src.plugin === "compact"))) stale = true;
 	}
 	if (!stale) return;
 	for (const m of messages) if (m.role === "assistant") m.usage = emptyPiUsage();

@@ -49,7 +49,13 @@ export const name = 'decisions-file-notice'
 /** Listeners only; nothing is resolved from the registry. */
 export const inject = []
 
-const SOURCE = { kind: 'plugin', plugin: 'decisions-file-notice' }
+// DSH 0.1.7 retired the `plugin` source wrapper: the v4 writer refuses any
+// message whose source.kind is 'plugin' (session-format-v3-to-v4/src/
+// message-sources.ts:9) and the whole TURN fails with "format v4 message
+// requires a producer-owned source kind". A third-party producer's own kind is
+// `plugin:<name>` - what that package's own migration produces for a name it
+// does not know (sources.ts:63).
+const SOURCE = { kind: 'plugin:decisions-file-notice' }
 
 const PATH_FIELDS = ['file_path', 'path', 'filePath']
 
