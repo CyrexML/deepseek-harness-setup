@@ -68,8 +68,17 @@ link_pkg() {
 }
 link_pkg dsh-web-search-exa "$DSH_ROOT/packages/web/web-search-exa"
 
-layer bridge "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en:" \
-  bash "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/translate.sh"
+# The plugin directory is passed EXPLICITLY. translate.sh falls back to
+# $HOME/.dsh, so without it a stand built with DSH_HOME pointed its translation
+# run at the WORKING profile - where the abort guard stopped it, leaving the new
+# profile untranslated while the layer looked fine.
+#
+# The marker is the abort guard's own string, not the bare "dsh-bridge-en:"
+# prefix: eight later layers write that prefix too, so a failed translation was
+# reported as ok as soon as any of them had applied - and the translation, power
+# button, splash screen, icon and rotation fix were silently absent.
+layer bridge "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: better-sidebar mobile fix" \
+  bash "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/translate.sh" "$NM/@wenbin_wb/dsh-bridge"
 # client.js is built by the last step of translate.sh: if a patch landed after
 # that build, the bundle is stale while the marker is present (see
 # scripts/bridge-rebuild-client.sh).
@@ -125,14 +134,40 @@ if [ ! -f "$DSH_ROOT/packages/client/ui-settings/src/client/settings-scope.ts" ]
     node "$HERE/patch-turn-rewind-settings-optional.mjs" "$NM/@anionex/dsh-turn-rewind"
 fi
 
-layer sidebar-slot-id "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: turnTail slot id" \
-  node "$HERE/patch-better-sidebar-slot-id.mjs"
-layer univer-slot-id "$NM/dsh-univer-office/lib/client.js" "dsh-local: turnTail slot id" \
-  node "$HERE/patch-univer-slot-id.mjs"
-layer sidebar-session-sync "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: session sync" \
-  node "$HERE/patch-better-sidebar-session-sync.mjs"
-layer sidebar-binary-handoff "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: binary handoff" \
-  node "$HERE/patch-better-sidebar-binary-handoff.mjs"
+# The next four layers are RETIRED on builds that carry the fix upstream has
+# since adopted. A layer whose anchor is gone for good can never apply again:
+# --check reports MISSING for ever and start-web.sh refuses to boot the stand.
+# The probes below are things our own patches never remove, so a plugin
+# downgrade (or a pnpm reinstall that drops the patch) brings the layer back.
+
+# better-sidebar up to 0.19.x drew its own panel through the
+# `conversation.chat.turnTail` slot, and all three layers exist because of that:
+# the list-slot contract needs an `id` (slot-id), the panel never mounted so the
+# active session had to be found another way (session-sync), and the plugin
+# claimed .pdf/.xlsx it could not draw (binary-handoff). 0.22.1 registers
+# `sidebar.right.pane.tab` instead - it is a tab of the NATIVE right sidebar,
+# with its own `canOpen` that hands host-owned paths back and its own pdf.js
+# rendering. Verified live on the 0.1.7 stand: the explorer lists the workspace
+# and a click on DECISIONS.md opens a rendered tab, which is precisely what
+# session-sync existed to fix.
+if grep -qF 'conversation.chat.turnTail' "$NM/dsh-better-sidebar/lib/client.js" 2>/dev/null; then
+  layer sidebar-slot-id "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: turnTail slot id" \
+    node "$HERE/patch-better-sidebar-slot-id.mjs"
+  layer sidebar-session-sync "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: session sync" \
+    node "$HERE/patch-better-sidebar-session-sync.mjs"
+  layer sidebar-binary-handoff "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: binary handoff" \
+    node "$HERE/patch-better-sidebar-binary-handoff.mjs"
+fi
+
+# dsh-univer-office 0.3.5 took the same fix verbatim - `id: "univer-turn-preview"`
+# with a comment citing the 0.1.6-alpha.2 list-slot contract, plus a fallback to
+# the old chain form for older hosts. Our marker is checked first: on 0.3.2 the
+# id is there only because we put it there, and that layer must stay verified.
+if grep -qF 'dsh-local: turnTail slot id' "$NM/dsh-univer-office/lib/client.js" 2>/dev/null \
+   || ! grep -qF 'id: "univer-turn-preview"' "$NM/dsh-univer-office/lib/client.js" 2>/dev/null; then
+  layer univer-slot-id "$NM/dsh-univer-office/lib/client.js" "dsh-local: turnTail slot id" \
+    node "$HERE/patch-univer-slot-id.mjs"
+fi
 layer sidebar-relative-path "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: relative path in chat links" \
   node "$HERE/patch-better-sidebar-relative-path.mjs"
 

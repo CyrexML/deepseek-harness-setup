@@ -1,23 +1,22 @@
 {
   "_": "Snapshot of the verified combination. Changed deliberately: edit the numbers and publish a new lock.",
-  "createdAt": "2026-09-28",
+  "createdAt": "2026-09-30",
   "tools": {
     "node": "22.23.2",
     "pnpm": "11.7.0"
   },
   "harness": {
-    "tag": "dsh-v0.1.6-alpha.2",
-    "commit": "ddefc45fbc7f8e46dd73185e68295696d1297887"
+    "tag": "dsh-v0.1.7-rc.2",
+    "commit": "477b4f420553e8a52c2fbccc464d7561b239c443"
   },
   "plugins": {
-    "@anionex/dsh-turn-rewind": "0.3.8",
-    "@dsh-external/workflow": "git+https://github.com/icetomoyo/dsh_workflow.git",
-    "@wenbin_wb/dsh-bridge": "2.10.13",
-    "dsh-better-sidebar": "0.19.1",
-    "dsh-context": "0.54.4",
-    "dsh-plugin": "1.4.8",
-    "dsh-univer-office": "0.3.2",
-    "graph-memory": "github:adoresever/graph-memory"
+    "@wenbin_wb/dsh-bridge": "2.11.3",
+    "dsh-better-sidebar": "0.22.1",
+    "dsh-context": "0.60.0",
+    "dsh-plugin": "1.4.11",
+    "dsh-univer-office": "0.3.5",
+    "graph-memory": "github:adoresever/graph-memory",
+    "@anionex/dsh-turn-rewind": "0.3.8"
   },
   "patchLayers": [
     {
@@ -97,20 +96,8 @@
       "marker": "dsh-bridge-en: html no-store"
     },
     {
-      "name": "sidebar-slot-id",
-      "marker": "dsh-local: turnTail slot id"
-    },
-    {
-      "name": "univer-slot-id",
-      "marker": "dsh-local: turnTail slot id"
-    },
-    {
-      "name": "sidebar-session-sync",
-      "marker": "dsh-local: session sync"
-    },
-    {
-      "name": "sidebar-binary-handoff",
-      "marker": "dsh-local: binary handoff"
+      "name": "turn-rewind-settings",
+      "marker": "dsh-local: settingsScope optional"
     },
     {
       "name": "sidebar-relative-path",
@@ -121,12 +108,11 @@
     "@deepseek-ai/dsh-base",
     "@deepseek-ai/dsh-web-app",
     "dsh-plugin",
-    "@dsh-external/workflow",
     "dsh-better-sidebar",
     "graph-memory",
     "dsh-univer-office",
     "@wenbin_wb/dsh-bridge",
-    "@anionex/dsh-turn-rewind",
-    "dsh-context"
+    "dsh-context",
+    "@anionex/dsh-turn-rewind"
   ]
 }

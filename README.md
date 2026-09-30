@@ -342,10 +342,7 @@ whatever is missing on every start.
 | zoom-scope | pinch does not zoom the conversation while typing |
 | pdfjs-map-polyfill | PDFs open in browsers older than Chrome 140 (pdf.js 6.3 calls a very new `Map` method) |
 | html-no-store | the app page is never cached, so a phone cannot get stuck on an old bundle |
-| session-sync | clicking a file in the side panel opens it (broken outright on harness 0.1.6) |
 | relative-path | a file link in the chat opens the same way as from the explorer |
-| binary-handoff | PDFs and office files open in the panel instead of being downloaded |
-| turnTail slot id | side panel and office plugin stay compatible with harness 0.1.6 |
 | better-sidebar preview | multi-page apps preview with working JavaScript |
 | llm-pi-ai usage | the model stops truncating answers based on a wrong length estimate |
 | graph-memory scope | agent memory does not mix projects |
@@ -357,7 +354,13 @@ whatever is missing on every start.
 | fs-edit-tolerant | an edit whose `old_string` differs only in whitespace still applies; when it truly does not match, the error quotes the file |
 | fs-missing-path | a write or edit aimed at a path that does not exist says so, instead of telling the model to read a file that cannot be read |
 | mobile-input | on a touch screen Enter breaks the line instead of sending; a clipboard carrying only HTML still pastes; a long question leaves room for its answers |
+| turn-rewind settings | the rewind button keeps working on a harness that dropped the settings service the plugin asked for |
 | write-streak-notice (preset) | says so when a turn has run long with nothing written, before the answer hits its cap |
+
+Some layers are version-conditional: they register only on a build that still needs
+them. Three side-panel layers and the office slot fix were retired once the plugins
+took the same fixes upstream — `ensure-patches.sh` checks the installed build and
+brings a layer back if a downgrade makes it necessary again.
 
 ## Housekeeping
 

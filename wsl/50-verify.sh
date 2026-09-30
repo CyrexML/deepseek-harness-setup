@@ -23,7 +23,7 @@ check 'version reads' node -e 'require("node:fs").readFileSync(process.argv[1])'
 
 step 'plugins'
 for p in dsh-plugin dsh-better-sidebar @wenbin_wb/dsh-bridge dsh-univer-office; do
-  [ -d "$HOME/.dsh/profiles/web/node_modules/$p" ] && ok '%s' "$p" || info '%s - not installed (may be disabled in config.json)' "$p"
+  [ -d "${DSH_HOME:-$HOME/.dsh}/profiles/web/node_modules/$p" ] && ok '%s' "$p" || info '%s - not installed (may be disabled in config.json)' "$p"
 done
 
 step 'patch layers'

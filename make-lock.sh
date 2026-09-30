@@ -12,6 +12,8 @@
 # after a manual update) and publishing the new lock; update.cmd applies it.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# The stand root, the way make-repo.sh finds it: the installer lives inside it.
+STAND="$(cd "$HERE/.." && pwd)"
 export PATH="$HOME/.local/node/bin:$PATH"
 PROFILE="$HOME/.dsh/profiles/web"
 DSH_ROOT="${DSH_ROOT:-$HOME/tools/deepseek-harness}"
@@ -20,10 +22,18 @@ OUT="$HERE/stand.lock.json"
 tag="$(git -C "$DSH_ROOT" describe --tags --exact-match 2>/dev/null || git -C "$DSH_ROOT" rev-parse --short HEAD)"
 commit="$(git -C "$DSH_ROOT" rev-parse HEAD)"
 
-node - "$PROFILE" "$HERE" "$tag" "$commit" "$OUT" <<'NODE'
+# Which layers this stand ACTUALLY registers. Some are conditional - a layer whose
+# fix upstream has since adopted is retired on the newer plugin, and the
+# settingsScope layer only exists on a host that lost the service. Reading the
+# script's own report is the only honest source: a grep over the file would pin
+# layers this combination does not use, and the installer would then demand them.
+REGISTERED="$(bash "$STAND/scripts/ensure-patches.sh" --check | sed -n 's/^patches: \([^ ]*\) - \(ok\|MISSING\)$/\1/p' | tr '\n' ' ')"
+[ -n "$REGISTERED" ] || { echo "ensure-patches.sh --check produced no layers" >&2; exit 1; }
+
+node - "$PROFILE" "$HERE" "$tag" "$commit" "$OUT" "$REGISTERED" <<'NODE'
 const fs = require('node:fs');
 const { execSync } = require('node:child_process');
-const [profile, here, tag, commit, out] = process.argv.slice(2);
+const [profile, here, tag, commit, out, registered] = process.argv.slice(2);
 
 const pkg = JSON.parse(fs.readFileSync(`${profile}/package.json`, 'utf8'));
 // Write the EXACT installed versions rather than the ranges from package.json:
@@ -38,9 +48,15 @@ for (const name of Object.keys(pkg.dependencies ?? {})) {
   } catch { plugins[name] = pkg.dependencies[name]; }
 }
 
-// The layers are read from ensure-patches.sh itself: it is their registry.
+// Markers come from ensure-patches.sh - it is their registry - but the SET comes
+// from what that script reported as registered a moment ago, in its own order.
+// The leading \s* matters: conditional layers sit indented inside an `if`.
 const ensure = fs.readFileSync(`${here}/scripts/ensure-patches.sh`, 'utf8');
-const layers = [...ensure.matchAll(/^layer\s+(\S+)\s+"[^"]+"\s+"([^"]+)"/gm)].map(m => ({ name: m[1], marker: m[2] }));
+const marker = new Map([...ensure.matchAll(/^\s*layer\s+(\S+)\s+"[^"]+"\s+"([^"]+)"/gm)].map(m => [m[1], m[2]]));
+const layers = registered.trim().split(/\s+/).map(name => {
+  if (!marker.has(name)) { console.error(`layer ${name} reported but not found in ensure-patches.sh`); process.exit(1); }
+  return { name, marker: marker.get(name) };
+});
 
 // The toolchain belongs in the lock as much as the plugins do. pnpm was taken
 // as @latest, so a fresh machine got a newer major than the one this stand was

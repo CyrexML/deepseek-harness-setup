@@ -8,7 +8,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
 
-DSHDIR="$HOME/.dsh"
+DSHDIR="${DSH_HOME:-$HOME/.dsh}"
 STAND_DIR_ENV="${STAND_DIR:-$HOME/Harness_AI}/stand.env"
 PROFILE="$DSHDIR/profiles/web"
 TPL="$ROOT/templates"

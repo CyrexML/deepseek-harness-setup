@@ -9,7 +9,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 . "$HERE/lib.sh"
 
-PROFILE="$HOME/.dsh/profiles/web"
+PROFILE="${DSH_HOME:-$HOME/.dsh}/profiles/web"
 mkdir -p "$PROFILE"
 
 want() { [ "$(cfg ".features.$1" true)" = "true" ]; }
