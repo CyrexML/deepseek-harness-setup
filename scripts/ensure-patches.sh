@@ -90,6 +90,13 @@ layer better-sidebar "$NM/dsh-better-sidebar/lib/index.js" "DSH_PREVIEW_TRUSTED_
   bash "$HERE/patch-sidebar.sh"
 layer llm-pi-ai "$DSH_ROOT/packages/llm/llm-pi-ai/lib/index.js" "dsh-local: replay usage" \
   node "$HERE/patch-llm-pi-ai-usage.mjs"
+# Session format v4 refuses a message whose source.kind is "plugin" and fails the
+# WHOLE turn; graph-memory still stamps the retired shape on its per-turn trace,
+# which it writes at the end of every turn. Marker file is the projection, the
+# script fixes all three messages.
+layer graph-memory-source "$NM/graph-memory/dist/src/format/dsh-turn-projection.js" "dsh-local: producer-owned source kind" \
+  node "$HERE/patch-graph-memory-source-kind.mjs" "$NM/graph-memory"
+
 layer graph-memory "$NM/graph-memory/dist/dsh.js" "dsh-local: workspace-scoped recall" \
   node "$HERE/patch-graph-memory-scope.mjs"
 layer ui-conversation "$DSH_ROOT/packages/client/ui-conversation/lib/client.js" "dsh-local: eager image read" \

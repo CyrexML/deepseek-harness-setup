@@ -21,7 +21,7 @@
   "patchLayers": [
     {
       "name": "bridge",
-      "marker": "dsh-bridge-en:"
+      "marker": "dsh-bridge-en: better-sidebar mobile fix"
     },
     {
       "name": "turn-rewind",
@@ -34,6 +34,10 @@
     {
       "name": "llm-pi-ai",
       "marker": "dsh-local: replay usage"
+    },
+    {
+      "name": "graph-memory-source",
+      "marker": "dsh-local: producer-owned source kind"
     },
     {
       "name": "graph-memory",
