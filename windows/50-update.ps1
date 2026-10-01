@@ -35,8 +35,13 @@ if (-not $NoPull) {
             if ($before -eq $after) { Write-Ok 'already the latest ({0})' $after } else { Write-Ok '{0} -> {1}' $before $after }
         } finally { Pop-Location }
     } else {
-        Write-Info 'this folder is not a git clone - download a new ZIP from GitHub and unpack it over this one'
-        Write-Info 'then run the update again'
+        # A warning, not a note. This path updates NOTHING by itself: it reruns the
+        # install steps from the files already in this folder. An unpacked ZIP that
+        # is a month old reinstalls a month-old stand, the run looks successful,
+        # and the thing it was meant to fix is still there.
+        Write-Warn 'this folder is not a git clone - nothing was fetched'
+        Write-Info 'what gets installed is whatever lies in this folder right now'
+        Write-Info 'to actually update: download a fresh ZIP from GitHub, unpack it over this folder, run the update again'
     }
 }
 

@@ -34,7 +34,14 @@ else
 fi
 
 step 'model'
-if curl -sf --max-time 10 "$MODEL_URL/health" 2>/dev/null | grep -q '"status":"ok"'; then
+# A server that is simply NOT RUNNING is not a failed check - it is the normal
+# state right after an install or an update, exactly as for the web interface
+# below. Only a server that answers badly counts as a fault. curl exit 7 is
+# "could not connect"; 28 is a timeout, which on a loopback port means the same.
+health="$(curl -sf --max-time 10 "$MODEL_URL/health" 2>/dev/null)"; curl_rc=$?
+if [ "$curl_rc" = 7 ] || [ "$curl_rc" = 28 ]; then
+  info 'llama-server is not running on %s - normal right after an install; start it with the Harness AI shortcut' "$MODEL_URL"
+elif printf '%s' "$health" | grep -q '"status":"ok"'; then
   ok 'llama-server responds (%s)' "$MODEL_URL"
   # Measure generation speed on a real answer: a three-token reply is dominated
   # by request overhead and the number means nothing.
@@ -45,7 +52,7 @@ if curl -sf --max-time 10 "$MODEL_URL/health" 2>/dev/null | grep -q '"status":"o
   info 'generation %s tok/s (on an RTX 5080, 16 GB: about 95)' "${tps:-?}"
   [ "${tps:-0}" -lt 20 ] 2>/dev/null && warn 'generation below 20 tok/s - the model likely did not fit into VRAM (see docs/MODEL.md section 5)'
 else
-  printf '    x %s\n' "$(t 'llama-server does not answer on %s' "$MODEL_URL")" >&2
+  printf '    x %s\n' "$(t 'llama-server answers on %s but not with status ok' "$MODEL_URL")" >&2
   info 'start it: windows\\run\\start-server.ps1'
   fails=$((fails+1))
 fi
