@@ -99,6 +99,21 @@ const block = [BEGIN, '- insert:', ...dirs.map(presetRow), END].join('\n');
 const marked = new RegExp(`${BEGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?${END}`);
 s = marked.test(s) ? s.replace(marked, block) : `${s.replace(/\n*$/, '\n')}\n${block}\n`;
 
+// The registry default must name a preset that EXISTS. 0.1.7 does not fall back:
+// a default naming nothing fails every new session with
+// "agent-preset/not-found: Unknown agent preset: <id>", and the interface comes
+// up fine, so the install looks successful until the first session is created.
+// The id is machine-dependent (`local-<ctx>`, only a 65536 window is
+// `local-64k`), so this repoints a stale default at what is actually installed
+// instead of trusting whoever wrote the row.
+const SHIPPED = new Set(['standard', 'ptc', 'minimal', 'cordis']);
+const defaultRow = /(^- id: agent-preset-registry\n(?:[ \t]+\S.*\n)*?[ \t]+default:[ \t]*)(\S+)/m;
+const m = s.match(defaultRow);
+if (m !== null && !SHIPPED.has(m[2]) && !dirs.includes(m[2])) {
+  console.log(`presets: registry default "${m[2]}" names no installed preset - repointing to "${dirs[0]}"`);
+  s = s.replace(defaultRow, `$1${dirs[0]}`);
+}
+
 if (CHECK) {
   const ok = s === readFileSync(PATCH, 'utf8');
   console.log(ok ? `presets: ${dirs.join(', ')} - up to date` : 'presets: profile is OUT OF DATE, run without --check');

@@ -150,6 +150,11 @@
 # scripts/port-presets-to-profile.mjs - 0.1.7 discovers no preset directories,
 # only rows. `selectedDefault` (what the "Set as default" button writes) wins
 # over this line once it is set.
+# @PRESET@, not a fixed name: the preset directory is `local-<ctx>`, and only a
+# 65536 window is called `local-64k`. A machine tuned to a smaller window got a
+# preset named after ITS window while this line still pinned local-64k, and 0.1.7
+# refuses an unknown default outright - "New session failed: agent-preset/
+# not-found: Unknown agent preset: local-64k" on the first new session.
 - id: agent-preset-registry
   config:
-    default: local-64k
+    default: @PRESET@
