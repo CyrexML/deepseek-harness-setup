@@ -69,7 +69,18 @@ function Log([string]$m) {
   } catch { }
 }
 
-function Wsl([string]$cmd) { & wsl.exe -d $Distro -- bash -lc $cmd }
+# Any stderr from a native command is a TERMINATING error here the moment it is
+# redirected - and every caller below pipes `2>&1 | Out-Null`. $ErrorActionPreference
+# is 'Stop', so PowerShell wraps the first stderr line into a NativeCommandError.
+# A shell script that merely WARNED then killed the launcher: a stand with no
+# sessions yet made `find` print "No such file or directory" during the shutdown
+# cleanup, and the window closed with "Could not start: find: ...". The trap is
+# lifted for the call itself; callers that care about success check $LASTEXITCODE.
+function Wsl([string]$cmd) {
+  $prev = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try { & wsl.exe -d $Distro -- bash -lc $cmd } finally { $ErrorActionPreference = $prev }
+}
 
 # The holder is the `wsl.exe` that started harness-web-fg.sh: node runs in its
 # foreground, which makes the system visible from any other window.
