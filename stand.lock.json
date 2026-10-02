@@ -64,6 +64,10 @@
       "marker": "dsh-bridge-en: zoom scope"
     },
     {
+      "name": "picker-yield",
+      "marker": "dsh-bridge-en: picker yield on remote"
+    },
+    {
       "name": "header-sidebar-btn",
       "marker": "dsh-bridge-en: header sidebar button removed"
     },

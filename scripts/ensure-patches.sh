@@ -130,6 +130,13 @@ layer pdfjs-map-polyfill "$DSH_ROOT/packages/client/ui-sidebar-documentpreview/l
   node "$HERE/patch-pdfjs-map-polyfill.mjs"
 layer zoom-scope "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bridge-en: zoom scope" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-zoom-scope.mjs" "$NM/@wenbin_wb/dsh-bridge"
+# On a phone the bridge keeps DSH's two directoryFlow slots for itself, so "Add
+# workspace" opens the PLUGIN's drawer - which has no "New folder" - instead of
+# DSH's own picker. It yields only on a loopback page. The admin gate the plugin
+# protects that way is preserved: patch-picker.mjs checks it before the button.
+layer picker-yield "$NM/@wenbin_wb/dsh-bridge/client/picker-yield.js" "dsh-bridge-en: picker yield on remote" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-picker-yield.mjs" "$NM/@wenbin_wb/dsh-bridge"
+
 layer header-sidebar-btn "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: header sidebar button removed" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-header-sidebar-btn.mjs" "$NM/@wenbin_wb/dsh-bridge"
 layer mobile-ux "$NM/@wenbin_wb/dsh-bridge/client/mobile-styles.js" "dsh-bridge-en: mobile ux" \
