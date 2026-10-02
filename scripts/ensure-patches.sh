@@ -120,6 +120,14 @@ fi
 
 layer graph-memory "$NM/graph-memory/dist/dsh.js" "dsh-local: workspace-scoped recall" \
   node "$HERE/patch-graph-memory-scope.mjs"
+# llama.cpp decodes images with stb_image, which has no WebP. The harness
+# re-encodes any attachment that cannot pass through untouched - an ordinary
+# screenshot cannot, because it carries sRGB/gAMA/pHYs chunks - and picks the
+# codec by alpha alone, so a PNG screenshot became WebP and the model server
+# answered 400 "Failed to load image or audio file", failing the whole turn.
+layer attachment-no-webp "$DSH_ROOT/packages/attachment/attachment-local/lib/index.js" "dsh-local: no webp for stb_image" \
+  node "$HERE/patch-attachment-no-webp.mjs" "$DSH_ROOT/packages/attachment/attachment-local/lib/index.js"
+
 layer ui-conversation "$DSH_ROOT/packages/client/ui-conversation/lib/client.js" "dsh-local: eager image read" \
   node "$HERE/patch-ui-conversation-eager-read.mjs"
 layer fs-edit-tolerant "$DSH_ROOT/packages/fs/fs-local/lib/index.js" "dsh-local: tolerant edit match" \

@@ -44,6 +44,10 @@
       "marker": "dsh-local: workspace-scoped recall"
     },
     {
+      "name": "attachment-no-webp",
+      "marker": "dsh-local: no webp for stb_image"
+    },
+    {
       "name": "ui-conversation",
       "marker": "dsh-local: eager image read"
     },
