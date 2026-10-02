@@ -33,7 +33,7 @@
  * решает это только для спецификатора строки, не для импортов внутри файла).
  * Путь совпадает с тем, что грузит сам хост, поэтому экземпляр модуля один.
  */
-import Base from '/home/rodionisimus/tools/deepseek-harness/packages/compaction/compaction-basic/lib/index.js'
+import Base from '@HARNESS_DIR@/packages/compaction/compaction-basic/lib/index.js'
 
 const CHARS_PER_TOKEN = 3.5
 
