@@ -88,6 +88,19 @@ layer turn-rewind "$NM/@anionex/dsh-turn-rewind/lib/client.js" "/* dsh-turn-rewi
   node "$HOME/Harness_AI/projects/PlugIN/dsh-turn-rewind-en/translate.mjs"
 layer better-sidebar "$NM/dsh-better-sidebar/lib/index.js" "DSH_PREVIEW_TRUSTED_ROOTS" \
   bash "$HERE/patch-sidebar.sh"
+# pi-ai hands the model max(1, window - estimate - 4096) tokens of room, and the
+# estimate is anchored on the previous response's usage - which graph-memory
+# invalidates whenever it archives history between turns. Measured: four of six
+# turns in one session ended on max-tokens, two of them after producing a single
+# token with a real prompt of 10K and 16K against a 65K window. The floor turns
+# that into a short answer instead of a dead turn. Path carries a pnpm hash, so
+# it is resolved rather than written out.
+PIAI="$(ls -d "$DSH_ROOT"/node_modules/.pnpm/@earendil-works+pi-ai@*/node_modules/@earendil-works/pi-ai/dist/api/simple-options.js 2>/dev/null | head -1)"
+if [ -n "$PIAI" ]; then
+  layer pi-ai-budget-floor "$PIAI" "dsh-local: output budget floor" \
+    node "$HERE/patch-pi-ai-budget-floor.mjs" "$PIAI"
+fi
+
 layer llm-pi-ai "$DSH_ROOT/packages/llm/llm-pi-ai/lib/index.js" "dsh-local: replay usage" \
   node "$HERE/patch-llm-pi-ai-usage.mjs"
 # Session format v4 refuses a message whose source.kind is "plugin" and fails the

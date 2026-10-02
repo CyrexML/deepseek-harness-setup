@@ -1,6 +1,6 @@
 {
   "_": "Snapshot of the verified combination. Changed deliberately: edit the numbers and publish a new lock.",
-  "createdAt": "2026-09-30",
+  "createdAt": "2026-10-02",
   "tools": {
     "node": "22.23.2",
     "pnpm": "11.7.0"
@@ -30,6 +30,10 @@
     {
       "name": "better-sidebar",
       "marker": "DSH_PREVIEW_TRUSTED_ROOTS"
+    },
+    {
+      "name": "pi-ai-budget-floor",
+      "marker": "dsh-local: output budget floor"
     },
     {
       "name": "llm-pi-ai",
