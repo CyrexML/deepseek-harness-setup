@@ -380,6 +380,22 @@
     - id: compaction-basic
       name: ./compaction-notools.mjs
       config:
+        # DSH 0.1.7 added headroomTokens and defaults it to 65536 - the size of
+        # a whole small window. The engine computes
+        #     pressureBudget = contextWindow - requestMaxTokens - headroomTokens
+        # and THROWS when that is not positive. On a 65536 window with a 12288
+        # reply cap the default leaves -12288, so every pressure check raised
+        # TargetPressureConfigError, the error was swallowed, and compaction
+        # NEVER ran: the context grew to the full window and every long turn
+        # ended on "Output token limit reached" (measured: totalTokens 65536).
+        #
+        # 8192 keeps the threshold where this preset wants it:
+        #     65536 - 12288 - 8192 = 45056 of pressure budget,
+        #     threshold = min(65536 x 0.7, 45056) = 45056
+        # against the 45875 the ratio alone would give - and still leaves
+        # 20480 above it, more than the worst single-step growth measured here
+        # (17910). Raising the window or lowering the reply cap would allow more.
+        headroomTokens: 8192
         # The threshold is floor(contextWindow x ratio), a share of the window
         # rather than an absolute, so moving from 32k to 64k doubled both the
         # threshold and the headroom.
