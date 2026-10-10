@@ -220,6 +220,14 @@ if grep -qF 'dsh-local: turnTail slot id' "$NM/dsh-univer-office/lib/client.js" 
   layer univer-slot-id "$NM/dsh-univer-office/lib/client.js" "dsh-local: turnTail slot id" \
     node "$HERE/patch-univer-slot-id.mjs"
 fi
+# While a turn edits a .univer file the plugin floats its own window over the
+# conversation. The host's right sidebar already reflows the chat (measured:
+# composer 774 -> 473 px) and the plugin already registers a `*.univer` tab type
+# there, so the edit is routed into that tab instead. CSS cannot do this: the
+# conversation sizes itself from the viewport, not from its container.
+layer univer-dock-sidebar "$NM/dsh-univer-office/lib/client.js" "dsh-local: univer edits dock into the host right sidebar" \
+  node "$HERE/patch-univer-dock-sidebar.mjs" "$NM/dsh-univer-office"
+
 layer sidebar-relative-path "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: relative path in chat links" \
   node "$HERE/patch-better-sidebar-relative-path.mjs"
 
