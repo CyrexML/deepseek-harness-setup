@@ -164,6 +164,14 @@ function Disable-IdleSleep {
     $saved = @{}
     foreach ($pair in @(@('STANDBYIDLE', 'standby-timeout-ac'), @('HIBERNATEIDLE', 'hibernate-timeout-ac'))) {
       $min = Get-AcTimeoutMinutes $pair[0]
+      # Same guard as harness-idle-sleep.ps1: a standby timeout that already
+      # reads "never" is our own leftover, not the user's choice. Saved as the
+      # original it would be "restored" on every stop and the PC would never
+      # sleep again. Hibernate "never" is an ordinary setting and is kept.
+      if ($pair[1] -eq 'standby-timeout-ac' -and $min -eq 0) {
+        $min = 10
+        Log "standby timeout read as 'never' - recording 10 min as the value to restore"
+      }
       if ($null -ne $min) { $saved[$pair[1]] = $min }
     }
     if ($saved.Count -gt 0) { $saved | ConvertTo-Json | Set-Content -Encoding UTF8 $PowerSaved }
@@ -178,7 +186,11 @@ function Restore-IdleSleep {
     $saved = Get-Content -Raw $PowerSaved | ConvertFrom-Json
     foreach ($p in $saved.PSObject.Properties) { & powercfg.exe /change $p.Name ([int]$p.Value) | Out-Null }
     Write-Host (T 'sleep timeouts restored')
-  } catch { Write-Host (T 'could not restore the sleep timeouts: {0}' @($_)) -ForegroundColor Yellow }
+    Log ('sleep timeouts restored: ' + (($saved.PSObject.Properties | ForEach-Object { "$($_.Name)=$($_.Value)" }) -join ', '))
+  } catch {
+    Write-Host (T 'could not restore the sleep timeouts: {0}' @($_)) -ForegroundColor Yellow
+    Log "sleep timeouts restore FAILED: $_"
+  }
   Remove-Item -Force $PowerSaved -ErrorAction SilentlyContinue
 }
 
