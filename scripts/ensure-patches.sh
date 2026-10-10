@@ -101,6 +101,15 @@ if [ -n "$PIAI" ]; then
     node "$HERE/patch-pi-ai-budget-floor.mjs" "$PIAI"
 fi
 
+# The context meter decides when compaction runs, and it priced reasoning blocks
+# at chars/4 like visible text - but this stand's chat template replays no
+# reasoning at all, so a third of what it measured was never sent. Measured over
+# 93 compactions: the meter priced the shadowed span at 30 317 tokens where
+# llama-server counted 22 515 for the same content. Compaction therefore fired
+# at about 33 000 real tokens of a 65 536 window, 130 times across two sessions.
+layer token-meter-reasoning "$DSH_ROOT/packages/llm/token-meter/lib/index.js" "dsh-local: reasoning is not replayed" \
+  node "$HERE/patch-token-meter-reasoning.mjs"
+
 layer llm-pi-ai "$DSH_ROOT/packages/llm/llm-pi-ai/lib/index.js" "dsh-local: replay usage" \
   node "$HERE/patch-llm-pi-ai-usage.mjs"
 # Session format v4 refuses a message whose source.kind is "plugin" and fails the
