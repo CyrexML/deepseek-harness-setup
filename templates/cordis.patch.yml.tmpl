@@ -28,6 +28,16 @@
         # re-encoding several images in a row.
         requestImagePixelBudget: 370800
         streamIdleTimeoutMs: 900000
+        # Повторы при недоступной модели (2026-10-14). Лаунчер перезапускает
+        # llama-server, когда видеокарта «залипает» (Wait-StopSignal, сторож GPU),
+        # и по кнопке в меню Power; модель недоступна ~10-30 с. Штатная политика
+        # (5 повторов, 0,5..8 с, llm/src/retry-policy.ts:14-16) ждёт ~15 с — на
+        # грани, и ход агента обрывался бы ошибкой. 8 повторов до 10 с ≈ 45 с.
+        retryPolicy:
+          mode: normal
+          maxRetries: 8
+          backoff:
+            maxDelayMs: 10000
         models:
           - id: @MODEL_ID@
             # Equals the server's -c (@CTX@). Workarounds through a fake

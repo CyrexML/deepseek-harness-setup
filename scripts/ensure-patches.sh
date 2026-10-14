@@ -172,6 +172,16 @@ layer mobile-back "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: mo
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-mobile-back.mjs" "$NM/@wenbin_wb/dsh-bridge"
 layer html-no-store "$NM/@wenbin_wb/dsh-bridge/lib/index.js" "dsh-bridge-en: html no-store" \
   node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-html-no-store.mjs" "$NM/@wenbin_wb/dsh-bridge"
+# Model restart button and GPU watchdog status in the Power menu (2026-10-14);
+# anchors live inside patch-power's code, so it runs after the bridge layer.
+layer gpu-restart "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: gpu restart" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-gpu-restart.mjs" "$NM/@wenbin_wb/dsh-bridge"
+# Lighter ⏻ menu without the sleep option (2026-10-14); replaces patch-power's popover.
+layer power-menu "$NM/@wenbin_wb/dsh-bridge/client/index.js" "dsh-bridge-en: power menu v2" \
+  node "$HOME/Harness_AI/projects/PlugIN/dsh-bridge-en/tools/patch-power-menu.mjs" "$NM/@wenbin_wb/dsh-bridge"
+# The rebuild check above runs before these later bridge layers; a layer applied
+# here would otherwise reach the browser only on the NEXT start. Quiet when fresh.
+bash "$HERE/bridge-rebuild-client.sh" "$NM/@wenbin_wb/dsh-bridge" || missing=1
 
 # DSH 0.1.7 removed the `settingsScope` service, and the plugin still lists it as
 # a REQUIRED client dependency - so it never activates, and one pending entry

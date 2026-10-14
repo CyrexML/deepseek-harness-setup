@@ -30,6 +30,8 @@ node "$HERE/tools/patch-preview.mjs" .    # user files via /sidebar/html|file: n
 node "$HERE/tools/patch-hashes.mjs" .     # remap stale css-module hashes of the host build at runtime
 node "$HERE/tools/patch-icon.mjs" .       # DSH whale as PWA/home-screen/apple-touch icon (assets from tools/gen-icon.mjs)
 node "$HERE/tools/patch-power.mjs" .      # Power card in Remote access: stop DSH / DSH+WSL via launcher signal file
+node "$HERE/tools/patch-gpu-restart.mjs" . # Power menu: model restart button + GPU watchdog status (launcher)
+node "$HERE/tools/patch-power-menu.mjs" .  # lighter ⏻ menu, no sleep option (replaces patch-power popover)
 node "$HERE/tools/patch-settings-mobile.mjs" . # settings nav/plugin-hub overflow on phones; dark power popover
 node "$HERE/tools/patch-zoom-scope.mjs" . # pinch: off in the chat, on in the side panel
 node "$HERE/tools/patch-header-sidebar-btn.mjs" . # drop the added sidebar button: 0.1.6 has a native one

@@ -7,7 +7,7 @@ stand on a Windows PC: a local model on your own GPU, a coding agent that reads 
 your project files, a side panel that renders the result (HTML pages, PDFs, spreadsheets),
 and a mobile interface you can actually use from a phone.
 
-It is not a bare harness install. It also sets up the plugins worth having, applies 23
+It is not a bare harness install. It also sets up the plugins worth having, applies 26
 patch layers that fix what does not work out of the box (most of them on the mobile side),
 tunes the model server for your GPU, and installs shortcuts, an update button and a full
 uninstall.
@@ -36,7 +36,7 @@ What you get:
 Why this is not the same as "installing the harness yourself": the harness is the core.
 Around it you still have to choose and wire up plugins, fix what does not work on a phone,
 pick a model for your card, compute the context window, set up startup, the tunnel and
-power behaviour. Here that is already done and pinned: **24 patch layers** where things
+power behaviour. Here that is already done and pinned: **26 patch layers** where things
 break, every component version recorded in `stand.lock.json`, and model server settings
 computed for your GPU instead of copied from someone else's example.
 
@@ -170,7 +170,7 @@ The installer explains every step as it goes:
 | `00-prereqs` | checks GPU and free space, installs WSL2 and a distribution, opens the model port |
 | `10-llama` | installs llama.cpp with the CUDA build matching your driver |
 | `20-model` | picks a model for your GPU and downloads it |
-| `wsl/*` | builds the harness, installs plugins, applies 24 patch layers, writes the config |
+| `wsl/*` | builds the harness, installs plugins, applies 26 patch layers, writes the config |
 | `30-tune` | computes the context window that fits your VRAM and measures the result |
 | `40-shortcuts` | shortcuts, autostart, power-maintenance task |
 | `50-verify` | verifies everything came up |
@@ -245,11 +245,11 @@ The same thing in words — [docs/MODEL.md](docs/MODEL.md).
   computer. Step by step: [docs/MOBILE.md](docs/MOBILE.md).
 
 **Stopping the stand: the power button in the top-left corner of the interface.** It works
-from the PC and from the phone, and offers four levels — stop the stand only, stop it
-together with WSL, stop and sleep, stop and shut the PC down.
+from the PC and from the phone: restart the model, stop the stand, stop it together with
+WSL, or shut the PC down. The header shows whether generation speed is normal.
 
 <p align="center">
-  <img src="docs/images/power-menu.png" width="330" alt="The power button menu">
+  <img src="docs/images/power-menu.png" width="268" alt="The power button menu">
 </p>
 
 The desktop shortcut **Harness AI — stop** does the same as the first option.
@@ -267,6 +267,17 @@ To see the current state:
 ```powershell
 powershell -ExecutionPolicy Bypass -File F:\Harness_AI\run\harness-idle-sleep.ps1
 ```
+
+**Slow generation.** Sometimes the GPU gets "stuck": generation drops several times over
+(for example from 130 to 23 tokens/s) with no error — the card reports ~99% load at a third
+of its usual power, while its memory bus is almost idle. Restarting only the model fixes it;
+DSH, sessions and the phone tunnel keep running. The launcher watches for this: about 30 s of
+the stuck pattern during generation restarts the model at the next pause between requests,
+and DSH simply retries a request that was in flight (the restart takes ~10 s). If the model
+gets stuck again right after restarts, automatic restarts stop and the power menu says a
+reboot is needed. **Restart model** in the power menu does the same by hand. The watchdog
+runs when the stand is started from the shortcut (hidden mode); its state is in
+`run\gpu.status`.
 
 ## Updating
 
@@ -320,7 +331,7 @@ Linux side, from inside WSL, run `bash wsl/uninstall.sh`.
 - **DeepSeek Harness** at the tag from `stand.lock.json`, built from source inside WSL2.
 - **Plugins** at pinned versions: mobile bridge, side panel with a file explorer and
   viewers, office documents, context meter, graph memory, turn rewind.
-- **24 patch layers** — my own fixes on top of the harness and the plugins (below).
+- **26 patch layers** — my own fixes on top of the harness and the plugins (below).
 - **llama.cpp** plus the GGUF model you chose, on the Windows side.
 
 <p align="center">
@@ -351,6 +362,8 @@ whatever is missing on every start.
 | mobile-attach | a one-tap attach button on the touch composer, and a photo one beside it |
 | mobile-back | the system back gesture closes the drawer, the panel or a dialog instead of leaving the app |
 | load-monitor | GPU load, temperature, power draw and the energy used since start, in the header |
+| gpu-restart | GPU watchdog status and a **Restart model** button in the power menu (the launcher restarts only the model) |
+| power-menu | a lighter power menu: one list, no descriptions, no sleep option |
 | fs-edit-tolerant | an edit whose `old_string` differs only in whitespace still applies; when it truly does not match, the error quotes the file |
 | fs-missing-path | a write or edit aimed at a path that does not exist says so, instead of telling the model to read a file that cannot be read |
 | mobile-input | on a touch screen Enter breaks the line instead of sending; a clipboard carrying only HTML still pastes; a long question leaves room for its answers |

@@ -249,20 +249,134 @@ function Get-VramReport {
   } catch { return $null }
 }
 
-# Hidden mode: wait for a signal. Returns 'dsh' | 'wsl' (the web button) or
-# 'gone' (a second click on the shortcut already stopped the system).
+# --- GPU watchdog and model restart (2026-10-14) ---------------------------
+#
+# The "stuck GPU" state: generation falls from ~70-130 to ~14-23 tok/s with no
+# error. Signature, measured 2026-10-14 during generation: utilization.gpu
+# 97-100% at full SM clock, but utilization.memory 13-14% and ~119 W, against
+# ~65% and ~325 W when healthy - the card waits instead of streaming weights.
+# Restarting ONLY llama-server cured it (22.7 -> 131 tok/s) with DSH, sessions
+# and the tunnel left running; no Windows reboot was needed. The trigger is not
+# known yet (a headless Chromium run was ruled out).
+#
+# So, while the stand runs in hidden mode, every ~6 s during generation the
+# counters are sampled; ~30 s of the stuck signature schedules a model restart
+# for the next pause between requests (or after 120 s regardless). DSH retries
+# a request while the model is down (qwen-local retryPolicy, ~45 s). If the
+# restart does not help - stuck again within 10 min twice, or 3 auto restarts
+# in an hour - auto restart stops and the status says a PC reboot is needed.
+# The web Power menu shows the status (run\gpu.status) and has a manual
+# "Restart the model" button (signal mode 'model').
+$GpuStatusFile = "$RunDir\gpu.status"
+$GpuStuckSamples = 5            # x ~6 s = ~30 s of stuck generation
+$script:Gpu = @{ streak = 0; pendingSince = $null; auto = New-Object System.Collections.ArrayList
+  lastRestart = $null; persistent = $false; failedFix = 0; last = $null; state = $null }
+
+function Test-ModelBusy {
+  try { $s = Invoke-RestMethod -Uri 'http://127.0.0.1:8080/slots' -TimeoutSec 2; return [bool](@($s) | Where-Object { $_.is_processing }) }
+  catch { return $false }
+}
+
+function Get-GpuLoad {
+  try {
+    $q = (& "$env:SystemRoot\System32\nvidia-smi.exe" --query-gpu=utilization.gpu,utilization.memory,power.draw,memory.free --format=csv,noheader,nounits 2>$null | Select-Object -First 1)
+    if (-not $q) { return $null }
+    $p = $q -split ','
+    $inv = [Globalization.CultureInfo]::InvariantCulture
+    return [pscustomobject]@{ gpu = [int]$p[0].Trim(); mem = [int]$p[1].Trim(); watts = [double]::Parse($p[2].Trim(), $inv); free = [int]$p[3].Trim() }
+  } catch { return $null }
+}
+
+function Write-GpuStatus($load, [bool]$busy) {
+  try {
+    $g = $script:Gpu
+    $state = if ($g.state) { $g.state } elseif ($g.persistent) { 'reboot-needed' } elseif ($g.pendingSince) { 'restart-pending' } elseif ($g.last -and -not $g.last.healthy) { 'stuck' } elseif ($g.last) { 'ok' } else { 'unknown' }
+    $o = [ordered]@{
+      checked = (Get-Date).ToString('o'); state = $state; busy = $busy
+      now = $(if ($load) { [ordered]@{ gpu = $load.gpu; mem = $load.mem; watts = $load.watts; free = $load.free } } else { $null })
+      lastGeneration = $g.last
+      lastRestart = $(if ($g.lastRestart) { [ordered]@{ at = $g.lastRestart.at.ToString('o'); reason = $g.lastRestart.reason; ok = $g.lastRestart.ok } } else { $null })
+      autoRestartsLastHour = @($g.auto | Where-Object { $_ -gt (Get-Date).AddHours(-1) }).Count
+    }
+    # WriteAllText: no BOM (Set-Content -Encoding UTF8 writes one, and JSON.parse rejects it).
+    [IO.File]::WriteAllText($GpuStatusFile, ($o | ConvertTo-Json -Compress -Depth 4))
+  } catch { }
+}
+
+function Restart-Model([string]$reason) {
+  $g = $script:Gpu
+  $auto = $reason -like 'auto*'
+  Log "model restart ($reason)"
+  $g.pendingSince = $null; $g.streak = 0; $g.last = $null
+  if ($auto) { [void]$g.auto.Add((Get-Date)) } else { $g.persistent = $false; $g.failedFix = 0 }
+  $g.state = 'restarting'; Write-GpuStatus $null $false
+  try { & "$RunDir\stop-server.ps1" | Out-Null } catch { Log "stop-server: $_" }
+  Start-Sleep -Seconds 2
+  $ok = $false
+  try {
+    & "$RunDir\start-server.ps1" | Out-Null
+    foreach ($i in 1..120) {
+      try { $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8080/health' -TimeoutSec 3 -UseBasicParsing; if ($r.StatusCode -eq 200) { $ok = $true; break } } catch { }
+      Start-Sleep -Seconds 1
+    }
+  } catch { Log "start-server: $_" }
+  $g.state = $null
+  $g.lastRestart = @{ at = Get-Date; reason = $reason; ok = $ok; auto = $auto }
+  Log ('model restart ' + $(if ($ok) { 'done' } else { 'FAILED: no /health in 120 s' }))
+  $v = Get-VramReport; if ($v) { Log $v.text }
+  Write-GpuStatus $null $false
+}
+
+function Watch-Gpu([int]$tick) {
+  $g = $script:Gpu
+  $busy = Test-ModelBusy
+  if ($g.pendingSince) {
+    $waited = ((Get-Date) - $g.pendingSince).TotalSeconds
+    if (-not $busy) { Restart-Model 'auto'; return }
+    if ($waited -gt 120) { Restart-Model 'auto, no pause in 120 s'; return }
+  }
+  if ($tick % 3 -ne 0) { return }
+  $load = Get-GpuLoad
+  if ($load -and $busy) {
+    $stuck = ($load.gpu -ge 80 -and $load.mem -lt 30 -and $load.watts -lt 200)
+    $g.last = [ordered]@{ at = (Get-Date).ToString('o'); healthy = (-not $stuck); gpu = $load.gpu; mem = $load.mem; watts = $load.watts }
+    if ($stuck) { $g.streak++ } else { $g.streak = 0 }
+    if ($stuck -and $g.streak -eq $GpuStuckSamples) {
+      Log "GPU stuck for ~30 s: util $($load.gpu)%, memory bus $($load.mem)%, $($load.watts) W"
+      $recent = $g.lastRestart -and $g.lastRestart.auto -and ((Get-Date) - $g.lastRestart.at).TotalMinutes -lt 10
+      if ($recent) { $g.failedFix++ } else { $g.failedFix = 0 }
+      $hour = @($g.auto | Where-Object { $_ -gt (Get-Date).AddHours(-1) }).Count
+      if ($g.failedFix -ge 2 -or $hour -ge 3) {
+        if (-not $g.persistent) { Log 'stuck again right after model restarts: auto restart off, a PC reboot is needed' }
+        $g.persistent = $true
+      } elseif (-not $g.pendingSince) {
+        $g.pendingSince = Get-Date
+        Log 'model restart scheduled for the next pause between requests'
+      }
+    }
+  }
+  Write-GpuStatus $load $busy
+}
+
+# Hidden mode: wait for a signal. Returns 'dsh' | 'wsl' | 'sleep' | 'shutdown'
+# (the web Power menu) or 'gone' (a second click on the shortcut already stopped
+# the system). Mode 'model' restarts only llama-server and keeps waiting.
 function Wait-StopSignal {
+  $tick = 0
   while ($true) {
     Start-Sleep -Seconds 2
+    $tick++
     if (Test-Path $PowerRequest) {
       $mode = 'dsh'
       try { $mode = (Get-Content -Raw $PowerRequest | ConvertFrom-Json).mode } catch { }
       Remove-Item -Force $PowerRequest -ErrorAction SilentlyContinue
+      if ($mode -eq 'model') { Log 'signal: model'; Restart-Model 'button'; continue }
       if ($mode -notin @('wsl', 'sleep', 'shutdown')) { $mode = 'dsh' }
       Log "signal: $mode"
       return $mode
     }
     if (-not (Test-SystemRunning)) { Log 'system gone (llama-server and web holder both absent)'; return 'gone' }
+    try { Watch-Gpu $tick } catch { Log "gpu watchdog: $_" }
   }
 }
 
@@ -345,13 +459,13 @@ try {
 
   # 1. The model.
   #
-  # Diagnostic note worth keeping: after a dozen server restarts in a row,
-  # generation once fell from 83 to 3.8 tok/s with an unchanged command line and
-  # no error at all. The signature is a card reported as 99% "busy" while drawing
-  # 93 W of 360 with 5% memory utilisation. The cause is accumulated driver VRAM
-  # state, not configuration, and only a Windows reboot clears it - restarting
-  # the server does not. So if generation collapses, look at
-  # `nvidia-smi --query-gpu=power.draw,utilization.memory` rather than the logs.
+  # Diagnostic note worth keeping: generation can collapse (83 -> 3.8 tok/s once,
+  # 70 -> 14 and 131 -> 22.7 later) with an unchanged command line and no error.
+  # The signature is a card reported as ~99% "busy" while drawing ~100-120 W of
+  # 360 with 5-14% memory utilisation. This note used to say only a Windows
+  # reboot clears it; on 2026-10-14 restarting ONLY llama-server did (22.7 ->
+  # 131 tok/s). The watchdog in Wait-StopSignal now detects it and restarts the
+  # model; the Power menu has a manual button. See "GPU watchdog" above.
   Write-Host (T 'starting the model...')
   # Sampling and the chat template are the defaults of start-server.ps1; the
   # custom jinja keeps past reasoning out of the replayed prompt (measured at
