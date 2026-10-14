@@ -148,4 +148,62 @@ else
   warn 'no chat template - the server falls back to the one baked into the model (context grows faster)'
 fi
 
+# A browser for dsh-univer-office. univer_compile_svg (an SVG page -> a slide, with
+# text measured in a real browser), slide lint, screenshots and PDF all launch
+# Chromium, and WSL has none: the calls fail with UNIVER_RENDER_BROWSER_UNAVAILABLE
+# and the live Univer window stays empty while the agent works. The harness build
+# already carries Playwright; its Chromium is downloaded once, and a wrapper in
+# ~/.local/bin starts the newest one. start-web.sh hands the wrapper to DSH through
+# UNIVER_RENDER_BROWSER - the plugin reads it from the DSH process, never from the
+# agent's shell.
+step 'browser for Univer slides (Chromium)'
+HARNESS="${HARNESS_DIR:-$HOME/tools/deepseek-harness}"
+PW_CLI="$(ls -d "$HARNESS"/node_modules/.pnpm/playwright@[0-9]*/node_modules/playwright/cli.js 2>/dev/null | grep -v -- '-alpha' | sort -V | tail -1 || true)"
+PW_CACHE="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
+find_chrome() { ls -d "$PW_CACHE"/chromium-[0-9]*/chrome-linux*/chrome 2>/dev/null | sort -V | tail -1 || true; }
+if [ -z "$PW_CLI" ]; then
+  warn 'no Playwright in the harness build - Univer slides, screenshots and PDF will not work'
+else
+  if [ -n "$(find_chrome)" ]; then
+    ok 'Chromium already downloaded'
+  else
+    info 'downloading Chromium (about 170 MB)'
+    if node "$PW_CLI" install chromium >/dev/null 2>&1 && [ -n "$(find_chrome)" ]; then ok 'Chromium downloaded'
+    else warn 'Chromium download failed - run: node %s install chromium' "$PW_CLI"; fi
+  fi
+  mkdir -p "$HOME/.local/bin"
+  cp "$TPL/univer-chrome" "$HOME/.local/bin/univer-chrome"
+  chmod +x "$HOME/.local/bin/univer-chrome"
+  if timeout 90 "$HOME/.local/bin/univer-chrome" --headless=new --no-sandbox --disable-gpu \
+       --dump-dom 'data:text/html,<p>univer-ok</p>' 2>/dev/null | grep -q univer-ok; then
+    ok 'works: %s' "$HOME/.local/bin/univer-chrome"
+  else
+    missing="$(ldd "$(find_chrome)" 2>/dev/null | awk '/not found/ {print $1}' | tr '\n' ' ' || true)"
+    warn 'Chromium does not start'
+    if [ -n "$missing" ]; then warn 'missing libraries: %s' "$missing"; fi
+    warn 'install them: sudo %s %s install-deps chromium' "$(command -v node)" "$PW_CLI"
+  fi
+fi
+
+# Windows fonts for WSL. Slides and pages ask for Segoe UI, Georgia, Arial; WSL
+# substitutes DejaVu, about 15% wider (499 px against 574 px for the same line), so
+# text measured here overflowed its boxes in Univer slides that look fine on Windows.
+# The fonts are read in place from the Windows side; a fonts.conf of your own is
+# left alone.
+step 'Windows fonts for WSL'
+FC="$HOME/.config/fontconfig/fonts.conf"
+WINDIR_WIN="$( (cd /mnt/c 2>/dev/null && cmd.exe /c 'echo %WINDIR%') 2>/dev/null | tr -d '\r' || true)"
+WINFONTS="/mnt/c/Windows/Fonts"
+case "$WINDIR_WIN" in ?:\\*) WINFONTS="$(winpath "$WINDIR_WIN")/Fonts";; esac
+if [ ! -d "$WINFONTS" ]; then
+  warn 'Windows fonts not found at %s - skipped' "$WINFONTS"
+elif [ -f "$FC" ] && ! grep -qF "$MARK" "$FC"; then
+  warn 'you already have %s - left as is; to get the Windows fonts add <dir>%s</dir> to it' "$FC" "$WINFONTS"
+else
+  mkdir -p "$(dirname "$FC")"
+  sed -e "s|@WINFONTS@|$WINFONTS|g" "$TPL/fonts.conf.tmpl" > "$FC"
+  command -v fc-cache >/dev/null 2>&1 && fc-cache -f >/dev/null 2>&1 || true
+  ok 'written: %s' "$FC"
+fi
+
 done_step 'settings ready'

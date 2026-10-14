@@ -33,6 +33,21 @@ else
   fails=$((fails+1))
 fi
 
+step 'browser for Univer slides'
+# univer_compile_svg, slide lint, screenshots and PDF need it; without it they fail
+# with UNIVER_RENDER_BROWSER_UNAVAILABLE. A real page is rendered, not just a path checked.
+if [ -x "$HOME/.local/bin/univer-chrome" ]; then
+  if timeout 90 "$HOME/.local/bin/univer-chrome" --headless=new --no-sandbox --disable-gpu \
+       --dump-dom 'data:text/html,<p>univer-ok</p>' 2>/dev/null | grep -q univer-ok; then
+    ok 'Chromium renders a page'
+  else
+    printf '    x %s\n' "$(t 'Chromium does not start - run the installer again and read the "browser for Univer slides" step')" >&2
+    fails=$((fails+1))
+  fi
+else
+  info 'no ~/.local/bin/univer-chrome - Univer slides, screenshots and PDF will not work'
+fi
+
 step 'model'
 # A server that is simply NOT RUNNING is not a failed check - it is the normal
 # state right after an install or an update, exactly as for the web interface

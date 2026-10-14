@@ -1,0 +1,19 @@
+#!/bin/sh
+# harness-stand: Chromium for dsh-univer-office - univer_compile_svg (SVG -> slide with
+# real text metrics), slide lint, screenshots and PDF. WSL has no system browser, and
+# without one those calls fail with UNIVER_RENDER_BROWSER_UNAVAILABLE. DSH reads this
+# file through UNIVER_RENDER_BROWSER, which scripts/start-web.sh exports when it exists.
+#
+# Written by the installer (templates/univer-chrome) to ~/.local/bin/univer-chrome.
+# It starts the NEWEST Chromium that Playwright downloaded, so a Playwright update does
+# not leave a stale path behind. libasound comes from the system package (installed by
+# the toolchain step); a stand built without sudo can unpack it into ~/.local/lib/asound.
+CACHE="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
+CHROME="$(ls -d "$CACHE"/chromium-[0-9]*/chrome-linux*/chrome 2>/dev/null | sort -V | tail -1)"
+if [ -z "$CHROME" ]; then
+  echo "univer-chrome: no Chromium under $CACHE - run the installer again (step: settings)" >&2
+  exit 127
+fi
+LOCAL_ASOUND="$HOME/.local/lib/asound/usr/lib/x86_64-linux-gnu"
+[ -d "$LOCAL_ASOUND" ] && export LD_LIBRARY_PATH="$LOCAL_ASOUND${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "$CHROME" "$@"

@@ -170,7 +170,7 @@ The installer explains every step as it goes:
 | `00-prereqs` | checks GPU and free space, installs WSL2 and a distribution, opens the model port |
 | `10-llama` | installs llama.cpp with the CUDA build matching your driver |
 | `20-model` | picks a model for your GPU and downloads it |
-| `wsl/*` | builds the harness, installs plugins, applies 26 patch layers, writes the config |
+| `wsl/*` | builds the harness, installs plugins, applies 26 patch layers, writes the config, sets up a browser for Univer slides and the Windows fonts |
 | `30-tune` | computes the context window that fits your VRAM and measures the result |
 | `40-shortcuts` | shortcuts, autostart, power-maintenance task |
 | `50-verify` | verifies everything came up |

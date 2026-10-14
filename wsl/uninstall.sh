@@ -26,7 +26,7 @@ for t in "${targets[@]}"; do
 done
 [ "$KEEP_DATA" = 1 ] && t '    ~/.dsh STAYS (--keep-data)\n'
 echo
-t 'Left alone: Node.js (~/.local/node), system packages, your projects outside the stand.\n'
+t 'Left alone: Node.js (~/.local/node), the Chromium download (~/.cache/ms-playwright), system packages, your projects outside the stand.\n'
 echo
 
 if [ "$YES" = 0 ]; then
@@ -48,6 +48,14 @@ for t in "${targets[@]}"; do
   step 'removing %s' "$t"
   rm -rf "$t" && ok 'removed'
 done
+
+step 'Univer browser wrapper and Windows fonts'
+rm -f "$HOME/.local/bin/univer-chrome" && ok 'removed ~/.local/bin/univer-chrome'
+if grep -qF '# harness-stand' "$HOME/.config/fontconfig/fonts.conf" 2>/dev/null; then
+  rm -f "$HOME/.config/fontconfig/fonts.conf" && ok 'removed ~/.config/fontconfig/fonts.conf'
+else
+  ok 'fonts.conf was not ours - left alone'
+fi
 
 step 'PATH line in ~/.bashrc'
 if grep -q '# harness-stand' "$HOME/.bashrc" 2>/dev/null; then
