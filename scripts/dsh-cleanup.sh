@@ -21,6 +21,13 @@
 #     out of sync). The session directory and its projcache go into
 #     run/archive/sessions-<date>.tar.gz (restored by unpacking into ~/.dsh) and
 #     are then removed. Archives older than 90 days are deleted.
+#     A session's age is its NEWEST journal (session.v2/v3/v4...jsonl.zstd - a
+#     directory migrated between formats keeps the old journal next to the new
+#     one), and a session is aged together with its subagents (header field
+#     parentSession): the family goes only when ALL of it is older than --days, and
+#     then goes whole, so a parent never loses its subagent transcripts.
+#     storages/workspace.json is left as is: the UI already tolerates ids with no
+#     directory, and keeping them is what lets an unpacked archive reappear.
 #  2. Attachments (images and files from chats, ~/.dsh/attachments, addressed by
 #     sha256): an object no remaining session journal refers to is removed.
 #  3. run/backups: files older than --backup-days are removed (a previous "keep
@@ -33,7 +40,7 @@ set -euo pipefail
 # From the launcher this arrives through `wsl.exe -- bash -lc`, where PATH has no
 # node (.bashrc is not read for a non-interactive login shell) - add it here.
 export PATH="$HOME/.local/node/bin:/usr/local/bin:$PATH"
-DSH="$HOME/.dsh"; RUN="$HOME/Harness_AI/run"; ARCH="$RUN/archive"; WINRUN=/mnt/f/Harness_AI/run
+DSH="${DSH_HOME:-$HOME/.dsh}"; RUN="$HOME/Harness_AI/run"; ARCH="$RUN/archive"; WINRUN=/mnt/f/Harness_AI/run
 APPLY=0; DAYS=30; BDAYS=90; LDAYS=30; BENCHDAYS=""; CACHES=0; QUIET=0
 while [ $# -gt 0 ]; do case "$1" in
   --apply) APPLY=1;; --days) DAYS="$2"; shift;; --backup-days) BDAYS="$2"; shift;; --ledger-days) LDAYS="$2"; shift;; --bench-days) BENCHDAYS="$2"; shift;; --caches) CACHES=1;; --quiet) QUIET=1;;
@@ -51,11 +58,51 @@ mb() { du -sm "$1" 2>/dev/null | cut -f1; }
 HOME_TAG="${HOME#/}"; HOME_TAG="${HOME_TAG//\//-}"
 web_running() { pgrep -f 'apps/cli/lib/bin.js web' >/dev/null 2>&1; }
 
+# Session directories, one line each: "old|keep <TAB> sessions/<workspace>/<id>".
+# The journal name carries the format version (session.v2 / v3 / v4 so far); the
+# script once matched only v2 and stopped seeing every session written after the
+# format moved on. Age and families: see rule 1 above. A journal whose header
+# cannot be read counts as a family of its own, judged by its own age.
+sessions_list() {
+  [ -d "$DSH/sessions" ] || return 0
+  node - "$DSH" "$DAYS" <<'JS'
+const { readdirSync, readFileSync, statSync } = require('node:fs');
+const { join } = require('node:path');
+const zlib = require('node:zlib');
+const [DSH, DAYS] = [process.argv[2], Number(process.argv[3])];
+const header = (f) => { // first line of a multi-frame zstd journal
+  const buf = readFileSync(f); let off = 0, text = '';
+  while (off < buf.length && !text.includes('\n')) { const dec = zlib.zstdDecompressSync(buf.subarray(off), { info: true }); text += dec.buffer.toString('utf8'); off += dec.engine.bytesWritten; }
+  return JSON.parse(text.split('\n')[0]);
+};
+const S = new Map(); // id -> { rel, mtime, parent }
+for (const ws of readdirSync(join(DSH, 'sessions'), { withFileTypes: true })) {
+  if (!ws.isDirectory()) continue;
+  for (const e of readdirSync(join(DSH, 'sessions', ws.name), { withFileTypes: true })) {
+    if (!e.isDirectory()) continue;
+    const dir = join(DSH, 'sessions', ws.name, e.name);
+    const js = readdirSync(dir).filter(n => /^session\.v\d+\.jsonl\.zstd$/.test(n)).sort((a, b) => Number(b.match(/\d+/)[0]) - Number(a.match(/\d+/)[0]));
+    if (!js.length) continue;
+    const mtime = Math.max(...js.map(n => statSync(join(dir, n)).mtimeMs));
+    let parent = null; try { parent = header(join(dir, js[0])).parentSession || null; } catch {}
+    S.set(e.name, { rel: join('sessions', ws.name, e.name), mtime, parent });
+  }
+}
+const root = (id) => { const seen = new Set(); while (S.get(id).parent && S.has(S.get(id).parent) && !seen.has(id)) { seen.add(id); id = S.get(id).parent; } return id; };
+const newest = new Map();
+for (const [id, s] of S) { const r = root(id); newest.set(r, Math.max(newest.get(r) || 0, s.mtime)); }
+const limit = Date.now() - DAYS * 86400000;
+for (const [id, s] of S) process.stdout.write(`${newest.get(root(id)) < limit ? 'old' : 'keep'}\t${s.rel}\n`);
+JS
+}
+
 before=$(mb "$DSH")
 say "== DSH data: ${before} MB (${DSH})"
-say "   sessions     $(mb "$DSH/sessions") MB, $(findq "$DSH/sessions" -name 'session.v2.jsonl.zstd' | wc -l) journals"
+LIST=$(sessions_list)
+say "   sessions     $(mb "$DSH/sessions") MB, $(printf '%s' "$LIST" | grep -c . || true) sessions (subagents included)"
 findq "$DSH/sessions" -maxdepth 1 -mindepth 1 -type d | while read -r d; do
-  n=$(findq "$d" -name 'session.v2.jsonl.zstd' | wc -l); old=$(findq "$d" -name 'session.v2.jsonl.zstd' -mtime +"$DAYS" | wc -l)
+  w="sessions/$(basename "$d")/"
+  n=$(printf '%s\n' "$LIST" | grep -cF "	$w" || true); old=$(printf '%s\n' "$LIST" | grep -F "	$w" | grep -c '^old' || true)
   say "     $(printf '%3dM' "$(mb "$d")") $(basename "$d" | sed "s|^--${HOME_TAG}-||; s/--$//")  ($n sessions, older than $DAYS days: $old)"
 done
 say "   attachments  $(mb "$DSH/attachments") MB, $(findq "$DSH/attachments" -type f | wc -l) files"
@@ -106,13 +153,36 @@ say "== package caches (not DSH): pnpm store $(mb "$HOME/.local/share/pnpm") MB 
 if web_running; then
   say "!! the web is running - sessions left alone (stop the stand and repeat); cleaning the rest"
 else
-  mapfile -t OLD < <(findq "$DSH/sessions" -mindepth 2 -maxdepth 2 -name 'session.v2.jsonl.zstd' -mtime +"$DAYS" -printf '%h\n')
+  mapfile -t OLD < <(printf '%s\n' "$LIST" | sed -n "s|^old\t|$DSH/|p")
   if [ "${#OLD[@]}" -gt 0 ]; then
     mkdir -p "$ARCH"; tarf="$ARCH/sessions-$(date +%Y%m%d-%H%M).tar.gz"
     rel=(); for d in "${OLD[@]}"; do rel+=("${d#$DSH/}"); id=$(basename "$d"); pc="$DSH/storages/session_projcache/sessions/$id.json"; [ -f "$pc" ] && rel+=("${pc#$DSH/}"); done
-    tar czf "$tarf" -C "$DSH" "${rel[@]}"
+    # Attachments these sessions refer to go into the same archive: rule 2 below
+    # removes every attachment no REMAINING journal refers to, and an archive
+    # without them would unpack into chats with missing images and files.
+    mapfile -t ATT < <(node - "$DSH" "${rel[@]}" <<'JS'
+const { readdirSync, readFileSync, existsSync } = require('node:fs');
+const { join } = require('node:path');
+const zlib = require('node:zlib');
+const [DSH, ...rels] = process.argv.slice(2);
+const refs = new Set();
+for (const r of rels) {
+  if (!r.startsWith('sessions/')) continue;
+  for (const n of readdirSync(join(DSH, r)).filter(n => n.endsWith('.jsonl.zstd'))) {
+    const buf = readFileSync(join(DSH, r, n)); let off = 0, text = '';
+    try { while (off < buf.length) { const dec = zlib.zstdDecompressSync(buf.subarray(off), { info: true }); text += dec.buffer.toString('utf8'); off += dec.engine.bytesWritten; } } catch {}
+    for (const m of text.matchAll(/sha256:([0-9a-f]{64})/g)) refs.add(m[1]);
+  }
+}
+for (const h of refs) for (const sub of ['objects', 'file-objects', 'files', 'request-images']) {
+  const rel = join('attachments', 'v1', sub, h.slice(0, 2), h);
+  if (existsSync(join(DSH, rel))) process.stdout.write(rel + '\n');
+}
+JS
+)
+    tar czf "$tarf" -C "$DSH" "${rel[@]}" ${ATT[@]+"${ATT[@]}"}
     for d in "${OLD[@]}"; do rm -rf "$d"; rm -f "$DSH/storages/session_projcache/sessions/$(basename "$d").json"; done
-    say "sessions: ${#OLD[@]} older than $DAYS days -> $tarf"
+    say "sessions: ${#OLD[@]} older than $DAYS days (+${#ATT[@]} attachments) -> $tarf"
   else say "sessions: none older than $DAYS days"; fi
   findq "$ARCH" -name 'sessions-*.tar.gz' -mtime +90 -delete 2>/dev/null || true
 fi
