@@ -14,11 +14,16 @@ function patch(file, edits) {
   const path = join(dir, file);
   let s = readFileSync(path, 'utf8');
   let applied = 0, skipped = 0;
-  for (const [a, b] of edits) {
-    if (s.includes(b)) { skipped++; continue; }
-    const n = s.split(a).length - 1;
-    if (n !== 1) { console.error(`${file}: MATCH COUNT ${n} for ${JSON.stringify(a.slice(0, 70))}`); process.exit(1); }
-    s = s.replace(a, b); applied++;
+  for (const edit of edits) {
+    // an edit is [anchor, replacement] or a list of such variants, one per bridge generation
+    const variants = Array.isArray(edit[0]) ? edit : [edit];
+    if (variants.some(([, b]) => s.includes(b))) { skipped++; continue; }
+    const hit = variants.find(([a]) => s.split(a).length - 1 === 1);
+    if (!hit) {
+      for (const [a] of variants) console.error(`${file}: MATCH COUNT ${s.split(a).length - 1} for ${JSON.stringify(a.slice(0, 70))}`);
+      process.exit(1);
+    }
+    s = s.replace(hit[0], hit[1]); applied++;
   }
   unlinkWrite(path, s);
   console.log(`${file}: sidebar patch applied ${applied}, already present ${skipped}`);
@@ -78,18 +83,26 @@ patch('client/index.js', [
   injectMobileStyles();
 ${HELPERS}`],
   // title click: close via the real toggle
-  [`    titleEl.onclick = () => {
+  [[`    titleEl.onclick = () => {
       const openPanels = document.querySelectorAll('div[class*="nArs4W_panel"]:not([class*="panelHidden"]), div[class*="workbench_panel"]:not([class*="panelHidden"])');
       openPanels.forEach((p) => p.classList.add('nArs4W_panelHidden'));
     };`, `    titleEl.onclick = () => { closeSidebarPanel(); };`],
+   [`    titleEl.onclick = () => {
+      const openPanels = document.querySelectorAll(workbenchPanelSelector({ openOnly: true }));
+      openPanels.forEach((p) => p.classList.add('dsh-bridge-panelHidden'));
+    };`, `    titleEl.onclick = () => { closeSidebarPanel(); };`]],
   // new-session click: close via the real toggle
   // 2.11.2 slipped a comment line between the forEach and `const dshNewBtn`,
   // so an anchor spanning both stopped matching. It ends at the forEach now:
   // shorter, still unique (rightBtn.onclick occurs once), and identical on 2.10.x.
-  [`    rightBtn.onclick = () => {
+  [[`    rightBtn.onclick = () => {
       const openPanels = document.querySelectorAll('div[class*="nArs4W_panel"]:not([class*="panelHidden"]), div[class*="workbench_panel"]:not([class*="panelHidden"])');
       openPanels.forEach((p) => p.classList.add('nArs4W_panelHidden'));`, `    rightBtn.onclick = () => {
       closeSidebarPanel();`],
+   [`    rightBtn.onclick = () => {
+      const openPanels = document.querySelectorAll(workbenchPanelSelector({ openOnly: true }));
+      openPanels.forEach((p) => p.classList.add('dsh-bridge-panelHidden'));`, `    rightBtn.onclick = () => {
+      closeSidebarPanel();`]],
   // header: sidebar button between the title and (+)
   [`    header.appendChild(leftBtn);
     header.appendChild(titleEl);
@@ -111,28 +124,84 @@ ${HELPERS}`],
     header.appendChild(sideBtn);
     header.appendChild(rightBtn);`],
   // session switch: close via the real toggle
-  [`        document.body.classList.remove('dsh-workbench-open');
+  [[`        document.body.classList.remove('dsh-workbench-open');
         const openPanels = document.querySelectorAll('div[class*="nArs4W_panel"]:not([class*="panelHidden"]), div[class*="workbench_panel"]:not([class*="panelHidden"])');
         openPanels.forEach((p) => p.classList.add('nArs4W_panelHidden'));
       }
     });`, `        closeSidebarPanel();
       }
     });`],
+   [`        document.body.classList.remove('dsh-workbench-open');
+        const openPanels = document.querySelectorAll(workbenchPanelSelector({ openOnly: true }));
+        openPanels.forEach((p) => p.classList.add('dsh-bridge-panelHidden'));
+      }
+    });`, `        closeSidebarPanel();
+      }
+    });`]],
   // observer: keep body.dsh-workbench-open in sync with the panel's real state
-  [`    const panels = document.querySelectorAll('div[class*="nArs4W_panel"]:not([class*="panelHidden"]), div[class*="workbench_panel"]:not([class*="panelHidden"])');
+  [[`    const panels = document.querySelectorAll('div[class*="nArs4W_panel"]:not([class*="panelHidden"]), div[class*="workbench_panel"]:not([class*="panelHidden"])');
     panels.forEach((p) => {`, `    const panels = document.querySelectorAll('div[class*="nArs4W_panel"]:not([class*="panelHidden"]), div[class*="workbench_panel"]:not([class*="panelHidden"])');
     // sync: a panel opened by better-sidebar itself (file click, agent open) must become visible
     document.body.classList.toggle('dsh-workbench-open', panels.length > 0);
     document.body.classList.toggle('dsh-sidebar-panel-open', panels.length > 0);
     panels.forEach((p) => {`],
+   [`    const panels = document.querySelectorAll(workbenchPanelSelector({ openOnly: true }));
+    panels.forEach((p) => {`, `    const panels = document.querySelectorAll(workbenchPanelSelector({ openOnly: true }));
+    // sync: a panel opened by better-sidebar itself (file click, agent open) must become visible
+    document.body.classList.toggle('dsh-workbench-open', panels.length > 0);
+    document.body.classList.toggle('dsh-sidebar-panel-open', panels.length > 0);
+    panels.forEach((p) => {`]],
   // "Back to chat" button: not mounted — the header sidebar button opens AND closes the panel,
   // and the in-tab-strip button ate space from the tabs.
-  [`      const bar = p.querySelector('div[class*="tabBar"], div[class*="nArs4W_tabBar"]');
+  [[`      const bar = p.querySelector('div[class*="tabBar"], div[class*="nArs4W_tabBar"]');
       if (bar && !bar.querySelector('.dsh-mobile-panel-close-btn')) {`, `      const bar = p.querySelector('div[class*="tabBar"], div[class*="nArs4W_tabBar"]');
       if (false && bar && !bar.querySelector('.dsh-mobile-panel-close-btn')) { // disabled: header sidebar button replaces it`],
+   [`      const bar = p.querySelector(\`div[class*="tabBar"], div\${familySelector('WB', 'tabBar')}\`);
+      if (bar && !bar.querySelector('.dsh-mobile-panel-close-btn')) {`, `      const bar = p.querySelector(\`div[class*="tabBar"], div\${familySelector('WB', 'tabBar')}\`);
+      if (false && bar && !bar.querySelector('.dsh-mobile-panel-close-btn')) { // disabled: header sidebar button replaces it`]],
 ]);
 
 // ---------------- client/mobile-styles.js ----------------
+const tabStripCss = (wb) => [`      div[class*="${wb}tabActive"],
+      div[class*="workbench_tabActive"] {`, `      ${MARK}
+      div[class*="${wb}tabBar"],
+      div[class*="workbench_tabBar"] {
+        flex: none !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        min-height: 40px !important;
+        height: 40px !important;
+        padding: 0 8px !important;
+        border-radius: 0 !important;
+        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
+        box-shadow: none !important;
+        justify-content: space-between !important;
+      }
+      div[class*="${wb}tabList"] {
+        flex: 1 1 auto !important;
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        height: auto !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        justify-content: flex-start !important;
+      }
+      /* no blue tap flash on the tab strip / tabs / panel toggle */
+      div[class*="${wb}tabBar"],
+      div[class*="${wb}tabBar"] *,
+      div[class*="${wb}tab"],
+      .dsh-header-sidebar-btn {
+        -webkit-tap-highlight-color: transparent !important;
+        -webkit-touch-callout: none !important;
+      }
+
+      div[class*="${wb}tabActive"],
+      div[class*="workbench_tabActive"] {`];
+
 patch('client/mobile-styles.js', [
   [`      .dsh-header-new-btn:active {
         opacity: 0.6;
@@ -163,43 +232,7 @@ patch('client/mobile-styles.js', [
   // The pill-tab rule above uses [class*="nArs4W_tab"], which ALSO matches nArs4W_tabBar / nArs4W_tabList
   // and (being declared later) clamps the whole strip to max-width:170px. Re-assert the strip/list sizing
   // after it so the tab strip spans the full panel width.
-  [`      div[class*="nArs4W_tabActive"],
-      div[class*="workbench_tabActive"] {`, `      ${MARK}
-      div[class*="nArs4W_tabBar"],
-      div[class*="workbench_tabBar"] {
-        flex: none !important;
-        width: 100% !important;
-        max-width: none !important;
-        min-width: 0 !important;
-        min-height: 40px !important;
-        height: 40px !important;
-        padding: 0 8px !important;
-        border-radius: 0 !important;
-        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
-        box-shadow: none !important;
-        justify-content: space-between !important;
-      }
-      div[class*="nArs4W_tabList"] {
-        flex: 1 1 auto !important;
-        width: auto !important;
-        max-width: none !important;
-        min-width: 0 !important;
-        height: auto !important;
-        padding: 0 !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        justify-content: flex-start !important;
-      }
-      /* no blue tap flash on the tab strip / tabs / panel toggle */
-      div[class*="nArs4W_tabBar"],
-      div[class*="nArs4W_tabBar"] *,
-      div[class*="nArs4W_tab"],
-      .dsh-header-sidebar-btn {
-        -webkit-tap-highlight-color: transparent !important;
-        -webkit-touch-callout: none !important;
-      }
-
-      div[class*="nArs4W_tabActive"],
-      div[class*="workbench_tabActive"] {`],
+  // 2.12.4 writes the better-sidebar hash as a __F_WB__ placeholder that the bridge
+  // fills at runtime; the CSS added here follows the same convention on that version.
+  [tabStripCss('nArs4W_'), tabStripCss('__F_WB__')],
 ]);

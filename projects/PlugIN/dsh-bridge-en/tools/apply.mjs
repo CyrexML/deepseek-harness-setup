@@ -36,6 +36,9 @@ function register(idx, key) {
 }
 strings.forEach((s, i) => register(i, s.key));
 extra.forEach((s, i) => register(1000 + i, s.key));
+// hand translations keyed by Chinese text (strings new in bridge 2.12-2.14, 2026-10-14):
+// above the machine ones, so the local model is not asked for them again
+if (existsSync(here('tr-manual.json'))) for (const [k, v] of Object.entries(JSON.parse(readFileSync(here('tr-manual.json'), 'utf8')))) if (!map.has(k) && !keepKeys.has(k)) map.set(k, v);
 // machine translations (auto-translate.mjs) — keyed by Chinese text, lowest priority
 if (existsSync(here('tr-auto.json'))) for (const [k, v] of Object.entries(JSON.parse(readFileSync(here('tr-auto.json'), 'utf8')))) if (!map.has(k) && !keepKeys.has(k)) map.set(k, v);
 

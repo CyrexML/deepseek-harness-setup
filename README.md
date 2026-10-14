@@ -36,7 +36,7 @@ What you get:
 Why this is not the same as "installing the harness yourself": the harness is the core.
 Around it you still have to choose and wire up plugins, fix what does not work on a phone,
 pick a model for your card, compute the context window, set up startup, the tunnel and
-power behaviour. Here that is already done and pinned: **26 patch layers** where things
+power behaviour. Here that is already done and pinned: **27 patch layers** where things
 break, every component version recorded in `stand.lock.json`, and model server settings
 computed for your GPU instead of copied from someone else's example.
 
@@ -170,7 +170,7 @@ The installer explains every step as it goes:
 | `00-prereqs` | checks GPU and free space, installs WSL2 and a distribution, opens the model port |
 | `10-llama` | installs llama.cpp with the CUDA build matching your driver |
 | `20-model` | picks a model for your GPU and downloads it |
-| `wsl/*` | builds the harness, installs plugins, applies 26 patch layers, writes the config, sets up a browser for Univer slides and the Windows fonts |
+| `wsl/*` | builds the harness, installs plugins, applies 27 patch layers, writes the config, sets up a browser for Univer slides and the Windows fonts |
 | `30-tune` | computes the context window that fits your VRAM and measures the result |
 | `40-shortcuts` | shortcuts, autostart, power-maintenance task |
 | `50-verify` | verifies everything came up |
@@ -331,7 +331,7 @@ Linux side, from inside WSL, run `bash wsl/uninstall.sh`.
 - **DeepSeek Harness** at the tag from `stand.lock.json`, built from source inside WSL2.
 - **Plugins** at pinned versions: mobile bridge, side panel with a file explorer and
   viewers, office documents, context meter, graph memory, turn rewind.
-- **26 patch layers** — my own fixes on top of the harness and the plugins (below).
+- **27 patch layers** — my own fixes on top of the harness and the plugins (below).
 - **llama.cpp** plus the GGUF model you chose, on the Windows side.
 
 <p align="center">
@@ -353,7 +353,8 @@ whatever is missing on every start.
 | zoom-scope | pinch does not zoom the conversation while typing |
 | pdfjs-map-polyfill | PDFs open in browsers older than Chrome 140 (pdf.js 6.3 calls a very new `Map` method) |
 | html-no-store | the app page is never cached, so a phone cannot get stuck on an old bundle |
-| relative-path | a file link in the chat opens the same way as from the explorer |
+| sidebar-session-root | the Files panel opens on the session's own folder, not on a git repository that happens to contain it (better-sidebar 0.26 roots it at the repository) |
+| univer-viewer | a deck opens over HTTPS (the phone through the tunnel): the viewer no longer downgrades its own `wss://` socket to `ws://`; on a narrow screen its side panel starts folded |
 | better-sidebar preview | multi-page apps preview with working JavaScript |
 | llm-pi-ai usage | the model stops truncating answers based on a wrong length estimate |
 | graph-memory scope | agent memory does not mix projects |
@@ -371,8 +372,8 @@ whatever is missing on every start.
 | write-streak-notice (preset) | says so when a turn has run long with nothing written, before the answer hits its cap |
 
 Some layers are version-conditional: they register only on a build that still needs
-them. Three side-panel layers and the office slot fix were retired once the plugins
-took the same fixes upstream — `ensure-patches.sh` checks the installed build and
+them. Four side-panel layers (the chat-link path fix among them) and the office slot fix were
+retired once the plugins took the same fixes upstream — `ensure-patches.sh` checks the installed build and
 brings a layer back if a downgrade makes it necessary again.
 
 ## Housekeeping

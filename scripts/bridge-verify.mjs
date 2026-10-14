@@ -30,9 +30,10 @@ const { chromium, devices } = await import(__pwEntry);
 import { readFileSync, mkdirSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 const OUT = `${process.env.HOME}/Harness_AI/run/verify`; mkdirSync(OUT, { recursive: true });
-const cookie = JSON.parse(readFileSync(`${process.env.HOME}/.dsh/dsh-bridge/sessions.json`, 'utf8')).at(-1)[0];
-const lan = 'http://' + execSync('hostname -I').toString().trim().split(/\s+/)[0] + ':3082'; // the WSL IP changes on restart
-const local = readFileSync(`${process.env.HOME}/Harness_AI/run/web.log`, 'utf8').match(/dsh web: (http:\/\/\S+)/g).pop().replace('dsh web: ', '');
+// DSH_HOME / BRIDGE_PORT / DSH_WEB_LOG point the test at a parallel stand (e.g. a new harness on 3081/3083)
+const cookie = JSON.parse(readFileSync(`${process.env.DSH_HOME ?? `${process.env.HOME}/.dsh`}/dsh-bridge/sessions.json`, 'utf8')).at(-1)[0];
+const lan = 'http://' + execSync('hostname -I').toString().trim().split(/\s+/)[0] + ':' + (process.env.BRIDGE_PORT ?? '3082'); // the WSL IP changes on restart
+const local = readFileSync(process.env.DSH_WEB_LOG ?? `${process.env.HOME}/Harness_AI/run/web.log`, 'utf8').match(/dsh web: (http:\/\/\S+)/g).pop().replace('dsh web: ', '');
 const browser = await chromium.launch({ env: { ...process.env, LD_LIBRARY_PATH: `${process.env.HOME}/.local/lib/asound/usr/lib/x86_64-linux-gnu` } }); // libasound from ~/.local, as in shot.mjs
 const results = [];
 const ok = (name, cond, extra = '') => { results.push(`${cond ? 'PASS' : 'FAIL'} ${name} ${extra}`); };
@@ -60,16 +61,24 @@ const dismiss = async (page) => { const c = page.locator('button', { hasText: 'C
   ok('mobile: sidebar power button', await pb.count() > 0 && await pb.isVisible());
   if (await pb.count()) {
     await pb.click(); await page.waitForTimeout(400);
-    const r = await page.evaluate(() => { const p = document.querySelector('.dsh-power-pop'); if (!p) return null; const b = p.getBoundingClientRect(); return { l: b.left, r: b.right, w: innerWidth, bg: getComputedStyle(p).backgroundColor }; });
-    ok('mobile: popover inside viewport, dark', !!r && r.l >= 0 && r.r <= r.w && r.bg === 'rgb(20, 26, 46)', JSON.stringify(r));
+    const r = await page.evaluate(() => { const p = document.querySelector('.dsh-pwr'); if (!p) return null; const b = p.getBoundingClientRect(); return { l: b.left, r: b.right, w: innerWidth, bg: getComputedStyle(p).backgroundColor }; });
+    // power menu v2 (patch-power-menu.mjs): .dsh-pwr, #161b2c, no sleep item, Esc closes it
+    ok('mobile: popover inside viewport, dark', !!r && r.l >= 0 && r.r <= r.w && r.bg === 'rgb(22, 27, 44)', JSON.stringify(r));
+    ok('mobile: power menu has Restart model, no sleep', await page.locator('.dsh-pwr .it', { hasText: 'Restart model' }).count() === 1 && await page.locator('.dsh-pwr', { hasText: /sleep/i }).count() === 0);
     await page.screenshot({ path: `${OUT}/m-power.png` });
-    await page.locator('.dsh-power-pop button', { hasText: 'Cancel' }).click().catch(() => {});
+    await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+    ok('mobile: power menu closes on Esc', await page.locator('.dsh-pwr').count() === 0);
   }
   // The drawer opens ONLY on a tap (touch events); click/dispatchEvent leave it
   // alone, and until the tap the side panel is outside the viewport.
   await openDrawer(); // the power popup may have closed the drawer
   await page.locator('.BlCpQa_triggerLabel, [class*="_triggerLabel"]', { hasText: 'Settings' }).first().click({ force: true }); await page.waitForTimeout(1500);
   for (const tab of ['General', 'Plugin Hub', 'Remote access']) {
+    // bridge 2.12.4+: on a phone (<=480px) Settings is a list, then a detail page whose
+    // back entry is the nav title; the list is hidden while a section is open
+    if (await page.locator('[data-dshbr-settings-view="detail"]').count()) {
+      await page.locator('[data-dshbr-settings-view="detail"] nav [class*="_navTitle"]').first().click({ force: true }); await page.waitForTimeout(800);
+    }
     await page.locator('nav button', { hasText: tab }).first().click({ force: true }); await page.waitForTimeout(2500);
     const over = await page.evaluate(() => [...document.querySelectorAll('div[class*="_panel"] *')].filter(e => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.right > innerWidth + 2 && cs.opacity !== '0' && cs.visibility !== 'hidden' && !e.closest('[class*="_tabsRow"], [class*="_sortGroup"], [class*="_segGroup"]'); }).length);
     ok(`mobile: settings/${tab} no overflow`, over === 0, `overflowing=${over}`);

@@ -20,8 +20,18 @@ import { readFileSync, writeFileSync, rmSync } from 'node:fs';
 const unlinkWrite = (p, d) => { rmSync(p, { force: true }); writeFileSync(p, d); };
 
 import { join } from 'node:path';
+import { existsSync } from 'node:fs';
 const dir = process.argv[2] || '.';
 const MARK = '/* dsh-bridge-en: hash remap */';
+
+// Bridge 2.12.4 solved this upstream (client/host-families.js): mobile-styles.js is now
+// a template with __F_<SLOT>__ placeholders that are filled at runtime from the live
+// page, with a verified baseline per host generation. No hashed selector is left for
+// this remap to fix, and the anchor (`style.textContent = MOBILE_STYLES_CSS`) is gone.
+if (existsSync(join(dir, 'client/host-families.js'))) {
+  console.log('hash-remap: not needed — the bridge resolves host class names itself (client/host-families.js)');
+  process.exit(0);
+}
 
 function patch(file, edits) {
   const path = join(dir, file);

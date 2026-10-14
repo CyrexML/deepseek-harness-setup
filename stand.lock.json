@@ -1,22 +1,22 @@
 {
   "_": "Snapshot of the verified combination. Changed deliberately: edit the numbers and publish a new lock.",
-  "createdAt": "2026-10-02",
+  "createdAt": "2026-10-14",
   "tools": {
     "node": "22.23.2",
     "pnpm": "11.7.0"
   },
   "harness": {
-    "tag": "dsh-v0.1.7-rc.2",
-    "commit": "477b4f420553e8a52c2fbccc464d7561b239c443"
+    "tag": "dsh-v0.2.0-rc.2",
+    "commit": "639ed015397290b3745d163aafe02ffee4aa3f84"
   },
   "plugins": {
-    "@wenbin_wb/dsh-bridge": "2.11.3",
-    "dsh-better-sidebar": "0.22.1",
-    "dsh-context": "0.60.0",
-    "dsh-plugin": "1.4.11",
-    "dsh-univer-office": "0.3.5",
-    "graph-memory": "github:adoresever/graph-memory",
-    "@anionex/dsh-turn-rewind": "0.3.8"
+    "@anionex/dsh-turn-rewind": "0.3.9",
+    "@wenbin_wb/dsh-bridge": "2.14.0",
+    "dsh-better-sidebar": "0.26.0",
+    "dsh-context": "0.70.0",
+    "dsh-plugin": "1.6.8",
+    "dsh-univer-office": "0.3.7",
+    "graph-memory": "github:adoresever/graph-memory#5841b1987c3967998818764c9d4238add5f3aa7c"
   },
   "patchLayers": [
     {
@@ -34,6 +34,10 @@
     {
       "name": "pi-ai-budget-floor",
       "marker": "dsh-local: output budget floor"
+    },
+    {
+      "name": "token-meter-reasoning",
+      "marker": "dsh-local: reasoning is not replayed"
     },
     {
       "name": "llm-pi-ai",
@@ -108,12 +112,24 @@
       "marker": "dsh-bridge-en: html no-store"
     },
     {
-      "name": "turn-rewind-settings",
-      "marker": "dsh-local: settingsScope optional"
+      "name": "gpu-restart",
+      "marker": "dsh-bridge-en: gpu restart"
     },
     {
-      "name": "sidebar-relative-path",
-      "marker": "dsh-local: relative path in chat links"
+      "name": "power-menu",
+      "marker": "dsh-bridge-en: power menu v2"
+    },
+    {
+      "name": "univer-dock-sidebar",
+      "marker": "dsh-local: univer edits dock into the host right sidebar"
+    },
+    {
+      "name": "univer-viewer-wss",
+      "marker": "dsh-local: viewer wss on https"
+    },
+    {
+      "name": "sidebar-session-root",
+      "marker": "dsh-local: sidebar root is the session cwd"
     }
   ],
   "bundles": [

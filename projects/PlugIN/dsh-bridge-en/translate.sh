@@ -27,7 +27,7 @@ node "$HERE/tools/patch-theme.mjs" .       # per-device Appearance memory on rem
 node "$HERE/tools/patch-rotation.mjs" .  # PWA orientation follows system lock; drawer dropped on rotation
 node "$HERE/tools/patch-splash.mjs" .    # dark DeepSeek-toned splash until the client mounts
 node "$HERE/tools/patch-preview.mjs" .    # user files via /sidebar/html|file: no head injection, cache-control no-store
-node "$HERE/tools/patch-hashes.mjs" .     # remap stale css-module hashes of the host build at runtime
+node "$HERE/tools/patch-hashes.mjs" .     # remap stale css-module hashes at runtime (no-op on 2.12.4+: upstream host-families.js)
 node "$HERE/tools/patch-icon.mjs" .       # DSH whale as PWA/home-screen/apple-touch icon (assets from tools/gen-icon.mjs)
 node "$HERE/tools/patch-power.mjs" .      # Power card in Remote access: stop DSH / DSH+WSL via launcher signal file
 node "$HERE/tools/patch-gpu-restart.mjs" . # Power menu: model restart button + GPU watchdog status (launcher)

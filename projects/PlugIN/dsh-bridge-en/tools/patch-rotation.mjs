@@ -24,7 +24,9 @@ function patch(file, edits) {
   let s = readFileSync(path, 'utf8');
   let applied = 0, skipped = 0;
   for (const [a, b] of edits) {
-    if (s.includes(b)) { skipped++; continue; }
+    // the marker, not the whole replacement: later patches (mobile-ux, preview-zoom) insert
+    // code right after `injectMobileStyles();`, so the replacement text is no longer contiguous
+    if (s.includes(b) || s.includes(MARK)) { skipped++; continue; }
     const n = s.split(a).length - 1;
     if (n !== 1) { console.error(`${file}: MATCH COUNT ${n} for ${JSON.stringify(a.slice(0, 70))}`); process.exit(1); }
     s = s.replace(a, b); applied++;
@@ -38,9 +40,12 @@ patch('lib/index.js', [[
   `  ${MARK} // no orientation field: follow the system rotation lock ('any' = FULL_SENSOR on Android)\n`,
 ]]);
 
+// 2.12.4 added a second `injectMobileStyles();` (in refreshHostFamilies), so the
+// anchor carries the line before it: the call at the top of setupMobileExperience.
+const SETUP = "  if (typeof document === 'undefined' || typeof window === 'undefined') return;\n";
 patch('client/index.js', [[
-  '  injectMobileStyles();\n',
-  `  injectMobileStyles();
+  SETUP + '  injectMobileStyles();\n',
+  `${SETUP}  injectMobileStyles();
 ${MARK}
   // The drawer is a portrait-only construct (its CSS lives under max-width: 768px). A rotation that
   // crosses the breakpoint must drop it, or the hidden backdrop comes back on return and blocks taps.

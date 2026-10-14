@@ -191,7 +191,15 @@ bash "$HERE/bridge-rebuild-client.sh" "$NM/@wenbin_wb/dsh-bridge" || missing=1
 # Registered ONLY on a host without the service. Declaring it unconditionally
 # made --check report it MISSING on 0.1.6 - and start-web.sh refuses to start a
 # stand with an incomplete layer set, so the working stand would not have come up.
-if [ ! -f "$DSH_ROOT/packages/client/ui-settings/src/client/settings-scope.ts" ]; then
+# RETIRED from turn-rewind 0.3.9, which took the fix upstream: its inject list is
+# ['slots', 'sessions', 'conversation'] and it reads settings through configForms
+# on 0.1.7. A layer that can never apply again would stay MISSING and stop the
+# stand from starting, so it is registered only while our marker is there (an
+# older plugin, still to be verified) or the plugin still requires settingsScope.
+TR_CLIENT="$NM/@anionex/dsh-turn-rewind/lib/client.js"
+if [ ! -f "$DSH_ROOT/packages/client/ui-settings/src/client/settings-scope.ts" ] \
+   && { grep -qF 'dsh-local: settingsScope optional' "$TR_CLIENT" 2>/dev/null \
+        || grep -qE "exports\.inject = \[[^]]*'settingsScope'" "$TR_CLIENT" 2>/dev/null; }; then
   layer turn-rewind-settings "$NM/@anionex/dsh-turn-rewind/lib/client.js" "dsh-local: settingsScope optional" \
     node "$HERE/patch-turn-rewind-settings-optional.mjs" "$NM/@anionex/dsh-turn-rewind"
 fi
@@ -238,7 +246,32 @@ fi
 layer univer-dock-sidebar "$NM/dsh-univer-office/lib/client.js" "dsh-local: univer edits dock into the host right sidebar" \
   node "$HERE/patch-univer-dock-sidebar.mjs" "$NM/dsh-univer-office"
 
-layer sidebar-relative-path "$NM/dsh-better-sidebar/lib/client.js" "dsh-local: relative path in chat links" \
-  node "$HERE/patch-better-sidebar-relative-path.mjs"
+# Over HTTPS (the phone through the tunnel) the Univer window opened empty: its
+# viewer downgrades its own wss:// socket to ws:// and the browser blocks it as
+# mixed content. The shim sits in the viewer's index.html, the one file of it
+# that is not cached for a year. See the script header.
+layer univer-viewer-wss "$NM/dsh-univer-office/artifacts/viewer/index.html" "dsh-local: viewer wss on https" \
+  node "$HERE/patch-univer-viewer-wss.mjs" "$NM/dsh-univer-office"
+
+# better-sidebar 0.26 roots Files at the enclosing git repository; every project
+# here lives inside the ~/Harness_AI repository, so every session showed
+# ~/Harness_AI. Registered only on versions that carry that logic.
+SB_INDEX="$NM/dsh-better-sidebar/lib/index.js"
+if grep -qF 'dsh-local: sidebar root is the session cwd' "$SB_INDEX" 2>/dev/null \
+   || grep -qF 'const effectiveBase = pathUnderOf(base, canonicalTop) ? base : canonicalTop;' "$SB_INDEX" 2>/dev/null; then
+  layer sidebar-session-root "$SB_INDEX" "dsh-local: sidebar root is the session cwd" \
+    node "$HERE/patch-better-sidebar-session-root.mjs" "$NM/dsh-better-sidebar"
+fi
+
+# Retired on better-sidebar 0.26: its htmlUrl() and fileUrl() complete a relative
+# path with resolveSidebarPath() themselves - exactly what the patch added. The
+# layer stays registered while our marker is in the file or the old, unresolved
+# htmlUrl is still there (0.22.x).
+SB_CLIENT="$NM/dsh-better-sidebar/lib/client.js"
+if grep -qF 'dsh-local: relative path in chat links' "$SB_CLIENT" 2>/dev/null \
+   || grep -qF 'return encodeHtmlUrl(scope.sessionId, path);' "$SB_CLIENT" 2>/dev/null; then
+  layer sidebar-relative-path "$SB_CLIENT" "dsh-local: relative path in chat links" \
+    node "$HERE/patch-better-sidebar-relative-path.mjs"
+fi
 
 exit $missing

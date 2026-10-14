@@ -29,7 +29,9 @@ function patch(file, edits) {
   let s = readFileSync(path, 'utf8');
   let applied = 0, skipped = 0;
   for (const [a, b] of edits) {
-    if (s.includes(b)) { skipped++; continue; }
+    // present = the replacement, or its marker line (a later edit may rewrite part of it)
+    const markLine = b.split('\n').find((l) => l.includes('/* dsh-bridge-en:'));
+    if (s.includes(b) || (markLine && s.includes(markLine))) { skipped++; continue; }
     const n = s.split(a).length - 1;
     if (n !== 1) { console.error(`${file}: MATCH COUNT ${n} for ${JSON.stringify(a.slice(0, 70))}`); process.exit(1); }
     s = s.replace(a, b); applied++;
@@ -47,12 +49,24 @@ patch('lib/index.js', [
           const shouldBuffer = (!isPreview && contentType.includes('text/html') && !isCompressed(proxyRes.headers))
 `,
   ],
+  // The anchor is the writeHead line alone: 2.13 put the SSE keepalive block
+  // between it and `proxyRes.pipe(res)`, which the anchor used to include.
   [
-    "          res.writeHead(proxyRes.statusCode ?? 502, sanitizeProxyHeaders(proxyRes.headers));\n          proxyRes.pipe(res);\n",
+    "          res.writeHead(proxyRes.statusCode ?? 502, sanitizeProxyHeaders(proxyRes.headers));\n",
     `          const passHeaders = sanitizeProxyHeaders(proxyRes.headers);
           if (isPreview) { passHeaders['cache-control'] = 'no-store'; passHeaders['cdn-cache-control'] = 'no-store'; } ${MARK}
           res.writeHead(proxyRes.statusCode ?? 502, passHeaders);
-          proxyRes.pipe(res);
 `,
+  ],
+  // The Univer window (dsh-univer-office, /univer-viewer/) is a separate app in an
+  // iframe, and got the same head injection: its root is #app, not #root, so the
+  // splash stayed over the slides until its 25 s fallback - on the phone, which
+  // always comes through the bridge, the deck looked like it never opened. No
+  // injection there; caching is left alone (its 10 MB bundle is immutable, and
+  // no-store would download it again on every open over the tunnel).
+  [
+    "          const shouldBuffer = (!isPreview && contentType.includes('text/html')",
+    `          const isEmbeddedApp = pathname === '/univer-viewer' || pathname.startsWith('/univer-viewer/'); /* dsh-bridge-en: embedded app passthrough */
+          const shouldBuffer = (!isPreview && !isEmbeddedApp && contentType.includes('text/html')`,
   ],
 ]);

@@ -17,7 +17,7 @@ curl -s -o /dev/null -m 2 "$BASE/" || { echo "the host does not answer on $BASE 
 KEY="--$(echo "${PROJ#/}" | tr '/' '-')--"
 DIR="$HOME/.dsh/sessions/$KEY"
 [ -d "$DIR" ] || { echo "no sessions for $PROJ"; exit 1; }
-SID="$(ls -1t "$DIR" | head -1 | sed 's/^session-//')"
+SID="$(ls -1t "$DIR" | head -1)"   # the route takes the full id, session- prefix included
 URL="$BASE/sidebar/html/$SID$PROJ/$FILE"
 
 echo "project : $PROJ"
