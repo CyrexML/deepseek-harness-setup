@@ -119,6 +119,12 @@ export GRAPH_MEMORY_LLM_REASONING_EFFORT="${GRAPH_MEMORY_LLM_REASONING_EFFORT:-o
 # the rule holds for every start, from the shortcut and by hand alike.
 export DO_NOT_TRACK=1
 
+# Browser for dsh-univer-office: univer_compile_svg, screenshots, slide lint and PDF
+# need Chromium, and WSL has no system one. The wrapper starts Playwright's Chromium
+# with the locally unpacked libasound (~/.local/lib/asound). The plugin reads this
+# variable from the DSH process itself, so an export in the agent's bash does not help.
+[ -x "$HOME/.local/bin/univer-chrome" ] && export UNIVER_RENDER_BROWSER="${UNIVER_RENDER_BROWSER:-$HOME/.local/bin/univer-chrome}"
+
 # Check the thing that does not change first.
 if ! curl -sf --max-time 10 "$DSH_LLAMA_BASE_URL/models" > /dev/null; then
   echo "llama-server does not answer on $DSH_LLAMA_BASE_URL" >&2
