@@ -1,7 +1,8 @@
 /**
  * compaction-basic для стенда: (1) пересказ без каталога инструментов,
  * (2) порог сжатия по usage llama-server, а не по оценке метра,
- * (3) пересказ без reasoning-блоков в реплее (см. summarize()).
+ * (3) пересказ без reasoning-блоков в реплее (см. summarize()),
+ * (5) пересказ, оказавшийся вызовом инструмента, не принимается (см. looksLikeToolCall).
  *
  * (1) Замер по логам 2026-09-11/12: из 36 сжатий сессии 317a9aa7 23 закончились
  * "summarization produced no text summary content" за 3-20 с каждое; в
@@ -107,6 +108,122 @@ export function openTodos(session) {
   return undefined
 }
 
+/**
+ * (5) Пересказ, который на деле — вызов инструмента. Без каталога инструментов
+ * модель не может ВЫЗВАТЬ инструмент, но пишет вызов ТЕКСТОМ: вся реплеенная
+ * история состоит из таких вызовов, и шаблон Qwen рисует их тем же XML. Базовый
+ * класс принимает любой непустой текст, и в сессию ложится «пересказ» из одной
+ * строки вроде `<tool_call><function=bash>ls -la …`. Замер 2026-10-14 (проект
+ * Presentation): 7 из 13 сжатий двух сессий — такие; всё, что агент знал о
+ * десятках шагов, заменялось одной командой и списком задач. Отсюда повторное
+ * чтение файлов, задачи «in_progress» по 20 шагов и выводы, давно опровергнутые.
+ */
+const TOOL_CALL_MARKUP = /<tool_call>|<function=|<parameter=/
+export function looksLikeToolCall(summary) {
+  const text = (summary ?? []).map((b) => (typeof b?.text === 'string' ? b.text : '')).join('').trim()
+  if (text.length === 0) return true
+  if (/^(<tool_call>|<function=)/.test(text)) return true
+  // Настоящий пересказ — это разделы «## …»; разметка вызова без единого раздела — не он.
+  return !/^##\s/m.test(text) && TOOL_CALL_MARKUP.test(text)
+}
+
+function blocksText(content) {
+  if (typeof content === 'string') return content
+  const out = []
+  for (const b of content ?? []) {
+    if (!b || typeof b !== 'object') continue
+    if (b.type === 'text' && typeof b.text === 'string') out.push(b.text)
+    else if (b.type === 'image' || b.type === 'file') out.push(`[${b.type}]`)
+  }
+  return out.join('\n')
+}
+const clip = (s, n) => (s.length <= n ? s : `${s.slice(0, n)} …[+${s.length - n} chars]`)
+
+/**
+ * История для повторной попытки: вызовы инструментов и их результаты переписаны
+ * обычным текстом, так что в запросе нет ни одного блока tool-call и шаблону
+ * нечего рисовать как <tool_call>. Результаты урезаются — для пересказа нужна их
+ * суть, а не полный вывод.
+ */
+export function flattenToolTraffic(messages) {
+  const names = new Map()
+  const out = []
+  const push = (m) => {
+    const last = out[out.length - 1]
+    if (last && last.role === m.role && (m.role === 'user' || m.role === 'assistant')) {
+      out[out.length - 1] = { ...last, content: [...last.content, { type: 'text', text: '\n\n' }, ...m.content] }
+    } else out.push(m)
+  }
+  for (const m of messages) {
+    if (m.role === 'assistant' && Array.isArray(m.content)) {
+      const parts = []
+      for (const b of m.content) {
+        if (b.type === 'text' && b.text.trim()) parts.push(b.text)
+        else if (b.type === 'tool-call') { names.set(b.id, b.name); parts.push(`[tool call] ${b.name} ${clip(String(b.arguments ?? ''), 400)}`) }
+      }
+      if (parts.length) push({ ...m, content: [{ type: 'text', text: parts.join('\n') }] })
+    } else if (m.role === 'tool') {
+      const text = `[tool result: ${names.get(m.toolCallId) ?? 'tool'}${m.isError ? ', error' : ''}]\n${clip(blocksText(m.content), 1500)}`
+      const { toolCallId: _id, isError: _e, ...rest } = m
+      push({ ...rest, role: 'user', source: { kind: 'user' }, content: [{ type: 'text', text }] })
+    } else push(m)
+  }
+  return out
+}
+
+/**
+ * Последний рубеж: пересказ, собранный из самой истории без модели. Хуже
+ * модельного, но несравнимо лучше одной строки с командой: в нём запросы
+ * пользователя дословно, прежний пересказ, файлы и последнее, что агент сказал.
+ */
+export function mechanicalSummary(messages) {
+  const requests = [], subagents = [], written = new Set(), read = new Set()
+  let prior = '', lastSaid = ''
+  for (const m of messages) {
+    const kind = m.source?.kind
+    if (m.role === 'user' && kind === 'user') requests.push(clip(blocksText(m.content).trim(), 1500))
+    else if (m.role === 'user' && kind === 'compact-checkpoint') {
+      const t = blocksText(m.content), a = t.indexOf('<compacted-summary>'), z = t.lastIndexOf('</compacted-summary>')
+      prior = clip((a >= 0 ? t.slice(a + 19, z > a ? z : undefined) : t).trim(), 5000)
+    } else if (m.role === 'user' && kind === 'subagent-settled') subagents.push(clip(blocksText(m.content).trim(), 300))
+    else if (m.role === 'assistant' && Array.isArray(m.content)) {
+      const said = m.content.filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim()
+      if (said) lastSaid = said
+      for (const b of m.content) {
+        if (b.type !== 'tool-call') continue
+        let args = {}
+        try { args = JSON.parse(b.arguments) } catch { /* разметка без JSON */ }
+        const p = args.file_path ?? args.path ?? args.source
+        if (typeof p !== 'string') continue
+        if (b.name === 'write' || b.name === 'edit') written.add(p)
+        else if (b.name === 'read') read.add(p)
+      }
+    }
+  }
+  const list = (xs) => (xs.length ? xs.map((x) => `- ${x}`).join('\n') : '- (none)')
+  return [
+    '(Checkpoint assembled from the transcript itself: the model returned a tool call instead of a summary twice. User requests are verbatim; verify file state before relying on it.)',
+    '',
+    '## Primary Request and Intent',
+    list(requests.slice(-4)),
+    '',
+    '## Prior Checkpoint',
+    prior || '(none)',
+    '',
+    '## Files and Code',
+    list([...[...written].slice(-30).map((p) => `written/edited: ${p}`), ...[...read].slice(-20).map((p) => `read: ${p}`)]),
+    '',
+    '## Subagent Results',
+    list(subagents.slice(-5)),
+    '',
+    '## Current Work',
+    `- Last thing the agent said: ${clip(lastSaid || '(none)', 1500)}`,
+    '',
+    '## Next Step',
+    '- Re-read the todo list below and the files listed above, then continue the most recent user request.',
+  ].join('\n')
+}
+
 export default class CompactionNoTools extends Base {
   static name = 'compaction-basic-notools'
   static inject = Base.inject
@@ -130,7 +247,20 @@ export default class CompactionNoTools extends Base {
       if (content.length === 0) continue
       messages.push({ ...m, content })
     }
-    const result = await super.summarize({ ...rest, messages }, agent, signal)
+    // (5) Пересказ-вызов: повтор на истории без tool-call блоков, затем сборка без модели.
+    let result = await super.summarize({ ...rest, messages }, agent, signal)
+    if (looksLikeToolCall(result.summary)) {
+      console.warn(`[compaction-notools] session ${agent.session.id}: summary was a tool call, retrying on a flattened transcript`)
+      try {
+        result = await super.summarize({ ...rest, messages: flattenToolTraffic(messages) }, agent, signal)
+      } catch (error) {
+        console.warn(`[compaction-notools] retry failed: ${error?.message ?? error}`)
+      }
+      if (looksLikeToolCall(result.summary)) {
+        console.warn(`[compaction-notools] session ${agent.session.id}: retry was a tool call too, using the mechanical checkpoint`)
+        result = { summary: [{ type: 'text', text: mechanicalSummary(messages) }], provider: result.provider, model: result.model, maxTokens: result.maxTokens }
+      }
+    }
     // (4) Список todo_write дописывается к пересказу, чтобы после сжатия модель
     // продолжала его вести и закрыла перед финальным ответом.
     const todos = openTodos(agent.session)

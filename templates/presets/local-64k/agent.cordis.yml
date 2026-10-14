@@ -306,16 +306,21 @@
 - id: skill-filesystem
   name: '@deepseek-ai/dsh-skill-filesystem'
 
-# The skills catalog is off in the working preset: the only skills left are the
-# eight univer ones, about 800 tokens in every prefix and after every compaction,
-# with zero calls across 144 sessions. The univer_* tools stay reachable through
-# dev_tool_search. For documents (.xlsx/.docx/.pptx/.univer) use the
-# "Local 64k + Office" preset, which scripts/make-office-preset.sh generates from
-# this file with the row enabled. Check: a new session has no user-role
-# skill-catalog message.
+# The skills catalog is ON again (2026-10-14), with short descriptions. It was off
+# because the eight univer skills cost about 800 tokens in every prefix and after
+# every compaction, with zero calls across 144 sessions, and documents were meant to
+# go through a separate "Local 64k + Office" preset. That preset was never brought
+# over to 0.1.7, and a session that built an 11-slide deck in project Presentation
+# ran without the univer-slide instructions: the agent hunted for SKILL.md on disk
+# with bash and hand-placed every SVG coordinate. catalogDescriptionMaxLength 120
+# keeps what each skill is for (the first sentence of every univer description)
+# and brings the catalog to about 300 tokens; a skill body is paid for only when
+# the model loads it (univer-slide 16 KB, univer 9.6 KB).
+# Check: a new session has a user-role skill-catalog message with 8 entries.
 - id: tool-skill
   name: '@deepseek-ai/dsh-tool-skill'
-  disabled: true
+  config:
+    catalogDescriptionMaxLength: 120
 
 # ── goals ───────────────────────────────────────────────────────────────────
 
@@ -512,12 +517,20 @@
         # trying to emit a translation dictionary as text, and their truncated
         # answers (36066 and 33060 characters) went to the parent whole as
         # subagent-settled - about 20k tokens of litter in the parent's context.
-        # maxTokens 4096 caps the price of such a failure at four thousand.
+        # That was capped with maxTokens 4096 - and it broke the workers instead
+        # (2026-10-14, project Presentation): llama-server runs with
+        # --reasoning-budget 5000, so one step of reasoning alone can exceed 4096.
+        # 8 of 9 workers ended on max-tokens with a reply that was 4096 tokens of
+        # reasoning and nothing else; 7 of them wrote no file at all. The cap must
+        # hold the reasoning budget plus the largest single write (an SVG slide or
+        # a source file, ~3-4k tokens), the same rule as the parent's maxTokens:
+        # 12288. The litter is bounded by the persona below (closing message of
+        # at most 10 lines), not by starving the worker.
         # The route is inherited from the parent (modelSelectionSettings), so no
         # provider/model here. The persona carries the worker rules the parent
         # tends to forget to state in the prompt.
         agentOptions:
-          maxTokens: 4096
+          maxTokens: 12288
         persona: >-
           You are a worker subagent with a fresh, small context. Your input is
           on disk; your output goes to disk. Read input in ranges, never a
